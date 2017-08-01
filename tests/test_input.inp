@@ -1,0 +1,6 @@
+integer     1
+double      2.0
+string      hello
+ivector     4 [ 1 2 3 4 ] 
+dvector     5 [ 0.1 0.2 0.3 0.4 0.5 ] 
+

@@ -1,0 +1,77 @@
+# Makefile for building on Windows systems using Microsoft Visual C++ 
+# and NMAKE.
+
+#### Start of system configuration section ####
+
+# Source direcotry.
+srcdir = .\srs
+
+# Common installation prefix.
+prefix = "@prefix@"
+
+# Installation directory for executables.
+bindir = $(prefix)\bin
+
+# Installation directory for header files.
+includedir = $(prefix)\include
+
+# Installation directory for object code libraries.
+libdir = $(prefix)\lib
+
+# Compiler settings.
+CXX      = @cxx@
+CXXFLAGS = @cxxflags@
+CPPFLAGS = /I. 
+LIBEXE   = @cxx_libexe@
+DEFS     =
+
+#### End of system configuration section ####
+
+SRC = $(srcdir)\cmd_argv.cpp \
+      $(srcdir)\collision.cpp \
+      $(srcdir)\corr_data.cpp \
+      $(srcdir)\gauss_data.cpp \
+      $(srcdir)\geometry.cpp \
+      $(srcdir)\grid.cpp \
+      $(srcdir)\input.cpp \
+      $(srcdir)\math.cpp \
+      $(srcdir)\molecule.cpp \
+      $(srcdir)\mol_energy.cpp \
+      $(srcdir)\part_func.cpp \
+      $(srcdir)\periodic_table.cpp \
+      $(srcdir)\phys_const.cpp \
+      $(srcdir)\random.cpp \
+      $(srcdir)\units.cpp
+OBJ = $(SRC:.cpp=.obj)
+
+LIBSRS = "libsrs.lib"
+
+all: $(LIBSRS)
+
+clean:
+	del /q /f $(LIBSRS) 
+	del /q /f $(srcdir)\*.obj $(srcdir)\*.d
+	cd .\tests && nmake /nologo clean
+
+distclean: clean
+	del /q /f *~ *.bak *.tmp *.stackdump core *.exe *.x *.pdb
+	del /q /f $(srcdir)\*~ $(srcdir)\*.bak $(srcdir)\*.tmp $(srcdir)\TAGS 
+	del /q /f .\html\*.html .\html\*.png .\html\*.css .\html\*.js
+	cd .\tests && nmake /nologo distclean
+
+doc:
+	doxygen .\libsrs.cfg
+
+tests: all
+	cd .\tests && nmake /nologo
+
+install:
+	copy /y $(LIBSRS) $(libdir)
+	copy /y $(srcdir)\*.h $(includedir)\srs
+
+{$(srcdir)}.cpp{$(srcdir)}.obj: 
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(DEFS) /c /Fo$@ $<
+
+$(LIBSRS): $(OBJ) 
+	$(LIBEXE) /nologo /out:$(LIBSRS) $**
+

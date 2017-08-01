@@ -1,0 +1,291 @@
+/**
+   @file molrot.cpp
+   
+   This file is part of ChemApps - A C++ Chemistry Toolkit
+   
+   Copyright (C) 2016-2017  Stig Rune Sellevag
+   
+   ChemApps is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+ 
+   ChemApps is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include <cmath>
+#include <map>
+#include <chem/molrot.h>
+#include <chem/input.h>
+#include <chem/utils.h>
+#include <chem/constants.h>
+#include <chem/molecule_io.h>
+
+
+void Molrot::analysis(std::ostream& to)
+{
+    if (atoms.size() > 0) {
+        rotate_to_principal_axes();
+        to << "\nGeometry in principal axes coordinate system:\n";
+        chem::print_geometry(to, atoms, xyz);
+        print_center_of_mass(to);
+        print_principal_moments(to);
+        print_constants(to);
+    }
+}
+
+arma::vec3 Molrot::constants()
+{
+    using namespace constants;
+
+    if (! aligned) {
+        rotate_to_principal_axes();
+    }
+    const double tol = 1.0e-3;
+    const double factor = planck_bar 
+        / (4.0*m_pi*giga*atomic_mass*bohr_radius*bohr_radius*1.0e-20);
+
+    arma::vec3 rotc;
+    rotc.zeros();
+
+    if (atoms.size() > 1) {
+        if (std::abs(pmom(0)) < tol) {
+            rotc(0) = factor / pmom(2);
+        } 
+        else {
+            rotc(0) = factor / pmom(0);
+            rotc(1) = factor / pmom(1);
+            rotc(2) = factor / pmom(2);
+        }
+    }
+    return rotc;
+}
+
+std::string Molrot::symmetry() 
+{
+    if (! aligned) {
+        rotate_to_principal_axes();
+    }
+    const double tol = 1.0e-3;
+
+    bool ab = std::abs(pmom(0) - pmom(1)) < tol;
+    bool bc = std::abs(pmom(1) - pmom(2)) < tol;
+
+    std::string symm = "asymmetric top";
+    if (ab && bc) {
+        symm = "spherical top";
+        if (atoms.size() == 1) {
+            symm = "atom";
+        }
+    } 
+    else if (bc) {
+        symm = "prolate symmetric top";
+        if (atoms.size() == 2) {
+            symm = "linear " + symm;
+        }
+    } 
+    else if (ab) {
+        symm = "oblate symmetric top";
+    }
+    return symm;
+}
+
+void Molrot::init(std::istream& from, const std::string& key)
+{
+    typedef std::map<std::string, Input>::iterator       Input_iter;
+    typedef std::map<std::string, Input>::const_iterator Cinput_iter;
+
+    // Read input data:
+
+    std::map<std::string, Input> input_data;
+    input_data["sigma"] = Input(sigma, 1.0);
+
+    bool found = chem::find_section(from, key);
+    if (found) {
+        std::string token;
+        while (from >> token) {
+            if (token == "End") {
+                break;
+            } 
+            else {
+                Input_iter it = input_data.find(token);
+                if (it != input_data.end()) {
+                    from >> it->second;
+                }
+            }
+        }
+    } 
+    else {
+        throw Molrot_error("cannot find " + key + " section");
+    }
+
+    // Check if initialized:
+
+    for (Cinput_iter it = input_data.begin(); it != input_data.end(); ++it) {
+        if (! it->second.is_init()) {
+            throw Molrot_error(it->first + " not initialized");
+        }
+    }
+}
+
+arma::vec3 Molrot::center_of_mass() const
+{
+    arma::vec3 com;
+
+    double totmass = 0.0;
+    for (unsigned i = 0; i < atoms.size(); ++i) {
+        totmass += (atoms)[i].atomic_mass;
+    }
+    for (int j = 0; j < xyz.n_cols; ++j) {
+        double sum = 0.0;
+        for (unsigned i = 0; i < atoms.size(); ++i) {
+            sum += (atoms)[i].atomic_mass * (xyz)(i,j);
+        }
+        com(j) = sum / totmass;
+    }
+    return com;
+}
+
+void Molrot::principal_moments()
+{
+    // Work on a local copy of the cartesian coordinates:
+    arma::mat xyz_(xyz);
+
+    // Convert geometry to bohr:
+    xyz_ /= constants::bohr_radius;
+    
+    // Move geometry to center of mass:
+    arma::vec3 com = center_of_mass();
+    chem::translate(xyz_, -com(0), -com(1), -com(2));
+    
+    // Compute principal moments:
+    paxis.zeros();
+    pmom.zeros();
+
+    if (atoms.size() > 1) {
+        for (unsigned i = 0; i < atoms.size(); ++i) {
+            double m = (atoms)[i].atomic_mass;
+            double x = xyz_(i,0);
+            double y = xyz_(i,1);
+            double z = xyz_(i,2);
+            paxis(0,0) += m * (y*y + z*z);
+            paxis(1,1) += m * (x*x + z*z);
+            paxis(2,2) += m * (x*x + y*y);
+            paxis(0,1) -= m * x * y;
+            paxis(0,2) -= m * x * z;
+            paxis(1,2) -= m * y * z;
+            paxis(1,0)  = paxis(0,1);
+            paxis(2,0)  = paxis(0,2);
+            paxis(2,1)  = paxis(1,2);
+        }
+        arma::eig_sym(pmom, paxis, paxis);
+
+        // Check if principal axes form a proper rotation:
+        if (arma::det(paxis) < 0.0) {
+            paxis *= -1.0;
+        }
+        double det = arma::det(paxis);
+        chem::Assert((std::abs(det) - 1.0) < 1.0e-12, 
+                     Molrot_error("bad determinant of paxis"));
+    }
+}
+
+void Molrot::rotate_to_principal_axes()
+{
+    if (atoms.size() > 0) {
+        move_to_com();
+        principal_moments();
+        chem::rotate(xyz, paxis.t());
+        principal_moments();
+        aligned = true;
+    }
+}
+
+void Molrot::print_center_of_mass(std::ostream& to) const
+{
+    arma::vec3 com = center_of_mass();
+    chem::Format<double> fix;
+    fix.fixed().width(8).precision(4);
+
+    if (atoms.size() > 0) {
+        to << "Center of mass (X, Y, Z):  "
+           << fix(com(0)) << ", " 
+           << fix(com(1)) << ", " 
+           << fix(com(2)) << '\n';
+    }
+}
+
+void Molrot::print_principal_moments(std::ostream& to) const
+{
+    chem::Format<char> line;
+    line.width(54).fill('-');
+
+    if (atoms.size() > 0) {
+        to << "\nPrincipal axes and moments of inertia in atomic units:\n"
+           << line('-') << '\n';
+
+        chem::Format<double> fix;
+        fix.fixed().width(12);
+
+        to << "\t\tA\t     B\t\t  C\n"
+           << "Eigenvalue: " << fix(pmom(0)) << ' ' 
+           << fix(pmom(1)) << ' ' << fix(pmom(2)) << '\n';
+        to << "     X      "; 
+        for (std::size_t i = 0; i < pmom.size(); ++i) {
+            to <<fix(paxis(0,i)) << ' ';
+        }
+        to << "\n     Y      "; 
+        for (std::size_t i = 0; i < pmom.size(); ++i) {
+            to <<fix(paxis(1,i)) << ' ';
+        }
+        to << "\n     Z      "; 
+        for (std::size_t i = 0; i < pmom.size(); ++i) {
+            to <<fix(paxis(2,i)) << ' ';
+        }
+        to << '\n';
+    }
+}
+
+void Molrot::print_constants(std::ostream& to) 
+{
+    const double gHz2icm = constants::giga / (constants::light_speed * 100.0);
+
+    chem::Format<char>   line;
+    line.width(21).fill('-');
+
+    chem::Format<double> fix;
+    fix.fixed().width(14);
+
+    arma::vec3  r    = constants();
+    std::string symm = symmetry();
+
+    if (r(0) > 0.0) {
+        to << "\nRotational constants:\n" << line('-') << '\n';
+    
+        if (symm.find("linear") == 0) {
+            to << fix(r(0)) << " GHz\n" << fix(r(0) * gHz2icm) << " cm^-1\n\n";
+        }
+        else {
+            double ra = r[0];
+            double rb = r[1];
+            double rc = r[2];
+            to << "\tA\t\tB\t\tC\n"
+               << fix(ra) << '\t' << fix(rb) << '\t' << fix(rc) << " GHz\n"
+               << fix(ra * gHz2icm) << '\t' << fix(rb * gHz2icm) << '\t'
+               << fix(rc * gHz2icm) << " cm^-1\n\n";
+        }
+        to << "Rotational symmetry number: " << sigma << '\n';
+        if (symm.find("atom") == 0) {
+            to << "Rotational symmetry: This is an atom\n";
+        } 
+        else {
+            to << "Rotational symmetry: " << symm << '\n';
+        }
+    }
+}
