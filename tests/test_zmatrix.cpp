@@ -10,7 +10,7 @@
 #include <chem/molecule.h>
 
 
-int main(int argc, char* argv[])
+int main(int /*argc */, char* argv[])
 {
     arma::mat xyz_ans = 
         {{0.00000000e+00, 0.00000000e+00, 0.00000000e+00},

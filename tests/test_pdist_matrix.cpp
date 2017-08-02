@@ -6,7 +6,7 @@
 #include <armadillo>
 
 
-int main(int argc, char* argv[])
+int main(int /* argc */, char* argv[])
 {
     try {
         arma::mat mat(4,3);
@@ -41,14 +41,8 @@ int main(int argc, char* argv[])
         dm_ans(3,1) = dm_ans(1,3);
         dm_ans(3,2) = dm_ans(2,3);
 
-        for (int j = 0; j < dm.n_cols; ++j) {
-            for (int i = j; i < dm.n_rows; ++i) {
-                if (i != j) {
-                    chem::Assert(std::abs(dm(i,j) - dm_ans(i,j)) < 1.0e-8, 
-                                 std::runtime_error("bad pdist_matrix"));
-                }
-            }
-        }
+        chem::Assert(arma::approx_equal(dm, dm_ans, "absdiff", 1.0e-8),
+                     std::runtime_error("bad pdist_matrix"));
     } 
     catch (std::exception& e) {
         std::cerr << argv[0] << ": " << e.what() << '\n';

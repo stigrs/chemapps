@@ -10,7 +10,7 @@
 #include <armadillo>
 
 
-int main(int argc, char* argv[])
+int main(int /* argc */, char* argv[])
 {
     int i;
     double d;
@@ -46,12 +46,12 @@ int main(int argc, char* argv[])
         chem::Assert(i == 1, std::runtime_error("integer failed"));
         chem::Assert(d == 2.0, std::runtime_error("double failed"));
         chem::Assert(s == "hello", std::runtime_error("string failed"));
-        for (int i = 0; i < iv_ans.size(); ++i) {
-            chem::Assert(iv(i) == iv_ans(i), 
+        for (arma::uword it = 0; it < iv_ans.size(); ++it) {
+            chem::Assert(iv(it) == iv_ans(it), 
                          std::runtime_error("ivector failed"));
         }
-        for (int i = 0; i < dv_ans.size(); ++i) {
-            chem::Assert(dv(i) == dv_ans(i), 
+        for (arma::uword it = 0; it < dv_ans.size(); ++it) {
+            chem::Assert(dv(it) == dv_ans(it), 
                          std::runtime_error("dvector failed"));
         }
     }

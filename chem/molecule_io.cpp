@@ -80,7 +80,7 @@ void chem::read_zmat_format(std::istream& from,
     std::string line;
     std::string symbol;
     int natoms = 0;
-    int pos;
+    int pos = 0;
 
     // Count number of atoms:
 
@@ -167,9 +167,9 @@ void chem::print_xyz_format(std::ostream& to,
 
     to << atoms.size() << '\n';
     to << title << '\n';
-    for (unsigned i = 0; i < atoms.size(); ++i) {
+    for (std::size_t i = 0; i < atoms.size(); ++i) {
         to << atoms[i].atomic_symbol << '\t';
-        for (int j = 0; j < xyz.n_cols; ++j) {
+        for (arma::uword j = 0; j < xyz.n_cols; ++j) {
             to << fix(xyz(i,j)) << '\t';
         }
         to << '\n';
@@ -207,7 +207,7 @@ void chem::print_zmat_format(std::ostream& to,
            << dfix(angles(2))            << '\n';
     }
     if (atoms.size() > 3) {
-        for (int i = 3; i < atoms.size(); ++i) {
+        for (std::size_t i = 3; i < atoms.size(); ++i) {
             to << atoms[i].atomic_symbol        << '\t' 
                << ifix(bond_connect(i) + 1)     << "  "
                << dfix(distances(i))            << "  "
@@ -230,7 +230,7 @@ void chem::print_elec_states(std::ostream& to, const arma::vec& elec_state)
     to << "Electronic states:\n" << line('-') << '\n'
        << " #\tEnergy/cm^-1\tDegeneracy\n" << line('-') << '\n';
     int it = 1;
-    for (unsigned i = 0; i < elec_state.size(); i += 2) {
+    for (arma::uword i = 0; i < elec_state.size(); i += 2) {
         to << " " << it << '\t'
            << fix(elec_state[i+1]) << "\t\t" << elec_state[i] << '\n';
         it += 1;
@@ -253,10 +253,10 @@ void chem::print_geometry(std::ostream& to,
            << "Center\tAtomic\t\t    Coordinates/" << unit << '\n'
            << "Number\tSymbol\t   X\t\t   Y\t\t   Z\n"
            << line('-') << '\n';
-        for (unsigned i = 0; i < atoms.size(); ++i) {
+        for (std::size_t i = 0; i < atoms.size(); ++i) {
             to << i + 1 << '\t'
                << atoms[i].atomic_symbol << '\t';
-            for (int j = 0; j < xyz.n_cols; ++j) {
+            for (arma::uword j = 0; j < xyz.n_cols; ++j) {
                 to << fix(xyz(i,j)) << '\t';
             }
             to << '\n';
@@ -275,7 +275,7 @@ void chem::print_atomic_masses(std::ostream& to,
     gen.width(3);
 
     double totmass = 0.0;
-    for (unsigned i = 0; i < atoms.size(); ++i) {
+    for (std::size_t i = 0; i < atoms.size(); ++i) {
         to << "Center "             << gen(i+1)
            << " has atomic number " << gen(atoms[i].atomic_number)
            << " and mass "          << fix(atoms[i].atomic_mass) << '\n';

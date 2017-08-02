@@ -182,14 +182,4 @@ inline void Zmatrix::set_dihedral(int index, double value)
     }
 }
 
-inline void Zmatrix::rotate_moiety(const arma::ivec& moiety, double value)
-{
-    if (atoms.size() > 3) {
-        for (int i = 0; i < moiety.size(); ++i) {
-            double phi = get_dihedral(moiety(i));
-            set_dihedral(moiety(i), phi+value);
-        }
-    }
-}
-
 #endif /* CHEM_ZMATRIX_H */

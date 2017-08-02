@@ -9,7 +9,7 @@
 #include <armadillo>
 
 
-int main(int argc, char* argv[])
+int main(int /* argc */, char* argv[])
 {
     arma::mat xyz_ans(8,3);
     xyz_ans(0,0) =  0.0000;

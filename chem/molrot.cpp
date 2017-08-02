@@ -139,12 +139,12 @@ arma::vec3 Molrot::center_of_mass() const
     arma::vec3 com;
 
     double totmass = 0.0;
-    for (unsigned i = 0; i < atoms.size(); ++i) {
+    for (std::size_t i = 0; i < atoms.size(); ++i) {
         totmass += (atoms)[i].atomic_mass;
     }
-    for (int j = 0; j < xyz.n_cols; ++j) {
+    for (arma::uword j = 0; j < xyz.n_cols; ++j) {
         double sum = 0.0;
-        for (unsigned i = 0; i < atoms.size(); ++i) {
+        for (std::size_t i = 0; i < atoms.size(); ++i) {
             sum += (atoms)[i].atomic_mass * (xyz)(i,j);
         }
         com(j) = sum / totmass;
@@ -169,7 +169,7 @@ void Molrot::principal_moments()
     pmom.zeros();
 
     if (atoms.size() > 1) {
-        for (unsigned i = 0; i < atoms.size(); ++i) {
+        for (std::size_t i = 0; i < atoms.size(); ++i) {
             double m = (atoms)[i].atomic_mass;
             double x = xyz_(i,0);
             double y = xyz_(i,1);

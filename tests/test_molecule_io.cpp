@@ -10,7 +10,7 @@
 #include <armadillo>
 
 
-int main(int argc, char* argv[])
+int main(int /* argc */, char* argv[])
 {
     arma::mat xyz_ans(8,3);
     xyz_ans(0,0) =  0.0000;
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     try {
         std::ifstream from;
         chem::fopen(from, "test_molecule_io.inp");
-        chem::read_xyz_format(from, xyz, atoms, title);
+        chem::read_xyz_format(from, atoms, xyz, title);
         chem::Assert(arma::approx_equal(xyz, xyz_ans, "absdiff", 1.0e-12), 
                      std::runtime_error("bad xyz coords"));
     }

@@ -4,7 +4,7 @@
 #include <chem/constants.h>
 #include <chem/utils.h>
 
-int main(int argc, char* argv[])
+int main(int /* argc */, char* argv[])
 {
     try {
         double h = constants::planck;

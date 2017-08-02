@@ -4,7 +4,7 @@
 #include <chem/utils.h>
 
 
-int main(int argc, char* argv[])
+int main(int /* argc */, char* argv[])
 {
     try {
         double atomic_weight = ptable::get_element("C").atomic_weight;

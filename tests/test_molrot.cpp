@@ -10,7 +10,7 @@
 #include <armadillo>
 
 
-int main(int argc, char* argv[])
+int main(int /* argc */, char* argv[])
 {
     try {
         arma::vec3 rotc_ans = {127.63201, 24.89071, 24.02767};
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
         Molecule mol(from, std::cout, "Molecule");
         arma::vec3 rotc = mol.get_rot()->constants();
 
-        for (int i = 0; i < rotc.size(); ++i) {
+        for (arma::uword i = 0; i < rotc.size(); ++i) {
             chem::Assert(std::abs(rotc(i) - rotc_ans(i)) < 1.0e-4, 
                          std::runtime_error("bad rot const"));
         }

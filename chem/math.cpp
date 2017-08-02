@@ -50,8 +50,8 @@ void chem::pdist_matrix(arma::mat& dm, const arma::mat& mat)
 
     arma::rowvec dij(3);
 
-    for (int j = 0; j < dm.n_cols; ++j) {
-        for (int i = j; i < dm.n_rows; ++i) {
+    for (arma::uword j = 0; j < dm.n_cols; ++j) {
+        for (arma::uword i = j; i < dm.n_rows; ++i) {
             if (i != j) {
                 dij = mat.row(i) - mat.row(j);
                 dm(i,j) = arma::norm(dij);
@@ -63,7 +63,7 @@ void chem::pdist_matrix(arma::mat& dm, const arma::mat& mat)
 
 void chem::translate(arma::mat& xyz, double dx, double dy, double dz)
 {
-    for (int i = 0; i < xyz.n_rows; ++i) {
+    for (arma::uword i = 0; i < xyz.n_rows; ++i) {
         xyz(i,0) += dx;
         xyz(i,1) += dy;
         xyz(i,2) += dz;
@@ -75,7 +75,7 @@ void chem::rotate(arma::mat& xyz, const arma::mat33& rotm)
     arma::vec3 xold;
     arma::vec3 xnew;
 
-    for (int i = 0; i < xyz.n_rows; ++i) {
+    for (arma::uword i = 0; i < xyz.n_rows; ++i) {
         arma::vec3 xyz_new = rotm * xyz.row(i).t();
         xyz(i,0) = xyz_new(0);
         xyz(i,1) = xyz_new(1);

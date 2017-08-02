@@ -24,6 +24,16 @@
 #include <chem/molecule_io.h>
 
 
+void Zmatrix::rotate_moiety(const arma::ivec& moiety, double value)
+{
+    if (atoms.size() > 3) {
+        for (arma::uword i = 0; i < moiety.size(); ++i) {
+            double phi = get_dihedral(moiety(i));
+            set_dihedral(moiety(i), phi+value);
+        }
+    }
+}
+
 void Zmatrix::load(std::istream& from)
 {
     chem::read_zmat_format(from, 
@@ -54,7 +64,7 @@ void Zmatrix::build_zmat()
     arma::mat dist_mat;
     chem::pdist_matrix(dist_mat, xyz); 
 
-    for (int atom = 1; atom < atoms.size(); ++atom) {
+    for (std::size_t atom = 1; atom < atoms.size(); ++atom) {
         arma::rowvec dist  = dist_mat.row(atom).head(atom);
         bond_connect(atom) = find_nearest_atom(dist);
         distances(atom)    = dist.min();
@@ -95,7 +105,7 @@ void Zmatrix::build_zmat()
 void Zmatrix::build_xyz()
 {
     xyz = arma::zeros<arma::mat>(atoms.size(), 3);
-    for (int atom = 0; atom < atoms.size(); ++atom) {
+    for (std::size_t atom = 0; atom < atoms.size(); ++atom) {
         xyz.row(atom) = calc_position(atom);
     }
 }
@@ -105,7 +115,7 @@ int Zmatrix::find_nearest_atom(const arma::rowvec& dist) const
     double dist_min = dist.min();
     int nearest_atom = -1;
 
-    for (int i = 0; i < dist.size(); ++i) {
+    for (arma::uword i = 0; i < dist.size(); ++i) {
         if (chem::approx_equal(dist(i), dist_min)) {
             nearest_atom = i;
             break;
@@ -118,7 +128,7 @@ int Zmatrix::find_new_connection(const arma::ivec& iatms,
                                  const arma::ivec& connectivity) const
 {
     int connection = 0;
-    for (int idx = 1; idx < connectivity.size(); ++idx) {
+    for (arma::uword idx = 1; idx < connectivity.size(); ++idx) {
         if ((! arma::any(iatms == idx)) && 
             arma::any(iatms == connectivity(idx))) {
             connection = idx;
