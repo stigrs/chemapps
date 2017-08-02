@@ -4,52 +4,39 @@ SHELL = /bin/sh
 
 #### Start of system configuration section ####
 
-# Armadillo library.
-ARMA_INCLUDE = /usr/local/include
-ARMA_LIB     = /usr/local/lib
-
 # Source directory.
 srcdir = .
+
+# Armadillo library.
+ifeq ($(shell uname -s), macos)
+	ARMA_INC_PATH = -I/usr/local/include
+	ARMA_LIB_PATH = -L/usr/local/lib
+	ARMALIB = -larmadillo -framework Accelerate
+else
+	ARMA_INC_PATH = 
+	ARMA_LIB_PATH = 
+	ARMALIB = -larmadillo
+endif
 
 # Compiler settings.
 CXX      = @cxx@
 CXXFLAGS = @cxxflags@
-CPPFLAGS = -I$(srcdir) -I.. -I$(ARMA_INCLUDE) @cppflags@
+CPPFLAGS = -I$(srcdir) -I.. $(ARMA_INC_PATH) 
 DEPFLAGS = @cxx_depflag@
-LDFLAGS  = -L.. -L$(ARMA_LIB) @ldflags@ 
+LDFLAGS  = -L.. $(ARMA_LIB_PATH) 
 DEFS     = @defs@ 
 
 FC      = @fc@
 FCFLAGS = @fcflags@
-
-# Set LAPACK library.
-ifdef MKL_ROOT
-	MKLROOT = $(MKL_ROOT)
-endif
-ifdef MKLROOT
-	DEFS     += -DUSE_MKL_HEADERS
-	CPPFLAGS += -I$(MKLROOT)/include
-	ifeq ($(shell uname -m), x86_64)
-		LDFLAGS  += -L$(MKLROOT)/lib/intel64
-		ARMALIB = -lmkl_intel_ilp64 -lmkl_sequential -lmkl_core \
-				  -lpthread -lm 
-	else
-		LDFLAGS  += -L$(MKLROOT)/lib/ia32
-		ARMALIB = -lmkl_intel -lmkl_sequential -lmkl_core \
-				  -lpthread -lm 
-	endif
-else
-	ARMALIB = -larmadillo
-endif
 
 .SUFFIXES:
 .SUFFIXES: .cpp .h .d .o
 
 #### End of system configuration section ####
 
-SRC  = 	test_input.cpp test_ptable.cpp test_constants.cpp \
-		test_molecule_io.cpp test_molecule.cpp test_molrot.cpp \
-		test_pdist_matrix.cpp test_zmatrix.cpp
+SRC  = 	test_input.cpp test_ptable.cpp test_datum.cpp \
+	test_molecule_io.cpp test_molecule.cpp test_molrot.cpp \
+	test_pdist_matrix.cpp test_zmatrix.cpp test_molvib.cpp
 OBJ  = 	$(SRC:.cpp=.o)
 EXE1 = 	$(SRC:.cpp=.x) 
 
@@ -71,7 +58,7 @@ TAGS:
 	etags *.cpp *.h
 
 %.x: %.o
-	$(CXX) $(CXXFLAGS) $(DEFS) $(LDFLAGS) -o $@ $^ $(LIBS)
+	$(CXX) $(CXXFLAGS) $(DEFS) -o $@ $^ $(LDFLAGS) $(LIBS)
 
 %.o : %.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(DEFS) -c $< 

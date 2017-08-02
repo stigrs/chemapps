@@ -1,14 +1,13 @@
 #include <stdexcept>
 #include <exception>
 
-#include <chem/constants.h>
+#include <chem/datum.h>
 #include <chem/utils.h>
 
 int main(int /* argc */, char* argv[])
 {
     try {
-        double h = constants::planck;
-        chem::Assert(h == 6.62607004000e-34,
+        chem::Assert(datum::h == 6.62607004000e-34,
                      std::runtime_error("wrong Planck constant"));
     }
     catch (std::exception& e) {

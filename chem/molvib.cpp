@@ -21,6 +21,7 @@
 
 #include <chem/molvib.h>
 #include <chem/utils.h>
+#include <chem/datum.h>
 #include <chem/arma_io.h>
 
 
@@ -53,12 +54,17 @@ void Molvib::print(std::ostream& to)
 
     if (freqs.size() > 0) {
         int it = 0;
-        to << "Vibrational modes (cm^-1):\n" << line('-') << '\n';
-        for (int i = 0; i < freqs.size(); ++i) {
+        to << "\nVibrational modes (cm^-1):\n" << line('-') << '\n';
+        for (arma::uword i = 0; i < freqs.size(); ++i) {
             to << fix(freqs(i));
             if ((it == 8) && (freqs.size() > 9)) {
                 to << '\n';
             }
             it += 1;
         }
+        double zpe = zero_point_energy();
+        to << "\n\nZero-point vibrational energy: "
+           << zpe / datum::au2icm << " Hartree\n";
+    }
 }
+

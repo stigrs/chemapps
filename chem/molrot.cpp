@@ -24,7 +24,7 @@
 #include <chem/molrot.h>
 #include <chem/input.h>
 #include <chem/utils.h>
-#include <chem/constants.h>
+#include <chem/datum.h>
 #include <chem/molecule_io.h>
 
 
@@ -42,14 +42,13 @@ void Molrot::analysis(std::ostream& to)
 
 arma::vec3 Molrot::constants()
 {
-    using namespace constants;
+    using namespace datum;
 
     if (! aligned) {
         rotate_to_principal_axes();
     }
     const double tol = 1.0e-3;
-    const double factor = planck_bar 
-        / (4.0*m_pi*giga*atomic_mass*bohr_radius*bohr_radius*1.0e-20);
+    const double factor = h_bar/(4.0 * pi * giga * m_u * a_0 * a_0 * 1.0e-20);
 
     arma::vec3 rotc;
     rotc.zeros();
@@ -158,7 +157,7 @@ void Molrot::principal_moments()
     arma::mat xyz_(xyz);
 
     // Convert geometry to bohr:
-    xyz_ /= constants::bohr_radius;
+    xyz_ /= datum::a_0;
     
     // Move geometry to center of mass:
     arma::vec3 com = center_of_mass();
@@ -254,7 +253,7 @@ void Molrot::print_principal_moments(std::ostream& to) const
 
 void Molrot::print_constants(std::ostream& to) 
 {
-    const double gHz2icm = constants::giga / (constants::light_speed * 100.0);
+    const double gHz2icm = datum::giga / (datum::c_0 * 100.0);
 
     chem::Format<char>   line;
     line.width(21).fill('-');

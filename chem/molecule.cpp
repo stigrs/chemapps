@@ -42,6 +42,7 @@ void Molecule::print_data(std::ostream& to, const std::string& key) const
        << "Input orientation:\n";
     chem::print_geometry(to, atoms, xyz, geom_unit);
     chem::print_atomic_masses(to, atoms);
+    vib->print(to);
 }
 
 void Molecule::init(std::istream& from, 
@@ -101,6 +102,10 @@ void Molecule::init(std::istream& from,
     // Initialize molecular rotations object:
 
     rot = std::make_shared<Molrot>(from, key, atoms, xyz);
+    
+    // Initialize molecular vibrations object:
+
+    vib = std::make_shared<Molvib>(from, key);
     
     // Write input data to output stream:
 

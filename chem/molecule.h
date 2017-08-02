@@ -30,6 +30,7 @@
 #include <armadillo>
 #include <chem/element.h>
 #include <chem/molrot.h>
+#include <chem/molvib.h>
 #include <chem/zmatrix.h>
 
 //----------------------------------------------------------------------------
@@ -69,6 +70,7 @@ public:
 
     std::shared_ptr<Zmatrix> get_zmat() const { return zmat; }
     std::shared_ptr<Molrot>  get_rot()  const { return rot; }
+    std::shared_ptr<Molvib>  get_vib()  const { return vib; }
 
     int    get_charge()      const { return charge; }
     double get_elec_energy() const { return elec_energy; }
@@ -97,6 +99,7 @@ private:
    
     std::shared_ptr<Zmatrix> zmat;
     std::shared_ptr<Molrot>  rot;
+    std::shared_ptr<Molvib>  vib;
 };
 
 #endif /* CHEM_MOLECULE_H */

@@ -25,16 +25,16 @@
 #include <iostream>
 #include <cmath>
 #include <armadillo>
-#include <chem/constants.h>
+#include <chem/datum.h>
 
 
 namespace chem {
 
     /// Convert radians to degrees.
-    inline double radtodeg(double rad) { return rad*180.0/constants::m_pi; }
+    inline double radtodeg(double rad) { return rad*180.0/datum::pi; }
 
     /// Convert degrees to radians.
-    inline double degtorad(double deg) { return deg*constants::m_pi/180.0; }
+    inline double degtorad(double deg) { return deg*datum::pi/180.0; }
 
     /// Compute distance between two points.
     double distance(const arma::vec& a, const arma::vec& b);
@@ -86,3 +86,4 @@ inline bool chem::approx_equal(double a, double b, double epsilon)
 }
 
 #endif /* CHEM_MATH_H */
+
