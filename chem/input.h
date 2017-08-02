@@ -109,6 +109,15 @@ public:
 	v = vv;
     }
 
+    Input(arma::uvec& v)
+	: data(&v), type(t_uvector), state(not_init) { }
+
+    Input(arma::uvec& v, arma::uvec& vv)
+	: data(&v), type(t_uvector), state(def)
+    {
+	v = vv;
+    }
+
     Input(arma::vec& v)
 	: data(&v), type(t_dvector), state(not_init) { }
 
@@ -133,8 +142,9 @@ private:
 		t_ulint,   // unsigned long int
 		t_double,  // double
 		t_string,  // std::string
-		t_ivector, // VectorXi
-		t_dvector  // VectorXd
+		t_ivector, // integer vector
+		t_uvector, // unsigned vector
+		t_dvector  // double vector
     };
 
     /// Definition of intialization states.
@@ -151,6 +161,7 @@ private:
     void read_double(std::istream& from);
     void read_string(std::istream& from);
     void read_ivector(std::istream& from);
+    void read_uvector(std::istream& from);
     void read_dvector(std::istream& from);
 }; // Input
 

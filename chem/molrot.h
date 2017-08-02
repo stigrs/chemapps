@@ -40,6 +40,12 @@ struct Molrot_error : std::runtime_error {
 
 //-----------------------------------------------------------------------------
 
+// Forward declarations to allow friend declarations:
+
+class Imom_tor;
+
+//-----------------------------------------------------------------------------
+
 /// Class for handling molecular rotations.
 class Molrot {
 public:
@@ -66,7 +72,9 @@ public:
     /// Return rotational symmetry.
     std::string symmetry();
 
-private:
+    friend class Imom_tor;
+    
+protected:
     /// Initialize.
     void init(std::istream& from, const std::string& key);
 

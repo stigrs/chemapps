@@ -29,9 +29,10 @@
 #include <memory>
 #include <armadillo>
 #include <chem/element.h>
+#include <chem/zmatrix.h>
 #include <chem/molrot.h>
 #include <chem/molvib.h>
-#include <chem/zmatrix.h>
+#include <chem/imom_tor.h>
 
 //----------------------------------------------------------------------------
 
@@ -49,7 +50,9 @@ public:
     Molecule() 
     { 
         zmat = std::make_shared<Zmatrix>(atoms, xyz);
-        rot  = std::make_shared<Molrot>(atoms, xyz); 
+        rot  = std::make_shared<Molrot>(atoms, xyz);
+        vib  = std::make_shared<Molvib>();
+        tor  = std::make_shared<Imom_tor>(*rot);
     }
 
     Molecule(std::istream& from, 
@@ -100,6 +103,7 @@ private:
     std::shared_ptr<Zmatrix> zmat;
     std::shared_ptr<Molrot>  rot;
     std::shared_ptr<Molvib>  vib;
+    std::shared_ptr<Imom_tor> tor;
 };
 
 #endif /* CHEM_MOLECULE_H */

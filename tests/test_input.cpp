@@ -17,8 +17,10 @@ int main(int /* argc */, char* argv[])
     std::string s;
     
     arma::ivec iv;
+    arma::uvec uv;
     arma::vec  dv;
     arma::ivec iv_ans = { 1, 2, 3, 4 };
+    arma::uvec uv_ans = { 5, 6, 7, 8 };
     arma::vec  dv_ans = { 0.1, 0.2, 0.3, 0.4, 0.5 };
 
     std::map<std::string, Input> data;
@@ -28,6 +30,7 @@ int main(int /* argc */, char* argv[])
     data["double"]  = Input(d);
     data["string"]  = Input(s);
     data["ivector"] = Input(iv);
+    data["uvector"] = Input(uv);
     data["dvector"] = Input(dv);
 
     std::ifstream from;
@@ -49,6 +52,10 @@ int main(int /* argc */, char* argv[])
         for (arma::uword it = 0; it < iv_ans.size(); ++it) {
             chem::Assert(iv(it) == iv_ans(it), 
                          std::runtime_error("ivector failed"));
+        }
+        for (arma::uword it = 0; it < uv_ans.size(); ++it) {
+            chem::Assert(uv(it) == uv_ans(it), 
+                         std::runtime_error("uvector failed"));
         }
         for (arma::uword it = 0; it < dv_ans.size(); ++it) {
             chem::Assert(dv(it) == dv_ans(it), 

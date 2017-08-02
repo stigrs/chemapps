@@ -24,8 +24,19 @@
 
 #include <iostream>
 #include <string>
+#include <stdexcept>
 #include <armadillo>
+#include <chem/molrot.h>
 
+//-----------------------------------------------------------------------------
+
+// Error reporting:
+
+struct Imom_error : std::runtime_error {
+    Imom_error(std::string s) : std::runtime_error(s) { }
+};
+
+//-----------------------------------------------------------------------------
 
 /**
    Class for calculating reduced moment of inertia for torional modes in
@@ -45,15 +56,30 @@
 */
 class Imom_tor {
 public:
-    Imom_tor() { }
-
-    Imom_tor(std::istream& from, const std::string& key);
+    Imom_tor(Molrot& rot_) : rot(rot_) { }
+    
+    Imom_tor(std::istream& from, const std::string& key, Molrot& rot_);
 
     ~Imom_tor() { }
 
 private:
-    arma::ivec rot_axis = arma::zeros<arma::ivec>(2);
-    arma::ivec rot_top = arma::zeros<arma::ivec>(0);
+    void init(std::istream& from, const std::string& key);
+    
+    arma::uvec rot_axis = arma::zeros<arma::uvec>(2);
+    arma::uvec rot_top = arma::zeros<arma::uvec>(0);
+
+    Molrot& rot;
+
+    Imom_tor& operator=(const Imom_tor& imom); // no assignments
 };
 
+inline Imom_tor::Imom_tor(std::istream& from,
+                          const std::string& key,
+                          Molrot& rot_)
+    : rot(rot_)
+{
+    init(from, key);
+}
+
 #endif /* CHEM_IMOM_TOR_H */
+

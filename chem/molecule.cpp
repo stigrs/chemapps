@@ -106,6 +106,10 @@ void Molecule::init(std::istream& from,
     // Initialize molecular vibrations object:
 
     vib = std::make_shared<Molvib>(from, key);
+
+    // Initialize molecular torsions object:
+
+    tor = std::make_shared<Imom_tor>(from, key, *rot);
     
     // Write input data to output stream:
 

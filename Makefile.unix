@@ -62,7 +62,8 @@ else
 endif
 
 SRC :=	argparse.cpp input.cpp ptable.cpp datum.cpp molecule_io.cpp \
-    	molecule.cpp molrot.cpp math.cpp zmatrix.cpp molvib.cpp
+    	molecule.cpp molrot.cpp math.cpp zmatrix.cpp molvib.cpp \
+	imom_tor.cpp
 SRC := 	$(addprefix ./chem/,$(SRC))
 OBJ := 	$(SRC:.cpp=.o)
 HH  := 	$(shell ls ./chem/*.h)

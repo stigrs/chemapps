@@ -48,6 +48,9 @@ std::istream& operator>>(std::istream& from, Input& inp)
     case Input::t_ivector:
         inp.read_ivector(from);
         break;
+    case Input::t_uvector:
+        inp.read_uvector(from);
+        break;
     case Input::t_dvector:
         inp.read_dvector(from);
         break;
@@ -67,6 +70,7 @@ std::ostream& operator<<(std::ostream& to, const Input& inp)
     }
     else {
         arma::ivec iv;
+        arma::uvec uv;
         arma::vec  dv;
 
         switch (inp.type) {
@@ -91,6 +95,10 @@ std::ostream& operator<<(std::ostream& to, const Input& inp)
         case Input::t_ivector:
             iv = *static_cast<arma::ivec*>(inp.data);
             chem::print_vector(to, iv);
+            break;
+        case Input::t_uvector:
+            uv = *static_cast<arma::uvec*>(inp.data);
+            chem::print_vector(to, uv);
             break;
         case Input::t_dvector:
             dv = *static_cast<arma::vec*>(inp.data);
@@ -168,6 +176,12 @@ void Input::read_string(std::istream& from)
 void Input::read_ivector(std::istream& from)
 {
     arma::ivec& v = *static_cast<arma::ivec*>(data);
+    chem::read_vector(from, v);
+}
+
+void Input::read_uvector(std::istream& from)
+{
+    arma::uvec& v = *static_cast<arma::uvec*>(data);
     chem::read_vector(from, v);
 }
 
