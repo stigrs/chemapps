@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
             mol.get_zmat()->load(from);
             output_file = output_file + ".xyz";
             chem::fopen(to, output_file.c_str());
-            chem::print_xyz_format(to, mol.get_xyz(), mol.get_atoms(), "");
+            chem::print_xyz_format(to, mol.get_atoms(), mol.get_xyz(), "");
         }
         else if (Argparse::has_switch("--tozmat")) {
             output_file = output_file + ".zmat";
