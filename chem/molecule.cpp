@@ -109,7 +109,7 @@ void Molecule::init(std::istream& from,
 
     // Initialize molecular torsions object:
 
-    tor = std::make_shared<Imom_tor>(from, key, *rot);
+    tor = std::make_shared<Torsion>(from, key, *rot);
     
     // Write input data to output stream:
 

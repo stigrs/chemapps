@@ -42,7 +42,7 @@ struct Molrot_error : std::runtime_error {
 
 // Forward declarations to allow friend declarations:
 
-class Imom_tor;
+class Torsion;
 
 //-----------------------------------------------------------------------------
 
@@ -72,7 +72,7 @@ public:
     /// Return rotational symmetry.
     std::string symmetry();
 
-    friend class Imom_tor;
+    friend class Torsion;
     
 protected:
     /// Initialize.

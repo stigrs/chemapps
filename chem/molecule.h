@@ -32,7 +32,7 @@
 #include <chem/zmatrix.h>
 #include <chem/molrot.h>
 #include <chem/molvib.h>
-#include <chem/imom_tor.h>
+#include <chem/torsion.h>
 
 //----------------------------------------------------------------------------
 
@@ -52,7 +52,7 @@ public:
         zmat = std::make_shared<Zmatrix>(atoms, xyz);
         rot  = std::make_shared<Molrot>(atoms, xyz);
         vib  = std::make_shared<Molvib>();
-        tor  = std::make_shared<Imom_tor>(*rot);
+        tor  = std::make_shared<Torsion>(*rot);
     }
 
     Molecule(std::istream& from, 
@@ -74,6 +74,7 @@ public:
     std::shared_ptr<Zmatrix> get_zmat() const { return zmat; }
     std::shared_ptr<Molrot>  get_rot()  const { return rot; }
     std::shared_ptr<Molvib>  get_vib()  const { return vib; }
+    std::shared_ptr<Torsion> get_tor()  const { return tor; }
 
     int    get_charge()      const { return charge; }
     double get_elec_energy() const { return elec_energy; }
@@ -103,7 +104,7 @@ private:
     std::shared_ptr<Zmatrix> zmat;
     std::shared_ptr<Molrot>  rot;
     std::shared_ptr<Molvib>  vib;
-    std::shared_ptr<Imom_tor> tor;
+    std::shared_ptr<Torsion> tor;
 };
 
 #endif /* CHEM_MOLECULE_H */
