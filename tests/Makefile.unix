@@ -8,7 +8,7 @@ SHELL = /bin/sh
 srcdir = .
 
 # Armadillo library.
-ifeq ($(shell uname -s), macos)
+ifeq ($(shell uname -s), Darwin)
 	ARMA_INC_PATH = -I/usr/local/include
 	ARMA_LIB_PATH = -L/usr/local/lib
 	ARMALIB = -larmadillo -framework Accelerate
