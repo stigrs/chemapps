@@ -128,17 +128,26 @@ void Torsion::validate() const
 void Torsion::calc_red_imom()
 {
     // Rotate molecule to principal axes and compute principal moments:
-
+    
     rot.rotate_to_principal_axes();
     rot.principal_moments();
 
-    // Work on a local copy of the XYZ coordinates and convert coordinates to bohr:
+    // Work on a local copy of the XYZ and convert coordinates to bohr:
+
     xyz_ = rot.xyz;
     xyz_ /= datum::a_0;
 
     // Set up axis system for rotating top:
 
     axis_system();
+
+    // Set up direction cosines matrix:
+
+    direction_cosines();
+
+    // Calculate moment of inertia of rotating top:
+
+    top_moment_of_inertia();
 }
 
 void Torsion::axis_system()
@@ -221,4 +230,25 @@ void Torsion::center_of_mass()
         }
         top_com(j) = sum / totmass;
     }    
+}
+
+void Torsion::direction_cosines()
+{
+    for (arma::uword i = 0; i < 3; ++i) {
+        alpha(0,i) = arma::dot(x_axis, rot.paxis.col(i));
+        alpha(1,i) = arma::dot(y_axis, rot.paxis.col(i));
+        alpha(2,i) = arma::dot(z_axis, rot.paxis.col(i));
+    }
+    chem::Assert(std::abs(arma::det(alpha) - 1.0) < 1.0e-12, // should be +1
+                 Torsion_error("bad direction cosines matrix"));
+}
+
+void Torsion::top_moment_of_inertia()
+{
+    // Project coordinates of rotating top onto the (x,y,z) coordinate system:
+    
+    arma::mat top_xyz(rot_top.size(), 3);
+    for (arma::uword i = 0; i < rot_top.size(); ++i) {
+        top_xyz.row(i) = xyz_.row(rot_top(i)) - top_origo;
+    }
 }

@@ -34,20 +34,20 @@ The source code can be obtained from
 Requirements
 ------------
 * [Python](https://docs.python.org/3/) 3.5
-* [Armadillo] (http://arma.sourceforge.net) 7.960.0
+* [Armadillo] (http://arma.sourceforge.net) 7.950.1
 
 Installation
 ------------
 The program is installed by executing the command
 
-    ./configure.py
-    make
+    mkdir build && cd build
+    cmake ..
+    make 
     make install
 
 Testing of the program can be done by executing the command
 
-    make tests
-    cd ./tests && ./run.sh
+    make test
 
 Notes and References
 --------------------

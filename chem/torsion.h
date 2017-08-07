@@ -71,7 +71,7 @@ private:
     /// Validate input data.
     void validate() const;
 
-    /// Calculate reduced moment of inertia.
+    /// Calculation of reduced moment of inertia.
     void calc_red_imom();
 
     /// Set up axis system for rotating top.
@@ -80,13 +80,22 @@ private:
     /// Calculate center of mass for rotating top.
     void center_of_mass();
 
-    arma::mat  xyz_      = arma::zeros<arma::mat>(0);  ///< local copy of xyz
+    /// Set up direction cosines matrix.
+    void direction_cosines();
+
+    /// Calculate moment of inertia of rotating top.
+    void top_moment_of_inertia();
+
+    arma::mat xyz_  = arma::zeros<arma::mat>(0);   ///< local copy of xyz
+    arma::mat alpha = arma::zeros<arma::mat>(3,3); ///< direction cosines 
+
     arma::uvec rot_axis  = arma::zeros<arma::uvec>(2); ///< rotational axis
     arma::uvec rot_top   = arma::zeros<arma::uvec>(0); ///< rotating top moiety
     arma::uvec sigma_tor = arma::zeros<arma::uvec>(0); ///< symmetry number
-    arma::vec  rmi_tor   = arma::zeros<arma::vec>(0);  ///< red. moment of I
-    arma::vec  pot_tor   = arma::zeros<arma::vec>(0);  ///< potential coeff.
-    arma::vec  freq_tor  = arma::zeros<arma::vec>(0);  ///< torsional freqs.
+
+    arma::vec rmi_tor  = arma::zeros<arma::vec>(0); ///< red. moment of inertia
+    arma::vec pot_tor  = arma::zeros<arma::vec>(0); ///< potential coefficients
+    arma::vec freq_tor = arma::zeros<arma::vec>(0); ///< torsional frequencies
 
     arma::rowvec x_axis = arma::zeros<arma::rowvec>(3); ///< x axis of rot. top
     arma::rowvec y_axis = arma::zeros<arma::rowvec>(3); ///< y axis of rot. top

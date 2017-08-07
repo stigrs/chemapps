@@ -11,7 +11,11 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-option(BUILD_SHARED_LIBS "Compile shared libraries." ON)
+if(MSVC)
+    option(BUILD_SHARED_LIBS "Compile shared libraries." OFF)
+else()
+    option(BUILD_SHARED_LIBS "Compile shared libraries." ON)
+endif()
 option(BUILD_TESTS "Build tests." ON)
 
 # Set release compiler options.
@@ -44,3 +48,9 @@ if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+# Print status messages.
+message(STATUS "CMAKE_BUILD_TYPE  = ${CMAKE_BUILD_TYPE}")
+message(STATUS "BUILD_SHARED_LIBS = ${BUILD_SHARED_LIBS}")
+message(STATUS "BUILD_TESTS       = ${BUILD_TESTS}")
+
