@@ -79,7 +79,8 @@ private:
 
     /// Calculate center of mass for rotating top.
     void center_of_mass();
-    
+
+    arma::mat  xyz_      = arma::zeros<arma::mat>(0);  ///< local copy of xyz
     arma::uvec rot_axis  = arma::zeros<arma::uvec>(2); ///< rotational axis
     arma::uvec rot_top   = arma::zeros<arma::uvec>(0); ///< rotating top moiety
     arma::uvec sigma_tor = arma::zeros<arma::uvec>(0); ///< symmetry number

@@ -21,9 +21,11 @@
 
 #include <map>
 #include <cmath>
+#include <iostream>
 #include <chem/torsion.h>
 #include <chem/input.h>
 #include <chem/utils.h>
+#include <chem/datum.h>
 
 
 void Torsion::init(std::istream& from, const std::string& key)
@@ -80,7 +82,7 @@ void Torsion::init(std::istream& from, const std::string& key)
 
     // Calculate reduced moment of inertia if needed:
     
-    if ((rot_top.size() > 0) && rmi_tor.empty()) { 
+    if ((rot_top.size() > 0) && rmi_tor.empty()) {
         calc_red_imom();
     }
 }
@@ -130,6 +132,10 @@ void Torsion::calc_red_imom()
     rot.rotate_to_principal_axes();
     rot.principal_moments();
 
+    // Work on a local copy of the XYZ coordinates and convert coordinates to bohr:
+    xyz_ = rot.xyz;
+    xyz_ /= datum::a_0;
+
     // Set up axis system for rotating top:
 
     axis_system();
@@ -155,16 +161,16 @@ void Torsion::axis_system()
     // Calculate center of mass of rotating top and work on a local copy.
 
     center_of_mass();
-    arma::vec top_com_(top_com);
+    arma::rowvec top_com_(top_com);
 
     // Set up z axis - the rotation axis - and its norm:
 
-    z_axis = rot.xyz.row(rot_axis(1)) - rot.xyz.row(rot_axis(0));
+    z_axis = xyz_.row(rot_axis(1)) - xyz_.row(rot_axis(0));
     double z_norm = arma::norm(z_axis);
 
     // Find the vector from C1 to C.O.M.:
 
-    arma::rowvec r_vec = top_com - rot.xyz.row(rot_axis(0));
+    arma::rowvec r_vec = top_com - xyz_.row(rot_axis(0));
     double r_norm = arma::norm(r_vec);
 
     // Project r vector onto z axis and find the intersection point:
@@ -172,12 +178,12 @@ void Torsion::axis_system()
     const double tol = 1.0e-12;
     double theta = arma::dot(r_vec, z_axis) / (r_norm * z_norm);
     if ((std::abs(theta) - 1.0) < tol) { // r and z are parallel
-        top_com = rot.xyz.row(rot_top(0));
-        r_vec = top_com - rot.xyz.row(rot_axis(0));
+        top_com = xyz_.row(rot_top(0));
+        r_vec = top_com - xyz_.row(rot_axis(0));
         r_norm = arma::norm(r_vec);
         theta = arma::dot(r_vec, z_axis) / (r_norm * z_norm);
     }
-    top_origo = rot.xyz.row(rot_axis(0)) + theta * z_axis * r_norm / z_norm;
+    top_origo = xyz_.row(rot_axis(0)) + theta * z_axis * r_norm / z_norm;
 
     // Set up x axis:
 
@@ -208,11 +214,11 @@ void Torsion::center_of_mass()
     for (std::size_t i = 0; i < rot.atoms.size(); ++i) {
         totmass += rot.atoms[i].atomic_mass;
     }
-    for (arma::uword j = 0; j < rot.xyz.n_cols; ++j) {
+    for (arma::uword j = 0; j < xyz_.n_cols; ++j) {
         double sum = 0.0;
         for (arma::uword i = 0; i < rot_top.size(); ++i) {
-            sum += rot.atoms[i].atomic_mass * rot.xyz(i,j);
+            sum += rot.atoms[i].atomic_mass * xyz_(i,j);
         }
         top_com(j) = sum / totmass;
-    }
+    }    
 }
