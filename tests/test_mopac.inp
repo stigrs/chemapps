@@ -1,8 +1,17 @@
+Molecule
+ geometry
+  3
+  CO2
+  O  0.0000  0.0000  0.0000
+  C  1.1691  0.0000  0.0000
+  O  2.3382  0.0000  0.0000
+End
+
 Mopac
  version
    mopac5022mn
  keywords
-   "AM1 GEO-OK PRECISE"
+   AM1 GEO-OK PRECISE
  jobname
    test
 End

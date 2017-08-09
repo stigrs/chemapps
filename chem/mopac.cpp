@@ -19,7 +19,9 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <map>
+#include <fstream>
 #include <chem/mopac.h>
 #include <chem/input.h>
 #include <chem/utils.h>
@@ -51,7 +53,10 @@ Mopac::Mopac(std::istream& from, const std::string& key)
             else if (token == "keywords") {
                 std::string line;
                 std::getline(from, line);
-                keywords = line;
+                if (line.empty()) { // not entirely safe
+                    std::getline(from, line);
+                }
+                keywords = chem::trim(line, " ");
             }
             else {
                 Input_iter it = input_data.find(token);
@@ -72,7 +77,42 @@ Mopac::Mopac(std::istream& from, const std::string& key)
             throw Mopac_error(it->first + " not initialized");
         }
     }
-    for (Cinput_iter it = input_data.begin(); it != input_data.end(); ++it) {
-        std::cout << it->first << ": " << it->second << '\n';
-    }    
 }
+
+void Mopac::run(Molecule& mol) const
+{
+    // Create Mopac input file:
+    std::string dat_file = jobname + ".dat";
+    write_dat(mol, dat_file);
+
+    // Run Mopac:
+    std::string cmd = version + " " + dat_file;
+    int status = std::system(cmd.c_str());
+    if (status != 0) {
+        throw Mopac_error("running " + version + " failed");
+    }
+}
+
+void Mopac::write_dat(const Molecule& mol, const std::string& dat_file) const
+{
+    std::ofstream to;
+    chem::fopen(to, dat_file);
+    to << keywords << '\n'
+       << mol.get_title() << "\n\n";
+    write_xyz(to, mol);
+}
+
+void Mopac::write_xyz(std::ostream& to, const Molecule& mol) const
+{
+    chem::Format<double> fix;
+    fix.fixed().width(10).precision(6);
+
+    for (std::size_t i = 0; i < mol.get_atoms().size(); ++i) {
+        to << mol.get_atoms()[i].atomic_symbol << '\t';
+        for (arma::uword j = 0; j < mol.get_xyz().n_cols; ++j) {
+            to << fix(mol.get_xyz()(i,j)) << " " << opt_geom << " ";
+        }
+        to << '\n';
+    }
+}
+

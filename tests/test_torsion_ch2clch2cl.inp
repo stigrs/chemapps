@@ -5,6 +5,7 @@ Molecule
     angstrom
   geometry 
     8
+    CH2ClCH2Cl
     Cl -0.4737  2.1124  0.0000
     C   0.4737  0.5918  0.0000
     C  -0.4737 -0.5918  0.0000

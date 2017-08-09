@@ -82,11 +82,11 @@ namespace chem {
     }
 
     /// Wrapper function for opening file stream for output.
-    inline void fopen(std::ofstream& from, const std::string& filename,
+    inline void fopen(std::ofstream& to, const std::string& filename,
 		      std::ios_base::openmode mode = std::ios_base::out)
     {
-	from.open(filename.c_str(), mode);
-	if (! from.is_open()) {
+	to.open(filename.c_str(), mode);
+	if (! to.is_open()) {
 	    throw Fopen_error("cannot open " + filename);
 	}
     }

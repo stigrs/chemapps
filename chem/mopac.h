@@ -50,6 +50,12 @@ public:
     void run(Molecule& mol) const;
     
 private:
+    /// Create Mopac input file.
+    void write_dat(const Molecule& mol, const std::string& dat_file) const;
+
+    /// Write Cartesian coordinates in Mopac format.
+    void write_xyz(std::ostream& to, const Molecule& mol) const;
+    
     std::string version;  ///< Mopac version
     std::string keywords; ///< list of Mopac keywords
     std::string jobname;  ///< Mopac job name

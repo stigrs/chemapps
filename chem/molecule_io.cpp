@@ -46,6 +46,7 @@ void chem::read_xyz_format(std::istream& from,
 
     // Read title line:
     std::getline(from, title);
+    title = chem::trim(title, " ");
 
     /// Read XYZ coordinates:
     for (int i = 0; i < natoms; ++i) {
