@@ -20,7 +20,7 @@ int main(int /* argc */, char* argv[])
         chem::fopen(from, "test_molvib.inp");
 
         Molecule mol(from, std::cout, "Molecule");
-        double zpe = mol.get_vib()->zero_point_energy() / datum::au2icm;
+        double zpe = mol.get_vib()->zero_point_energy() / datum::au_to_icm;
 
         chem::Assert(std::abs(zpe - zpe_ans) < 1.0e-6, 
                      std::runtime_error("bad zero-point energy"));

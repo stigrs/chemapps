@@ -133,20 +133,25 @@ void Molrot::init(std::istream& from, const std::string& key)
     }
 }
 
+double Molrot::tot_mass() const
+{
+    double totmass = 0.0;
+    for (std::size_t i = 0; i < atoms.size(); ++i) {
+        totmass += atoms[i].atomic_mass;
+    }
+    return totmass;
+}
+
 arma::vec3 Molrot::center_of_mass() const
 {
     arma::vec3 com;
-
-    double totmass = 0.0;
-    for (std::size_t i = 0; i < atoms.size(); ++i) {
-        totmass += (atoms)[i].atomic_mass;
-    }
+    
     for (arma::uword j = 0; j < xyz.n_cols; ++j) {
         double sum = 0.0;
         for (std::size_t i = 0; i < atoms.size(); ++i) {
-            sum += (atoms)[i].atomic_mass * (xyz)(i,j);
+            sum += atoms[i].atomic_mass * (xyz)(i,j);
         }
-        com(j) = sum / totmass;
+        com(j) = sum / tot_mass();
     }
     return com;
 }
@@ -169,7 +174,7 @@ void Molrot::principal_moments()
 
     if (atoms.size() > 1) {
         for (std::size_t i = 0; i < atoms.size(); ++i) {
-            double m = (atoms)[i].atomic_mass;
+            double m = atoms[i].atomic_mass;
             double x = xyz_(i,0);
             double y = xyz_(i,1);
             double z = xyz_(i,2);
@@ -189,8 +194,7 @@ void Molrot::principal_moments()
         if (arma::det(paxis) < 0.0) {
             paxis *= -1.0;
         }
-        double det = arma::det(paxis);
-        chem::Assert((std::abs(det) - 1.0) < 1.0e-12, 
+        chem::Assert((std::abs(arma::det(paxis)) - 1.0) < 1.0e-12, 
                      Molrot_error("bad determinant of paxis"));
     }
 }

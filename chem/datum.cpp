@@ -75,15 +75,16 @@ namespace datum {
     const double zepto = 1.0e-21;
     const double yocto = 1.0e-24;
 
-    const double cal2J  = 4.184;          
-    const double icm2kJ = 1.19626564e-02; 
-    const double icm2K  = 100.0 * h * c_0 / k;
-    const double J2icm  = 100.0 * h * c_0;
-    const double au2cm  = a_0 * 1.0e-8;
-    const double au2icm = E_h / (h * c_0 * 100.0);
-    const double au2s   = h_bar / E_h;
-    const double au2K   = E_h / k;
-    const double au2kg  = m_e;
+    const double cal_to_J   = 4.184;          
+    const double icm_to_kJ  = 1.19626564e-02; 
+    const double icm_to_K   = 100.0 * h * c_0 / k;
+    const double J_to_icm   = 100.0 * h * c_0;
+    const double au_to_cm   = a_0 * 1.0e-8;
+    const double au_to_icm  = E_h / (h * c_0 * 100.0);
+    const double au_to_s    = h_bar / E_h;
+    const double au_to_K    = E_h / k;
+    const double au_to_kg   = m_e;
+    const double au_to_kgm2 = m_u * a_0 * a_0 * 1.0e-20;
 
 } // constants::
 

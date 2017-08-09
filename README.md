@@ -33,7 +33,7 @@ The source code can be obtained from
 
 Requirements
 ------------
-* [Python](https://docs.python.org/3/) 3.5
+* [CMake](https://cmake.org) 3.4.3
 * [Armadillo] (http://arma.sourceforge.net) 7.950.1
 
 Installation

@@ -81,6 +81,9 @@ protected:
     /// Move geometry to center of mass.
     void move_to_com();
 
+    /// Calculate total molecular mass.
+    double tot_mass() const;
+    
     /// Compute center of mass coordinates.
     arma::vec3 center_of_mass() const;
 

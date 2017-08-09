@@ -28,6 +28,205 @@
 #include <chem/datum.h>
 
 
+void Torsion::analysis(std::ostream& to)
+{
+    chem::Format<char> line;
+    line.width(24).fill('=');
+    
+    chem::Format<double> fix;
+    fix.fixed().width(10);
+
+    chem::Format<int> ifix;
+    ifix.fixed().width(11);
+
+    chem::Format<double> sci;
+    sci.scientific().precision(3);
+    
+    if (perform_torsional_analysis) {
+        to << "\nTorsional Mode Analysis:\n" << line('=') << "\n\n";
+        
+        line.width(28).fill('-');
+        to << "Atoms defining rotating top:\n" << line('-') << '\n'
+           << "Center  Atomic  Atomic\n"
+           << "Number  Symbol  Mass\n"
+           << line('-') << '\n';
+        for (arma::uword i = 0; i < rot_top.size(); ++i) {
+            to << i + 1 << '\t'
+               << rot.atoms[i].atomic_symbol << '\t'
+               << fix(rot.atoms[i].atomic_mass) << '\n';
+        }
+        to << line('-') << "\n\n";
+
+        to << "Center " << rot_axis(0) + 1 << " and " << rot_axis(1) + 1
+           << " define axis of rotation\n\n";
+
+        fix.width(10).precision(6);
+        to << "Center of mass of top (x, y, z): "
+           << fix(top_com(0)) << " "
+           << fix(top_com(1)) << " "
+           << fix(top_com(2)) << '\n';
+
+        to << "Origin of coordinates (x, y, z): "
+           << fix(top_origo(0)) << " "
+           << fix(top_origo(1)) << " "
+           << fix(top_origo(2)) << "\n\n";
+        
+        fix.width(9).precision(3);
+        to << "xz product of inertia: " << fix(bm) << " amu bohr^2\n"
+           << "yz product of inertia: " << fix(cm) << " amu bohr^2\n"
+           << "off-balance factor:    " << fix(um) << " amu bohr^2\n\n";
+
+        fix.width(0).precision(3);
+        to << "Moment of inertia of top:  "
+           << fix(am) << " amu bohr^2, "
+           << sci(am * datum::au_to_kgm2) << " kg m^2\n";
+
+        to << "Reduced moment of inertia: "
+           << fix(rmi_tor(0)) << " amu bohr^2, "
+           << sci(rmi_tor(0) * datum::au_to_kgm2) << " kg m^2\n\n";
+
+        const double factor = datum::giga / (datum::c_0 * 100.0);
+        
+        to << "Rotational constant: "
+           << fix(constant()(0)) << " GHz, "
+           << fix(constant()(0) * factor) << " cm^-1\n";
+    }
+    else {
+        if (! sigma_tor.empty()) {
+            line.width(32 + 11 * sigma_tor.size()).fill('-');
+            to << "\nTorsional modes:\n" << line('-') << '\n';
+            line.width(32).fill(' ');
+            to << line(' ');
+            for (arma::uword i = 0; i < sigma_tor.size(); ++i) {
+                to << "  Minimum " << i + 1;
+            }
+            line.width(32 + 11 * sigma_tor.size()).fill('-');
+            to << '\n' << line('-') << '\n';
+            
+            to << "Symmetry number:                ";
+            for (arma::uword i = 0; i < sigma_tor.size(); ++i) {
+                to << ifix(sigma_tor(i));
+            }
+            to << '\n';
+            
+            fix.width(11).precision(3);
+            to << "Moment of inertia [amu bohr^2]: ";
+            for (arma::uword i = 0; i < rmi_tor.size(); ++i) {
+                to << fix(rmi_tor(i));
+            }
+            to << '\n';
+            
+            to << "Potential energy [cm^-1]:       ";
+            for (arma::uword i = 0; i < pot_tor.size(); ++i) {
+                to << fix(pot_tor(i));
+            }
+            to << '\n';
+            
+            to << "Vibrational frequency [cm^-1]:  ";
+            for (arma::uword i = 0; i < freq_tor.size(); ++i) {
+                to << fix(freq_tor(i));
+            }
+            to << '\n' << line('-') << '\n';
+            
+            to << "Total number of minima:      " << tot_minima() << '\n'
+               << "Effective symmetry number:   " << symmetry_number() << '\n'
+               << "Effective moment of inertia: " << eff_moment_of_inertia()
+               << " amu bohr^2\n";
+        }
+    }
+}
+
+int Torsion::tot_minima() const
+{
+    int nminima = 0;
+    for(arma::uword i = 0; i < sigma_tor.size(); ++i) {
+        nminima += sigma_tor(i); // eq. 1 in C&T (2000)
+    }
+    return nminima;
+}
+
+double Torsion::eff_moment_of_inertia() const
+{
+    double imom_eff = 0.0;
+    if (tot_minima() > 0) {
+        for (arma::uword i = 0; i < sigma_tor.size(); ++i) {
+            imom_eff += sigma_tor(i) * rmi_tor(i); // eq. 7 in C&T (2000)
+        }
+        imom_eff /= static_cast<double>(tot_minima());
+    }
+    return imom_eff;
+}
+    
+arma::vec Torsion::constant()
+{
+    using namespace datum;
+    
+    arma::vec rotc = arma::zeros<arma::vec>(rmi_tor.size());
+    if(! rmi_tor.empty()) {
+        for (arma::uword i = 0; i < rotc.size(); ++i) {
+            rotc(i) = h_bar
+                / (4.0 * pi * giga * m_u * a_0 * a_0 * 1.0e-20 * rmi_tor(i));
+        }
+    }
+    return rotc;
+}
+
+double Torsion::red_moment_of_inertia()
+{
+    // Rotate molecule to principal axes and compute principal moments:
+    
+    rot.rotate_to_principal_axes();
+    rot.principal_moments();
+
+    // Work on a local copy of the XYZ and convert coordinates to bohr:
+
+    xyz_ = rot.xyz;
+    xyz_ /= datum::a_0;
+
+    // Set up axis system for rotating top:
+
+    axis_system();
+
+    // Set up direction cosines matrix:
+
+    direction_cosines();
+
+    // Compute projection of vector from C.O.M. of the molecule to the
+    // origin of the coordinates of the top onto the principal axes:
+
+    arma::rowvec rm = arma::zeros<arma::rowvec>(3);
+    for (arma::uword i = 0; i < rm.size(); ++i) {
+        rm(i) = arma::dot(top_origo, rot.paxis.row(i));
+    }
+    
+    // Calculate moment of inertia of rotating top:
+
+    top_moment_of_inertia();
+
+    // Calculrate reduced moment of inertia (eq. 1):
+
+    arma::rowvec betam = arma::zeros<arma::rowvec>(3);
+
+    for (int i = 0; i < 3; ++i) {
+        int im1 = i - 1;
+        if (im1 < 0) {
+            im1 = 2;
+        }
+        int ip1 = i + 1;
+        if (ip1 > 2) {
+            ip1 = 0;
+        }
+        betam(i) = alpha(2,i) * am - alpha(0,i) * bm - alpha(1,i) * cm
+            + um * (alpha(1,im1) * rm(ip1) - alpha(1,ip1) * rm(im1));
+    }
+    double lambdam = 0.0;
+    for (int i = 0; i < 3; ++i) {
+        lambdam += std::pow(alpha(1,i)*um, 2.0) / rot.total_mass()
+            + std::pow(betam(i), 2.0) / rot.pmom(i);
+    }
+    return am - lambdam;
+}
+
 void Torsion::init(std::istream& from, const std::string& key)
 {
     typedef std::map<std::string, Input>::iterator       Input_iter;
@@ -83,7 +282,9 @@ void Torsion::init(std::istream& from, const std::string& key)
     // Calculate reduced moment of inertia if needed:
     
     if ((rot_top.size() > 0) && rmi_tor.empty()) {
-        calc_red_imom();
+        perform_torsional_analysis = true;
+        rmi_tor.set_size(1);
+        rmi_tor(0) = red_moment_of_inertia();
     }
 }
 
@@ -123,31 +324,10 @@ void Torsion::validate() const
             throw Torsion_error("bad freq_tor");
         }
     }
-}
-
-void Torsion::calc_red_imom()
-{
-    // Rotate molecule to principal axes and compute principal moments:
-    
-    rot.rotate_to_principal_axes();
-    rot.principal_moments();
-
-    // Work on a local copy of the XYZ and convert coordinates to bohr:
-
-    xyz_ = rot.xyz;
-    xyz_ /= datum::a_0;
-
-    // Set up axis system for rotating top:
-
-    axis_system();
-
-    // Set up direction cosines matrix:
-
-    direction_cosines();
-
-    // Calculate moment of inertia of rotating top:
-
-    top_moment_of_inertia();
+    chem::Assert((sigma_tor.size() == rmi_tor.size()) &&
+                 (rmi_tor.size() == pot_tor.size()) &&
+                 (pot_tor.size() == freq_tor.size()),
+                 Torsion_error("bad torsional mode size"));
 }
 
 void Torsion::axis_system()
@@ -219,16 +399,12 @@ void Torsion::axis_system()
 
 void Torsion::center_of_mass()
 {
-    double totmass = 0.0;
-    for (std::size_t i = 0; i < rot.atoms.size(); ++i) {
-        totmass += rot.atoms[i].atomic_mass;
-    }
     for (arma::uword j = 0; j < xyz_.n_cols; ++j) {
         double sum = 0.0;
         for (arma::uword i = 0; i < rot_top.size(); ++i) {
             sum += rot.atoms[i].atomic_mass * xyz_(i,j);
         }
-        top_com(j) = sum / totmass;
+        top_com(j) = sum / rot.tot_mass();
     }    
 }
 
@@ -250,5 +426,31 @@ void Torsion::top_moment_of_inertia()
     arma::mat top_xyz(rot_top.size(), 3);
     for (arma::uword i = 0; i < rot_top.size(); ++i) {
         top_xyz.row(i) = xyz_.row(rot_top(i)) - top_origo;
+    }
+    for (arma::uword i = 0; i < top_xyz.n_rows; ++i) {
+        double x = arma::dot(top_xyz.row(i), x_axis);
+        double y = arma::dot(top_xyz.row(i), y_axis);
+        double z = arma::dot(top_xyz.row(i), z_axis);
+        top_xyz(i,0) = x;
+        top_xyz(i,1) = y;
+        top_xyz(i,2) = z;
+    }
+
+    // Moment of inertia, products of inertia, and off-balance factor:
+
+    am = 0.0;
+    bm = 0.0;
+    cm = 0.0;
+    um = 0.0;
+
+    for (arma::uword i = 0; i < top_xyz.n_rows; ++i) {
+        double mass = rot.atoms[rot_top(i)].atomic_mass;
+        double xi = top_xyz(i,0);
+        double yi = top_xyz(i,1);
+        double zi = top_xyz(i,2);
+        am += mass * (xi * xi + yi * yi);
+        bm += mass * xi * zi;
+        cm += mass * yi * zi;
+        um += mass * xi;
     }
 }

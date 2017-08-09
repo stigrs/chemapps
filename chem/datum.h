@@ -85,15 +85,16 @@ namespace datum {
     extern const double yocto;
 
     // Conversion factors:
-    extern const double cal2J;  ///< Conversion factor from cal to J
-    extern const double icm2kJ; ///< Conversion factor from cm^-1 to kJ/mol
-    extern const double icm2K;  ///< Conversion factor from cm^-1 to K
-    extern const double J2icm;  ///< Conversion factor from J to cm^-1
-    extern const double au2cm;  ///< Conversion factor from au to cm
-    extern const double au2icm; ///< Conversion factor from au to cm^-1
-    extern const double au2s;   ///< Conversion factor from au to s
-    extern const double au2K;   ///< Conversion factor from au to K
-    extern const double au2kg;  ///< Conversion factor from au to kg
+    extern const double cal_to_J;   ///< Conversion factor from cal to J
+    extern const double icm_to_kJ;  ///< Conversion factor from cm^-1 to kJ/mol
+    extern const double icm_to_K;   ///< Conversion factor from cm^-1 to K
+    extern const double J_to_icm;   ///< Conversion factor from J to cm^-1
+    extern const double au_to_cm;   ///< Conversion factor from au to cm
+    extern const double au_to_icm;  ///< Conversion factor from au to cm^-1
+    extern const double au_to_s;    ///< Conversion factor from au to s
+    extern const double au_to_K;    ///< Conversion factor from au to K
+    extern const double au_to_kg;   ///< Conversion factor from au to kg
+    extern const double au_to_kgm2; ///< Conversion factor from amu bohr^2 to kg m^2
 } // datum::
 
 #endif /* CHEM_DATUM_H */

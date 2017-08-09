@@ -64,15 +64,30 @@ public:
 
     ~Torsion() { }
 
+    /// Perform torsional mode analysis.
+    void analysis(std::ostream& to = std::cout);
+
+    /// Get total number of minima.
+    int tot_minima() const;
+
+    /// Calculate effective symmetry number.
+    double symmetry_number() const;
+
+    /// Calculate reduced moment of inertia.
+    double red_moment_of_inertia();
+    
+    /// Calculate effective moment of inertia.
+    double eff_moment_of_inertia() const;
+    
+    /// Calculate rotational constant for torsional mode.
+    arma::vec constant();
+    
 private:
     /// Initialize input data.
     void init(std::istream& from, const std::string& key);
 
     /// Validate input data.
     void validate() const;
-
-    /// Calculation of reduced moment of inertia.
-    void calc_red_imom();
 
     /// Set up axis system for rotating top.
     void axis_system();
@@ -103,10 +118,17 @@ private:
 
     arma::rowvec top_origo = arma::zeros<arma::rowvec>(3); ///< origo 
     arma::rowvec top_com   = arma::zeros<arma::rowvec>(3); ///< center of mass
+
+    double am; ///< moment of inertia of rotating top
+    double bm; ///< xz product of inertia
+    double cm; ///< yz product of inertia
+    double um; ///< off-balance factor
+
+    bool perform_torsional_analysis = false;
     
     Molrot& rot;
 
-    Torsion& operator=(const Torsion& imom); // no assignments
+    Torsion& operator=(const Torsion& tor); // no assignments
 };
 
 inline Torsion::Torsion(std::istream& from,
@@ -115,6 +137,12 @@ inline Torsion::Torsion(std::istream& from,
     : rot(rot_)
 {
     init(from, key);
+}
+
+inline double Torsion::symmetry_number() const
+{
+    // Eq. 8 in Chuang and Truhlar (2000):
+    return tot_minima() / static_cast<double>(sigma_tor.n_elem); 
 }
 
 #endif /* CHEM_TORSION_H */
