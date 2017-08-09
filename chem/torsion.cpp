@@ -221,7 +221,7 @@ double Torsion::red_moment_of_inertia()
     }
     double lambdam = 0.0;
     for (int i = 0; i < 3; ++i) {
-        lambdam += std::pow(alpha(1,i)*um, 2.0) / rot.total_mass()
+        lambdam += std::pow(alpha(1,i)*um, 2.0) / rot.tot_mass()
             + std::pow(betam(i), 2.0) / rot.pmom(i);
     }
     return am - lambdam;

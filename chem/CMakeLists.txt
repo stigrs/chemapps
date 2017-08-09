@@ -15,6 +15,7 @@ set(
     zmatrix.cpp
     molvib.cpp
     torsion.cpp
+    mopac.cpp
 )
 set(
     HEADER_FILES
@@ -29,6 +30,7 @@ set(
     zmatrix.h
     molvib.h
     torsion.h
+    mopac.h
 )
 add_library (
     chem 

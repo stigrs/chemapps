@@ -1,0 +1,14 @@
+# Files:
+*~
+*.x
+*.exe
+*.o
+*.d
+*.out
+*.log
+*.tmp
+tmp.*
+
+# Directories:
+build
+tmp

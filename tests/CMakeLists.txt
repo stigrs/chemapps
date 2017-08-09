@@ -14,6 +14,7 @@ set(PROGRAMS
     test_zmatrix
     test_torsion_ch3oh
     test_torsion_ch2clch2cl
+    test_mopac
 )
 file(GLOB INP_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_SOURCE_DIR}/*.inp")
