@@ -46,7 +46,7 @@ void Molecule::print_data(std::ostream& to, const std::string& key) const
 }
 
 void Molecule::init(std::istream& from, 
-                    std::ostream& to, 
+                    std::ostream& to,
                     const std::string& key,
                     bool verbose)
 {

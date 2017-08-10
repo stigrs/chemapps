@@ -55,9 +55,9 @@ public:
         tor  = std::make_shared<Torsion>(*rot);
     }
 
-    Molecule(std::istream& from, 
-             std::ostream& to, 
-             const std::string& key,
+    Molecule(std::istream& from,
+             std::ostream& to = std::cout, 
+             const std::string& key = "Molecule",
              bool verbose = false)
     {
         init(from, to, key, verbose);
@@ -79,14 +79,14 @@ public:
     int    get_charge()      const { return charge; }
     double get_elec_energy() const { return elec_energy; }
 
-    void set_xyz(const arma::mat& xyz_)       { xyz = xyz_; }
+    void set_xyz(const arma::mat& xyz_);
     void set_charge(const int charge_)        { charge = charge_; }
     void set_elec_energy(const double energy) { elec_energy = energy; }
 
     void print_data(std::ostream& to, const std::string& key) const;
 
 private:
-    void init(std::istream& from, 
+    void init(std::istream& from,
               std::ostream& to, 
               const std::string& key,
               bool verbose);
@@ -106,6 +106,18 @@ private:
     std::shared_ptr<Molvib>  vib;
     std::shared_ptr<Torsion> tor;
 };
+
+inline void Molecule::set_xyz(const arma::mat& xyz_)
+{
+    /*
+      Note: Moment of inertia for torsional modes is currently not updated when 
+      the geometry is changed. This may change in future versions.
+
+      TODO: Check if torsional modes need to be updated.
+    */
+    xyz = xyz_;
+    zmat->build_zmat();
+}
 
 #endif /* CHEM_MOLECULE_H */
 

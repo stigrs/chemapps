@@ -42,7 +42,7 @@ int main(int /* argc */, char* argv[])
         std::ifstream from;
         chem::fopen(from, "test_molecule.inp");
 
-        Molecule mol(from, std::cout, "Molecule");
+        Molecule mol(from);
         arma::mat xyz = mol.get_xyz();
         
         chem::Assert(arma::approx_equal(xyz, xyz_ans, "absdiff", 1.0e-12), 

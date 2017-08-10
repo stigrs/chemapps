@@ -18,7 +18,7 @@ int main(int /* argc */, char* argv[])
         std::ifstream from;
         chem::fopen(from, "test_molrot.inp");
 
-        Molecule mol(from, std::cout, "Molecule");
+        Molecule mol(from);
         arma::vec3 rotc = mol.get_rot()->constants();
 
         for (arma::uword i = 0; i < rotc.size(); ++i) {

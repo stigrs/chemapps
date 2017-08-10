@@ -53,7 +53,7 @@ public:
         : atoms(atoms_), xyz(xyz_)
     { }
 
-    Molrot(std::istream& from, 
+    Molrot(std::istream& from,
            const std::string& key,
            std::vector<Element>& atoms_,
            arma::mat& xyz_);

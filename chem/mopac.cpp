@@ -22,9 +22,11 @@
 #include <cstdlib>
 #include <map>
 #include <fstream>
+#include <sstream>
 #include <chem/mopac.h>
 #include <chem/input.h>
 #include <chem/utils.h>
+#include <chem/datum.h>
 
 
 Mopac::Mopac(std::istream& from, const std::string& key)
@@ -82,21 +84,32 @@ Mopac::Mopac(std::istream& from, const std::string& key)
 void Mopac::run(Molecule& mol) const
 {
     // Create Mopac input file:
-    std::string dat_file = jobname + ".dat";
-    write_dat(mol, dat_file);
+    write_dat(mol);
 
     // Run Mopac:
-    std::string cmd = version + " " + dat_file;
-    int status = std::system(cmd.c_str());
-    if (status != 0) {
+    std::string cmd = version + " " + jobname + ".dat";
+    if (std::system(cmd.c_str()) != 0) {
         throw Mopac_error("running " + version + " failed");
     }
+
+    // Check convergence:
+    if (! check_convergence()) {
+        throw Mopac_error(jobname + " failed to converge");
+    }
+    
+    // Update molecular energy:
+    mol.set_elec_energy(get_heat_of_formation());
+
+    // Update Cartesian coordinates:
+    arma::mat xyz = mol.get_xyz();
+    get_xyz(xyz);
+    mol.set_xyz(xyz);
 }
 
-void Mopac::write_dat(const Molecule& mol, const std::string& dat_file) const
+void Mopac::write_dat(const Molecule& mol) const
 {
     std::ofstream to;
-    chem::fopen(to, dat_file);
+    chem::fopen(to, jobname + ".dat");
     to << keywords << '\n'
        << mol.get_title() << "\n\n";
     write_xyz(to, mol);
@@ -116,3 +129,105 @@ void Mopac::write_xyz(std::ostream& to, const Molecule& mol) const
     }
 }
 
+bool Mopac::check_convergence() const
+{
+    bool converged = false;
+
+    std::ifstream from;
+    chem::fopen(from, jobname + ".out");
+
+    std::string buf;
+    while (std::getline(from, buf)) {
+        std::string pattern = "SCF FIELD WAS ACHIEVED";
+        if (buf.find(pattern) != std::string::npos) {
+            converged = true;
+            break;
+        }
+    }
+    return converged;
+}
+    
+double Mopac::get_heat_of_formation() const
+{
+    double heat = 0.0;
+    bool found = false;
+    
+    std::ifstream from;
+    chem::fopen(from, jobname + ".out");
+
+    std::string buf;
+    while (std::getline(from, buf)) {
+        std::string pattern = "SCF FIELD WAS ACHIEVED"; // is this fail-safe?
+        if (buf.find(pattern) != std::string::npos) {
+            while (std::getline(from, buf)) {
+                pattern = "FINAL HEAT OF FORMATION = ";
+                if (buf.find(pattern) != std::string::npos) {
+                    std::istringstream iss(buf);
+                    for (int i = 0; i < 5; ++i) { // ignore words in pattern
+                        iss >> buf;
+                    }
+                    iss >> heat;
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (found) {
+            break;
+        }
+    }
+    if (! found) {
+        throw Mopac_error("final heat of formation not found");
+    }
+    else {
+        return heat * datum::cal_to_J;
+    }
+}
+
+void Mopac::get_xyz(arma::mat& xyz) const
+{
+    // Note: xyz must have the correct size on input, no resizing is done.
+    
+    double heat = 0.0;
+    bool found = false;
+    
+    std::ifstream from;
+    chem::fopen(from, jobname + ".out");
+
+    std::string buf;
+    while (std::getline(from, buf)) {
+        std::string pattern = "SCF FIELD WAS ACHIEVED"; // is this fail-safe?
+        if (buf.find(pattern) != std::string::npos) {
+            while (std::getline(from, buf)) {
+                pattern = "CARTESIAN COORDINATES";
+                if (buf.find(pattern) != std::string::npos) {
+                    for (int i = 0; i < 3; ++i) { // ignore three lines
+                        std::getline(from, buf);
+                    }
+                    int center;
+                    std::string atom;
+                    double x;
+                    double y;
+                    double z;
+                    for (arma::uword i = 0; i < xyz.n_rows; ++i) {
+                        std::getline(from, buf);
+                        std::istringstream iss(buf);
+                        iss >> center >> atom >> x >> y >> z;
+                        xyz(i,0) = x;
+                        xyz(i,1) = y;
+                        xyz(i,2) = z;
+                    }
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (found) {
+            break;
+        }
+    }
+    if (! found) {
+        throw Mopac_error("optimized Cartesian coordinates not found");
+    }
+}
+                        

@@ -14,7 +14,7 @@ int main(int /* argc */, char* argv[])
         std::ifstream from;
         chem::fopen(from, "test_torsion_ch3oh.inp");
 
-        Molecule mol(from, std::cout, "Molecule");
+        Molecule mol(from);
         double rmi = mol.get_tor()->red_moment_of_inertia();
         
         const double rmi_ans = 2.19; // Chuang and Truhlar (2000)

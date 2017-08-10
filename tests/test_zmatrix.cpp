@@ -34,7 +34,7 @@ int main(int /*argc */, char* argv[])
 
         arma::ivec moiety = {3, 9, 10};
 
-        Molecule mol(from, std::cout, "Molecule");
+        Molecule mol(from);
         mol.get_zmat()->load(from);
         mol.get_zmat()->rotate_moiety(moiety, 90.0);
         arma::mat xyz = mol.get_xyz();

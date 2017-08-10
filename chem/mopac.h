@@ -25,6 +25,7 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
+#include <armadillo>
 #include <chem/molecule.h>
 
 //-----------------------------------------------------------------------------
@@ -42,16 +43,25 @@ class Mopac {
 public:
     Mopac();
 
-    Mopac(std::istream& from, const std::string& key);
+    Mopac(std::istream& from, const std::string& key = "Mopac");
 
     ~Mopac() { }
 
     /// Run Mopac calculation.
     void run(Molecule& mol) const;
+
+    /// Check SCF convergence.
+    bool check_convergence() const;
+        
+    /// Get heat of formation in kJ/mol from Mopac output file.
+    double get_heat_of_formation() const;
+
+    /// Get optimized Cartesian coordinates.
+    void get_xyz(arma::mat& xyz) const;
     
 private:
     /// Create Mopac input file.
-    void write_dat(const Molecule& mol, const std::string& dat_file) const;
+    void write_dat(const Molecule& mol) const;
 
     /// Write Cartesian coordinates in Mopac format.
     void write_xyz(std::ostream& to, const Molecule& mol) const;
@@ -67,7 +77,7 @@ inline Mopac::Mopac()
     version = "mopac5022mn";
     keywords = "PM6-D GEO-OK PRECISE";
     jobname = "mopac";
-    opt_geom = 1; // true
+    opt_geom = 1; // perform geometry optimization
 }
 
 #endif /* CHEM_MOPAC_H */

@@ -33,7 +33,7 @@ char   Argparse::invalid[20];
 
 void Argparse::init(int argc_, char** argv_)
 {
-    std::strcpy(invalid, "____invalid____");
+    std::strncpy(invalid, "____invalid____", 19);
     argc = argc_;
     argv = argv_;
 }

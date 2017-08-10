@@ -1,10 +1,12 @@
 #include <iostream>
 #include <fstream>
+#include <cmath>
 #include <stdexcept>
 #include <exception>
 #include <chem/mopac.h>
 #include <chem/molecule.h>
 #include <chem/utils.h>
+#include <chem/datum.h>
 
 
 int main(int /*argc */, char* argv[])
@@ -12,9 +14,15 @@ int main(int /*argc */, char* argv[])
     try {
         std::ifstream from;
         chem::fopen(from, "test_mopac.inp");
-        Molecule mol(from, std::cout, "Molecule");
-        Mopac mop(from, "Mopac");
+        Molecule mol(from);
+        Mopac mop(from);
         mop.run(mol);
+
+        const double heat_ans = 112.00281 * datum::cal_to_J;
+        double heat = mop.get_heat_of_formation();
+
+        chem::Assert(std::abs(heat - heat_ans) < 1.0e-12,
+                     std::runtime_error("bad heat of formation"));
     }
     catch (std::exception& e) {
         std::cerr << argv[0] << ": " << e.what() << '\n';

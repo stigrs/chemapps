@@ -39,6 +39,12 @@ struct Zmatrix_error : std::runtime_error {
 
 //-----------------------------------------------------------------------------
 
+// Forward declarations to allow friend declarations:
+
+class Molecule;
+
+//-----------------------------------------------------------------------------
+
 class Zmatrix {
 public:
     Zmatrix(std::vector<Element>& atoms_, arma::mat& xyz_);
@@ -72,7 +78,9 @@ public:
     /// Print Z matrix.
     void print(std::ostream& to);
 
-private:
+    friend class Molecule;
+    
+protected:
     /**
        Build Z matrix from Cartesian coordinates. The code is based on the
        qcl code written by Ben Albrecht released under the MIT license.
@@ -102,6 +110,7 @@ private:
     */
     arma::rowvec calc_position(int i) const;
 
+private:
     std::vector<Element>& atoms;
     arma::mat& xyz;
 
