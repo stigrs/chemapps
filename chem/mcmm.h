@@ -25,9 +25,11 @@
 #include <stdexcept>
 #include <string>
 #include <iostream>
+#include <random>
 #include <vector>
 #include <armadillo>
 #include <chem/molecule.h>
+#include <chem/conformer.h>
 
 //-----------------------------------------------------------------------------
 
@@ -44,9 +46,9 @@ template<class Pot>
 class Mcmm {
 public:
     Mcmm(std::istream& from, 
-         Molecule& mol_, 
+         Molecule& mol_,
          const std::string& key = "Mcmm", 
-         bool verbose = false);
+         bool verbose_ = false);
 
     ~Mcmm() { }
 
@@ -80,7 +82,8 @@ private:
     void save_conformer(double energy, const Molecule& mol);
 #endif
     Molecule& mol; ///< molecule
-
+    Pot pot;       ///< potential function
+    
     double xtol; ///< absolute error in geometry
     double etol; ///< absolute error in energy
     double emin; ///< lowest energy permitted
@@ -88,22 +91,26 @@ private:
     double rmin; ///< smallest bond distance permitted
     double temp; ///< temperature
 
-    int kiter;     ///< iteration parameter
     int maxiter;   ///< maximum number of iterations (k)
     int maxreject; ///< maximum number of consecutive rejected trials
-    int nreject;   ///< iterator for number of consecutive rejected trials
-    int naccept;   ///< iterator for number of accepted trials
     int nminima;   ///< number of local minima stored
-    int seed;      ///< seed for random number generator
-
+    int seed;      ///< random number generator seed
+    
+    int kiter;   ///< iteration parameter
+    int nreject; ///< iterator for number of consecutive rejected trials
+    int naccept; ///< iterator for number of accepted trials
+    
     arma::mat xcurr;   ///< current geometry
     arma::mat xglobal; ///< geometry of global minimum
 
     double ecurr;   ///< current energy
     double eglobal; ///< energy of global minimum
 
-    std::vector<double>    eminima; ///< array with local energy minima
-    std::vector<arma::mat> xminima; ///< array with local geometry minima
+    std::vector<Conformer> conformers; ///< array with local energy minima
+
+    bool verbose;
+
+    std::mt19937_64 mt; ///< random number engine
 }; 
 
 #endif /* CHEM_MCMM_H */

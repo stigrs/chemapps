@@ -5,32 +5,36 @@ link_directories (${ChemApps_BINARY_DIR})
 set(
     SRC_FILES
     argparse.cpp 
+    datum.cpp
     input.cpp
     ptable.cpp
-    datum.cpp
-    molecule_io.cpp
-    molecule.cpp
-    molrot.cpp
     math.cpp
-    zmatrix.cpp
+    mcmm.cpp
+    molecule.cpp
+    molecule_io.cpp
+    molrot.cpp
     molvib.cpp
-    torsion.cpp
     mopac.cpp
+    torsion.cpp
+    zmatrix.cpp
 )
 set(
     HEADER_FILES
     argparse.h 
-    input.h
-    ptable.h
+    arma_io.h
+    conformer.h
     datum.h
-    molecule_io.h
-    molecule.h
-    molrot.h
+    input.h
     math.h
-    zmatrix.h
+    mcmm.h
+    molecule.h
+    molecule_io.h
+    molrot.h
     molvib.h
-    torsion.h
     mopac.h
+    ptable.h
+    torsion.h
+    zmatrix.h
 )
 add_library (
     chem 
