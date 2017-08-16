@@ -4,6 +4,9 @@ project(ChemApps CXX)
 # By default, ChemApps is install in the HOME directory.
 set(CMAKE_INSTALL_PREFIX $ENV{HOME})
 
+# Export compile commands.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Enforce C++1 standard.
 set(CMAKE_CXX_STANDARD 11)
 
@@ -40,6 +43,10 @@ endif()
 
 # Armadillo library is required.
 find_package(Armadillo 7.950.1 REQUIRED)
+
+# Boost library is required.
+find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED)
+set(Boost_USE_STATIC_LIBS OFF)
 
 add_subdirectory(chem)
 add_subdirectory(src)

@@ -1,41 +1,40 @@
 /**
    @file molecule.cpp
-   
+
    This file is part of ChemApps - A C++ Chemistry Toolkit
-   
+
    Copyright (C) 2016-2017  Stig Rune Sellevag
-   
+
    ChemApps is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
- 
+
    ChemApps is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <map>
-#include <chem/molecule.h>
 #include <chem/input.h>
-#include <chem/utils.h>
+#include <chem/molecule.h>
 #include <chem/molecule_io.h>
-
+#include <chem/utils.h>
+#include <map>
 
 void Molecule::print_data(std::ostream& to, const std::string& key) const
 {
     chem::Format<char> line;
     line.width(15 + key.size()).fill('=');
-    
+
     chem::Format<double> fix;
     fix.fixed().precision(6);
-    
+
     to << "Input data on " << key << ":\n" << line('=') << '\n';
-        
+
     chem::print_elec_states(to, elec_state);
     to << "Electronic energy: " << fix(elec_energy) << " Hartree\n"
        << "Charge: " << charge << "\n\n"
@@ -45,12 +44,12 @@ void Molecule::print_data(std::ostream& to, const std::string& key) const
     vib->print(to);
 }
 
-void Molecule::init(std::istream& from, 
+void Molecule::init(std::istream& from,
                     std::ostream& to,
                     const std::string& key,
                     bool verbose)
 {
-    typedef std::map<std::string, Input>::iterator       Input_iter;
+    typedef std::map<std::string, Input>::iterator Input_iter;
     typedef std::map<std::string, Input>::const_iterator Cinput_iter;
 
     // Read input data:
@@ -71,8 +70,8 @@ void Molecule::init(std::istream& from,
         while (from >> token) {
             if (token == "End") {
                 break;
-            } 
-            else if (token == "geometry") { 
+            }
+            else if (token == "geometry") {
                 chem::read_xyz_format(from, atoms, xyz, title);
             }
             else {
@@ -82,15 +81,15 @@ void Molecule::init(std::istream& from,
                 }
             }
         }
-    } 
+    }
     else {
         throw Mol_error("cannot find " + key + " section");
     }
-    
+
     // Check if initialized:
 
     for (Cinput_iter it = input_data.begin(); it != input_data.end(); ++it) {
-        if (! it->second.is_init()) {
+        if (!it->second.is_init()) {
             throw Mol_error(it->first + " not initialized");
         }
     }
@@ -102,7 +101,7 @@ void Molecule::init(std::istream& from,
     // Initialize molecular rotations object:
 
     rot = std::make_shared<Molrot>(from, key, atoms, xyz);
-    
+
     // Initialize molecular vibrations object:
 
     vib = std::make_shared<Molvib>(from, key);
@@ -110,7 +109,7 @@ void Molecule::init(std::istream& from,
     // Initialize molecular torsions object:
 
     tor = std::make_shared<Torsion>(from, key, *rot);
-    
+
     // Write input data to output stream:
 
     if (verbose) {

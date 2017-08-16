@@ -1,5 +1,5 @@
-#include <stdexcept>
 #include <exception>
+#include <stdexcept>
 
 #include <chem/datum.h>
 #include <chem/utils.h>

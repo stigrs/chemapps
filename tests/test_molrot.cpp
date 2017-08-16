@@ -1,14 +1,13 @@
-#include <iostream>
-#include <fstream>
 #include <cmath>
-#include <stdexcept>
 #include <exception>
+#include <fstream>
+#include <iostream>
+#include <stdexcept>
 
 #include <chem/element.h>
-#include <chem/utils.h>
 #include <chem/molecule.h>
+#include <chem/utils.h>
 #include <armadillo>
-
 
 int main(int /* argc */, char* argv[])
 {
@@ -22,7 +21,7 @@ int main(int /* argc */, char* argv[])
         arma::vec3 rotc = mol.get_rot()->constants();
 
         for (arma::uword i = 0; i < rotc.size(); ++i) {
-            chem::Assert(std::abs(rotc(i) - rotc_ans(i)) < 1.0e-4, 
+            chem::Assert(std::abs(rotc(i) - rotc_ans(i)) < 1.0e-4,
                          std::runtime_error("bad rot const"));
         }
     }

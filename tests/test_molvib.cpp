@@ -1,15 +1,14 @@
-#include <iostream>
-#include <fstream>
 #include <cmath>
-#include <stdexcept>
 #include <exception>
+#include <fstream>
+#include <iostream>
+#include <stdexcept>
 
-#include <chem/element.h>
-#include <chem/utils.h>
 #include <chem/datum.h>
+#include <chem/element.h>
 #include <chem/molecule.h>
+#include <chem/utils.h>
 #include <armadillo>
-
 
 int main(int /* argc */, char* argv[])
 {
@@ -22,7 +21,7 @@ int main(int /* argc */, char* argv[])
         Molecule mol(from);
         double zpe = mol.get_vib()->zero_point_energy() / datum::au_to_icm;
 
-        chem::Assert(std::abs(zpe - zpe_ans) < 1.0e-6, 
+        chem::Assert(std::abs(zpe - zpe_ans) < 1.0e-6,
                      std::runtime_error("bad zero-point energy"));
     }
     catch (std::exception& e) {

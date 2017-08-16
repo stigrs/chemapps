@@ -1,13 +1,12 @@
-#include <iostream>
-#include <fstream>
-#include <cmath>
-#include <stdexcept>
-#include <exception>
+#include <chem/mcmm.h>
 #include <chem/molecule.h>
 #include <chem/mopac.h>
-#include <chem/mcmm.h>
 #include <chem/utils.h>
-
+#include <cmath>
+#include <exception>
+#include <fstream>
+#include <iostream>
+#include <stdexcept>
 
 int main(int /*argc */, char* argv[])
 {

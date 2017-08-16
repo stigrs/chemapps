@@ -1,20 +1,20 @@
 /**
    @file zmatrix.h
-   
+
    This file is part of ChemApps - A C++ Chemistry Toolkit
-   
+
    Copyright (C) 2016-2017  Stig Rune Sellevag
-   
+
    ChemApps is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
- 
+
    ChemApps is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -22,19 +22,19 @@
 #ifndef CHEM_ZMATRIX_H
 #define CHEM_ZMATRIX_H
 
+#include <chem/element.h>
+#include <armadillo>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <armadillo>
-#include <chem/element.h>
 
 //-----------------------------------------------------------------------------
 
 // Error reporting:
 
 struct Zmatrix_error : std::runtime_error {
-    Zmatrix_error(std::string s) : std::runtime_error(s) { }
+    Zmatrix_error(std::string s) : std::runtime_error(s) {}
 };
 
 //-----------------------------------------------------------------------------
@@ -49,8 +49,7 @@ class Zmatrix {
 public:
     Zmatrix(std::vector<Element>& atoms_, arma::mat& xyz_);
 
-    ~Zmatrix() { }
-
+    ~Zmatrix() {}
     /// Get bond distance.
     double get_distance(int index) const;
 
@@ -79,7 +78,7 @@ public:
     void print(std::ostream& to);
 
     friend class Molecule;
-    
+
 protected:
     /**
        Build Z matrix from Cartesian coordinates. The code is based on the
@@ -91,7 +90,7 @@ protected:
     void build_zmat();
 
     /**
-       Convert Z matrix to Cartesian coordinates. The code is based on the 
+       Convert Z matrix to Cartesian coordinates. The code is based on the
        qcl code written by Ben Albrecht released under the MIT license.
     */
     void build_xyz();
@@ -104,8 +103,8 @@ protected:
                             const arma::ivec& connectivity) const;
 
     /**
-       Calculate position of another atom based on internal coordinates. The 
-       code is based on the qcl code written by Ben Albrecht released under 
+       Calculate position of another atom based on internal coordinates. The
+       code is based on the qcl code written by Ben Albrecht released under
        the MIT license.
     */
     arma::rowvec calc_position(int i) const;
@@ -133,7 +132,7 @@ inline Zmatrix::Zmatrix(std::vector<Element>& atoms_, arma::mat& xyz_)
     bond_connect     = arma::zeros<arma::ivec>(atoms.size());
     angle_connect    = arma::zeros<arma::ivec>(atoms.size());
     dihedral_connect = arma::zeros<arma::ivec>(atoms.size());
-   
+
     build_zmat();
 }
 

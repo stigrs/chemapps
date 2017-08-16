@@ -1,29 +1,28 @@
 /**
    @file molvib.cpp
-   
+
    This file is part of ChemApps - A C++ Chemistry Toolkit
-   
+
    Copyright (C) 2016-2017  Stig Rune Sellevag
-   
+
    ChemApps is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
- 
+
    ChemApps is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <chem/arma_io.h>
+#include <chem/datum.h>
 #include <chem/molvib.h>
 #include <chem/utils.h>
-#include <chem/datum.h>
-#include <chem/arma_io.h>
-
 
 Molvib::Molvib(std::istream& from, const std::string& key)
 {
@@ -63,8 +62,7 @@ void Molvib::print(std::ostream& to)
             it += 1;
         }
         double zpe = zero_point_energy();
-        to << "\n\nZero-point vibrational energy: "
-           << zpe / datum::au_to_icm << " Hartree\n";
+        to << "\n\nZero-point vibrational energy: " << zpe / datum::au_to_icm
+           << " Hartree\n";
     }
 }
-

@@ -1,20 +1,20 @@
 /**
    @file molrot.h
-   
+
    This file is part of ChemApps - A C++ Chemistry Toolkit
-   
+
    Copyright (C) 2016-2017  Stig Rune Sellevag
-   
+
    ChemApps is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
- 
+
    ChemApps is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -22,20 +22,20 @@
 #ifndef CHEM_MOLROT_H
 #define CHEM_MOLROT_H
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <stdexcept>
-#include <armadillo>
 #include <chem/element.h>
 #include <chem/math.h>
+#include <armadillo>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 //-----------------------------------------------------------------------------
 
 // Error reporting:
 
 struct Molrot_error : std::runtime_error {
-    Molrot_error(std::string s) : std::runtime_error(s) { }
+    Molrot_error(std::string s) : std::runtime_error(s) {}
 };
 
 //-----------------------------------------------------------------------------
@@ -51,14 +51,15 @@ class Molrot {
 public:
     Molrot(std::vector<Element>& atoms_, arma::mat& xyz_)
         : atoms(atoms_), xyz(xyz_)
-    { }
+    {
+    }
 
     Molrot(std::istream& from,
            const std::string& key,
            std::vector<Element>& atoms_,
            arma::mat& xyz_);
 
-    ~Molrot() { }
+    ~Molrot() {}
 
     /// Perform rotational analysis.
     void analysis(std::ostream& to = std::cout);
@@ -73,7 +74,7 @@ public:
     std::string symmetry();
 
     friend class Torsion;
-    
+
 protected:
     /// Initialize.
     void init(std::istream& from, const std::string& key);
@@ -83,7 +84,7 @@ protected:
 
     /// Calculate total molecular mass.
     double tot_mass() const;
-    
+
     /// Compute center of mass coordinates.
     arma::vec3 center_of_mass() const;
 
@@ -93,7 +94,7 @@ protected:
     /**
        Rotate to principal axes.
 
-       @note This coordinate system is not the same as Gaussian's 
+       @note This coordinate system is not the same as Gaussian's
        standard orientation.
     */
     void rotate_to_principal_axes();
@@ -110,13 +111,13 @@ protected:
     std::vector<Element>& atoms;
     arma::mat& xyz;
 
-    arma::vec3  pmom;
+    arma::vec3 pmom;
     arma::mat33 paxis;
 
-    double sigma;          
-    bool   aligned = false;
- 
-    Molrot& operator=(const Molrot& rot); // no assignments
+    double sigma;
+    bool aligned = false;
+
+    Molrot& operator=(const Molrot& rot);  // no assignments
 };
 
 inline Molrot::Molrot(std::istream& from,
@@ -135,4 +136,3 @@ inline void Molrot::move_to_com()
 }
 
 #endif /* CHEM_MOLROT_H */
-

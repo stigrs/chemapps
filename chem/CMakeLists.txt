@@ -4,7 +4,6 @@ link_directories (${ChemApps_BINARY_DIR})
 
 set(
     SRC_FILES
-    argparse.cpp 
     datum.cpp
     input.cpp
     ptable.cpp
@@ -20,7 +19,6 @@ set(
 )
 set(
     HEADER_FILES
-    argparse.h 
     arma_io.h
     conformer.h
     datum.h

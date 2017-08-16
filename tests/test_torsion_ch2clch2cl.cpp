@@ -1,12 +1,11 @@
-#include <iostream>
-#include <fstream>
 #include <cmath>
-#include <stdexcept>
 #include <exception>
+#include <fstream>
+#include <iostream>
+#include <stdexcept>
 
-#include <chem/utils.h>
 #include <chem/molecule.h>
-
+#include <chem/utils.h>
 
 int main(int /* argc */, char* argv[])
 {
@@ -17,7 +16,7 @@ int main(int /* argc */, char* argv[])
         Molecule mol(from);
         double rmi = mol.get_tor()->red_moment_of_inertia();
 
-        const double rmi_ans = 58.76991427; // Chuang and Truhlar (2000)
+        const double rmi_ans = 58.76991427;  // Chuang and Truhlar (2000)
         chem::Assert(std::abs(rmi - rmi_ans) < 9.0e-2,
                      std::runtime_error("bad rmi"));
     }
