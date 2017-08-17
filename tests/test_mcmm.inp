@@ -1,5 +1,6 @@
 Mcmm
-
+  maxiter
+    10
 End
 Molecule
   zmatrix

@@ -57,11 +57,14 @@ public:
     void solve();
 
 private:
-    /// Check if MCMM solver is finished.
-    bool check_exit() const;
-
     /// Generate a new molecular conformer.
     void new_conformer();
+
+    /// Update MCMM solver.
+    void update();
+
+    /// Check if MCMM solver is finished.
+    bool check_exit() const;
 
     /// Check if random conformer is ok.
     bool accept_geom_dist() const;
@@ -73,14 +76,14 @@ private:
     void uniform_usage(arma::mat& xnew);
 
     /// Generate a new random conformer.
-    void gen_rand_conformer(Molecule& m) const;
+    void gen_rand_conformer(Molecule& m);
+
+    /// Select random dihedral angle.
+    std::vector<int> select_rand_dihedral(const Molecule& m);
 
 #if 0
     /// Check acceptance of energy.
     bool accept_energy(double enew);
-
-    /// Update MCMM solver.
-    void update();
 
     /// Sort local minima in descending order and cut to nminima.
     void sort_minima();

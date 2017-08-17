@@ -95,6 +95,7 @@ void Mcmm<Pot>::solve()
     bool finished = false;
     while (!finished) {
         new_conformer();
+        update();
         if (check_exit()) {
             finished = true;
         }
@@ -102,29 +103,23 @@ void Mcmm<Pot>::solve()
 }
 
 template <class Pot>
-bool Mcmm<Pot>::check_exit() const
-{
-    bool finished = false;
-    if (kiter >= maxiter) {
-        finished = true;
-    }
-    return finished;
-}
-
-template <class Pot>
 void Mcmm<Pot>::new_conformer()
 {
+#if 0
     do {
+#endif
         // Select starting geometry:
         arma::mat xnew;
-        uniform_usage(xnew);
+        //uniform_usage(xnew);
 
         Molecule m(mol);
-        m.set_xyz(xyz);
+        //m.set_xyz(xnew);
 
         // Generate a new conformer:
         gen_rand_conformer(m);
+#if 0
     } while (!accept_geom_dist());
+#endif 
 
 #if 0    
     // Perform geometry optimization:
@@ -141,6 +136,23 @@ void Mcmm<Pot>::new_conformer()
     }
 #endif
 }
+
+template <class Pot>
+void Mcmm<Pot>::update()
+{
+    kiter += 1;
+}
+
+template <class Pot>
+bool Mcmm<Pot>::check_exit() const
+{
+    bool finished = false;
+    if (kiter >= maxiter) {
+        finished = true;
+    }
+    return finished;
+}
+
 
 template <class Pot>
 void Mcmm<Pot>::uniform_usage(arma::mat& xnew)
@@ -172,23 +184,30 @@ void Mcmm<Pot>::uniform_usage(arma::mat& xnew)
 }
 
 template <class Pot>
-void Mcmm<Pot>::gen_rand_conformer(Molecule& m) const
+void Mcmm<Pot>::gen_rand_conformer(Molecule& m) 
 {
     // Select a random dihedral angle:
-    gen_rand_dihedral();
+    select_rand_dihedral(m);
 }
 
 template <class Pot>
-arma::ivec Mcmm<Pot> gen_rand_dihedral() const
+std::vector<int> Mcmm<Pot>::select_rand_dihedral(const Molecule& m) 
 {
-    std::vector<arma::ivec> connect = mol.get_zmat()->get_connectivities();
+    std::vector<arma::ivec> connect = m.get_zmat()->get_connectivities();
     std::uniform_int_distribution<> rnd_uni_int(2, connect.size());
-    int index;
-    do {
-        index = rnd_uni_int(mt);
-    } while (connect(index) == 0);
-    arma::ivec dihedral = connect(index);
-    std::cout << index << '\n';
+    int index = rnd_uni_int(mt);
+    arma::ivec dihedral = connect[index];
+
+    std::vector<int> res(0);
+    for (std::size_t i = 2; i < connect.size(); ++i) {
+        if (arma::all((connect[i] == dihedral) == 1)) {
+            res.push_back(i);
+        }
+    }
+    for (std::size_t i = 0; i < res.size(); ++i) {
+        std::cout << res[i] << '\n';
+    }
+    return res;
 }
 
 template class Mcmm<Mopac>;

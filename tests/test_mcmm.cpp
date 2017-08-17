@@ -14,8 +14,11 @@ int main(int /*argc */, char* argv[])
         std::ifstream from;
         chem::fopen(from, "test_mcmm.inp");
 
-        Molecule mol;
+        Molecule mol(from);
+        mol.get_zmat()->load(from);
+        mol.print_data(std::cout, "Molecule");
         Mcmm<Mopac> mc(from, mol);
+        mc.solve();
     }
     catch (std::exception& e) {
         std::cerr << argv[0] << ": " << e.what() << '\n';

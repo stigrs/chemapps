@@ -63,6 +63,8 @@ public:
         init(from, to, key, verbose);
     }
 
+    Molecule(const Molecule& mol);
+
     ~Molecule() {}
 
     const std::string get_title() const { return title; }
