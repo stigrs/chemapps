@@ -1,5 +1,5 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-alpha*,cppcoreguidelines-*,cppcoreguidelines-pro-bounds-pointer-arithmetic-,bugprone-*,cert-*,performance-*,readability-*'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-alpha*,clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-alpha*,clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-alpha*,cppcoreguidelines-*,cppcoreguidelines-pro-bounds-pointer-arithmetic-,bugprone-*,cert-*,performance-*,readability-*,cppcoreguidelines-*,bugprone-*,cert-*,performance-*,readability-*,cppcoreguidelines-*,bugprone-*,cert-*,performance-*,readability-*'
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
 User:            srs
@@ -11,7 +11,7 @@ CheckOptions:
   - key:             cppcoreguidelines-pro-bounds-constant-array-index.GslHeader
     value:           ''
   - key:             cppcoreguidelines-pro-bounds-constant-array-index.IncludeStyle
-    value:           '0'
+    value:           '1'
   - key:             google-readability-braces-around-statements.ShortStatementLines
     value:           '1'
   - key:             google-readability-function-size.StatementThreshold
