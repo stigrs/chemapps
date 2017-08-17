@@ -57,6 +57,9 @@ public:
     void solve();
 
 private:
+    /// Check if MCMM solver is finished.
+    bool check_exit() const;
+
     /// Generate a new molecular conformer.
     void new_conformer();
 
@@ -75,9 +78,6 @@ private:
 #if 0
     /// Check acceptance of energy.
     bool accept_energy(double enew);
-
-    /// Check if MCMM solver is finished.
-    bool check_exit() const;
 
     /// Update MCMM solver.
     void update();

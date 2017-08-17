@@ -87,11 +87,28 @@ Mcmm<Pot>::Mcmm(std::istream& from,
     else {
         mt.seed(seed);  // should only be used for testing purposes
     }
+}
 
-    std::uniform_real_distribution<> rnd_uni_real(0.0, 1.0);
-    for (int i = 0; i < 10; ++i) {
-        std::cout << rnd_uni_real(mt) << '\n';
+template <class Pot>
+void Mcmm<Pot>::solve()
+{
+    bool finished = false;
+    while (!finished) {
+        new_conformer();
+        if (check_exit()) {
+            finished = true;
+        }
     }
+}
+
+template <class Pot>
+bool Mcmm<Pot>::check_exit() const
+{
+    bool finished = false;
+    if (kiter >= maxiter) {
+        finished = true;
+    }
+    return finished;
 }
 
 template <class Pot>
@@ -102,8 +119,11 @@ void Mcmm<Pot>::new_conformer()
         arma::mat xnew;
         uniform_usage(xnew);
 
+        Molecule m(mol);
+        m.set_xyz(xyz);
+
         // Generate a new conformer:
-        // gen_rand_conformer();
+        gen_rand_conformer(m);
     } while (!accept_geom_dist());
 
 #if 0    
@@ -155,6 +175,20 @@ template <class Pot>
 void Mcmm<Pot>::gen_rand_conformer(Molecule& m) const
 {
     // Select a random dihedral angle:
-
+    gen_rand_dihedral();
 }
+
+template <class Pot>
+arma::ivec Mcmm<Pot> gen_rand_dihedral() const
+{
+    std::vector<arma::ivec> connect = mol.get_zmat()->get_connectivities();
+    std::uniform_int_distribution<> rnd_uni_int(2, connect.size());
+    int index;
+    do {
+        index = rnd_uni_int(mt);
+    } while (connect(index) == 0);
+    arma::ivec dihedral = connect(index);
+    std::cout << index << '\n';
+}
+
 template class Mcmm<Mopac>;
