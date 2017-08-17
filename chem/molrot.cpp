@@ -29,7 +29,7 @@
 
 void Molrot::analysis(std::ostream& to)
 {
-    if (! atoms.empty()) {
+    if (!atoms.empty()) {
         rotate_to_principal_axes();
         to << "\nGeometry in principal axes coordinate system:\n";
         chem::print_geometry(to, atoms, xyz);
@@ -96,9 +96,6 @@ std::string Molrot::symmetry()
 
 void Molrot::init(std::istream& from, const std::string& key)
 {
-    typedef std::map<std::string, Input>::iterator Input_iter;
-    typedef std::map<std::string, Input>::const_iterator Cinput_iter;
-
     // Read input data:
 
     std::map<std::string, Input> input_data;
@@ -112,7 +109,7 @@ void Molrot::init(std::istream& from, const std::string& key)
                 break;
             }
             else {
-                Input_iter it = input_data.find(token);
+                auto it = input_data.find(token);
                 if (it != input_data.end()) {
                     from >> it->second;
                 }
@@ -125,7 +122,7 @@ void Molrot::init(std::istream& from, const std::string& key)
 
     // Check if initialized:
 
-    for (Cinput_iter it = input_data.begin(); it != input_data.end(); ++it) {
+    for (auto it = input_data.begin(); it != input_data.end(); ++it) {
         if (!it->second.is_init()) {
             throw Molrot_error(it->first + " not initialized");
         }
@@ -200,7 +197,7 @@ void Molrot::principal_moments()
 
 void Molrot::rotate_to_principal_axes()
 {
-    if (! atoms.empty()) {
+    if (!atoms.empty()) {
         move_to_com();
         principal_moments();
         chem::rotate(xyz, paxis.t());
@@ -215,7 +212,7 @@ void Molrot::print_center_of_mass(std::ostream& to) const
     chem::Format<double> fix;
     fix.fixed().width(8).precision(4);
 
-    if (! atoms.empty()) {
+    if (!atoms.empty()) {
         to << "Center of mass (X, Y, Z):  " << fix(com(0)) << ", "
            << fix(com(1)) << ", " << fix(com(2)) << '\n';
     }
@@ -226,7 +223,7 @@ void Molrot::print_principal_moments(std::ostream& to) const
     chem::Format<char> line;
     line.width(54).fill('-');
 
-    if (! atoms.empty()) {
+    if (!atoms.empty()) {
         to << "\nPrincipal axes and moments of inertia in atomic units:\n"
            << line('-') << '\n';
 

@@ -49,9 +49,6 @@ void Molecule::init(std::istream& from,
                     const std::string& key,
                     bool verbose)
 {
-    typedef std::map<std::string, Input>::iterator Input_iter;
-    typedef std::map<std::string, Input>::const_iterator Cinput_iter;
-
     // Read input data:
 
     arma::vec elec_state_def(2);
@@ -75,7 +72,7 @@ void Molecule::init(std::istream& from,
                 chem::read_xyz_format(from, atoms, xyz, title);
             }
             else {
-                Input_iter it = input_data.find(token);
+                auto it = input_data.find(token);
                 if (it != input_data.end()) {
                     from >> it->second;
                 }
@@ -88,7 +85,7 @@ void Molecule::init(std::istream& from,
 
     // Check if initialized:
 
-    for (Cinput_iter it = input_data.begin(); it != input_data.end(); ++it) {
+    for (auto it = input_data.begin(); it != input_data.end(); ++it) {
         if (!it->second.is_init()) {
             throw Mol_error(it->first + " not initialized");
         }

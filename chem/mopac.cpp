@@ -30,9 +30,6 @@
 
 Mopac::Mopac(std::istream& from, const std::string& key)
 {
-    typedef std::map<std::string, Input>::iterator Input_iter;
-    typedef std::map<std::string, Input>::const_iterator Cinput_iter;
-
     // Read input data:
 
     std::string version_def  = "mopac5022mn";
@@ -60,7 +57,7 @@ Mopac::Mopac(std::istream& from, const std::string& key)
                 keywords = chem::trim(line, " ");
             }
             else {
-                Input_iter it = input_data.find(token);
+                auto it = input_data.find(token);
                 if (it != input_data.end()) {
                     from >> it->second;
                 }
@@ -73,7 +70,7 @@ Mopac::Mopac(std::istream& from, const std::string& key)
 
     // Check if initialized:
 
-    for (Cinput_iter it = input_data.begin(); it != input_data.end(); ++it) {
+    for (auto it = input_data.begin(); it != input_data.end(); ++it) {
         if (!it->second.is_init()) {
             throw Mopac_error(it->first + " not initialized");
         }

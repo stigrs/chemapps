@@ -30,50 +30,50 @@
 
 namespace chem {
 
-    // Error reporting:
+// Error reporting:
 
-    struct Arma_error : std::runtime_error {
-        Arma_error(std::string s) : std::runtime_error(s) {}
-    };
+struct Arma_error : std::runtime_error {
+    Arma_error(std::string s) : std::runtime_error(s) {}
+};
 
-    // I/O operators for vectors:
+// I/O operators for vectors:
 
-    template <typename T>
-    void print_vector(std::ostream& to, const arma::Col<T>& a)
-    {
-        to << a.size() << " [ ";
-        for (unsigned i = 0; i < a.size(); ++i) {
-            to << a(i) << " ";
-            if (!((i + 1) % 7) && (i != (a.size() - 1))) {
-                to << "\n  ";
-            }
-        }
-        to << ']';
-    }
-
-    template <typename T>
-    void read_vector(std::istream& from, arma::Col<T>& a)
-    {
-        unsigned n;
-        from >> n;
-        if (n < 1) {
-            throw Arma_error("read_vector: bad size");
-        }
-        a.resize(n);
-
-        char ch;
-        from >> ch;
-        if (ch != '[') {
-            throw Arma_error("read_vector: '[' missing");
-        }
-        for (unsigned i = 0; i < n; ++i) {
-            from >> a(i);
-        }
-        from >> ch;
-        if (ch != ']') {
-            throw Arma_error("read_vector: ']' missing");
+template <typename T>
+void print_vector(std::ostream& to, const arma::Col<T>& a)
+{
+    to << a.size() << " [ ";
+    for (unsigned i = 0; i < a.size(); ++i) {
+        to << a(i) << " ";
+        if (!((i + 1) % 7) && (i != (a.size() - 1))) {
+            to << "\n  ";
         }
     }
+    to << ']';
+}
+
+template <typename T>
+void read_vector(std::istream& from, arma::Col<T>& a)
+{
+    unsigned n;
+    from >> n;
+    if (n < 1) {
+        throw Arma_error("read_vector: bad size");
+    }
+    a.resize(n);
+
+    char ch;
+    from >> ch;
+    if (ch != '[') {
+        throw Arma_error("read_vector: '[' missing");
+    }
+    for (unsigned i = 0; i < n; ++i) {
+        from >> a(i);
+    }
+    from >> ch;
+    if (ch != ']') {
+        throw Arma_error("read_vector: ']' missing");
+    }
+}
 }  // chem::
 
 #endif /* CHEM_ARMA_IO_H */

@@ -1,5 +1,5 @@
 ---
-Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-alpha*,cppcoreguidelines-*,bugprone-*,cert-*,performance-*,readability-*'
+Checks:          'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-alpha*,cppcoreguidelines-*,cppcoreguidelines-pro-bounds-pointer-arithmetic-,bugprone-*,cert-*,performance-*,readability-*'
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
 User:            srs

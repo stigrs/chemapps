@@ -44,11 +44,11 @@ int main(int argc, char* argv[])
 
     std::string input_file;
 
-    if (vm.count("help")) {
+    if (vm.find("help") != vm.end()) {
         std::cout << options << '\n';
         return 0;
     }
-    if (vm.count("file")) {
+    if (vm.find("file") != vm.end()) {
         input_file = vm["file"].as<std::string>();
     }
     else {

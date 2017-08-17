@@ -222,9 +222,6 @@ double Torsion::red_moment_of_inertia()
 
 void Torsion::init(std::istream& from, const std::string& key)
 {
-    typedef std::map<std::string, Input>::iterator Input_iter;
-    typedef std::map<std::string, Input>::const_iterator Cinput_iter;
-
     // Read input data:
 
     arma::uvec rot_axis_def  = arma::zeros<arma::uvec>(2);
@@ -249,7 +246,7 @@ void Torsion::init(std::istream& from, const std::string& key)
                 break;
             }
             else {
-                Input_iter it = input_data.find(token);
+                auto it = input_data.find(token);
                 if (it != input_data.end()) {
                     from >> it->second;
                 }
@@ -262,7 +259,7 @@ void Torsion::init(std::istream& from, const std::string& key)
 
     // Check if initialized:
 
-    for (Cinput_iter it = input_data.begin(); it != input_data.end(); ++it) {
+    for (auto it = input_data.begin(); it != input_data.end(); ++it) {
         if (!it->second.is_init()) {
             throw Torsion_error(it->first + " not initialized");
         }

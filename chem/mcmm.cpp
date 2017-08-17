@@ -34,9 +34,6 @@ Mcmm<Pot>::Mcmm(std::istream& from,
                 bool verbose_)
     : mol(mol_), verbose(verbose_)
 {
-    typedef std::map<std::string, Input>::iterator Input_iter;
-    typedef std::map<std::string, Input>::const_iterator Cinput_iter;
-
     // Read input data:
 
     const double emin_def = -std::numeric_limits<double>::min();
@@ -61,7 +58,7 @@ Mcmm<Pot>::Mcmm(std::istream& from,
                 break;
             }
             else {
-                Input_iter it = input_data.find(token);
+                auto it = input_data.find(token);
                 if (it != input_data.end()) {
                     from >> it->second;
                 }
@@ -74,7 +71,7 @@ Mcmm<Pot>::Mcmm(std::istream& from,
 
     // Check if initialized:
 
-    for (Cinput_iter it = input_data.begin(); it != input_data.end(); ++it) {
+    for (auto it = input_data.begin(); it != input_data.end(); ++it) {
         if (!it->second.is_init()) {
             throw Mol_error(it->first + " not initialized");
         }

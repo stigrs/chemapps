@@ -35,21 +35,21 @@
 */
 namespace ptable {
 
-    struct Bad_atomic_symbol : std::domain_error {
-        Bad_atomic_symbol(std::string s) : std::domain_error(s) {}
-    };
+struct Bad_atomic_symbol : std::domain_error {
+    Bad_atomic_symbol(std::string s) : std::domain_error(s) {}
+};
 
-    Element get_element(const std::string& symbol);
-    std::string get_atomic_symbol(const std::string& symbol);
+Element get_element(const std::string& symbol);
+std::string get_atomic_symbol(const std::string& symbol);
 
-    int get_atomic_number(const std::string& symbol);
-    int get_mass_number(const std::string& symbol);
+int get_atomic_number(const std::string& symbol);
+int get_mass_number(const std::string& symbol);
 
-    double get_atomic_mass(const std::string& symbol);
-    double get_atomic_weight(const std::string& symbol);
-    double get_isotope_composition(const std::string& symbol);
+double get_atomic_mass(const std::string& symbol);
+double get_atomic_weight(const std::string& symbol);
+double get_isotope_composition(const std::string& symbol);
 
-    bool atomic_symbol_is_valid(const std::string& symbol);
+bool atomic_symbol_is_valid(const std::string& symbol);
 
 }  // ptable::
 

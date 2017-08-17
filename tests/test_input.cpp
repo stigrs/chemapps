@@ -39,7 +39,7 @@ int main(int /* argc */, char* argv[])
 
         std::string key;
         while (from >> key) {
-            Input_iter it = data.find(key);
+            auto it = data.find(key);
             if (it != data.end()) {
                 from >> it->second;
             }
