@@ -183,8 +183,7 @@ void Mopac::get_xyz(arma::mat& xyz) const
 {
     // Note: xyz must have the correct size on input, no resizing is done.
 
-    double heat = 0.0;
-    bool found  = false;
+    bool found = false;
 
     std::ifstream from;
     chem::fopen(from, jobname + ".out");

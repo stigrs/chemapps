@@ -50,6 +50,7 @@ public:
     Zmatrix(std::vector<Element>& atoms_, arma::mat& xyz_);
 
     ~Zmatrix() {}
+
     /// Get bond distance.
     double get_distance(int index) const;
 
@@ -58,6 +59,9 @@ public:
 
     /// Get dihedral angle.
     double get_dihedral(int index) const;
+
+    /// Get connectivities.
+    std::vector<arma::ivec> get_connectivities() const;
 
     /// Set bond distance.
     void set_distance(int index, double value);

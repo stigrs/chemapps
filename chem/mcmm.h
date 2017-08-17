@@ -69,6 +69,9 @@ private:
     */
     void uniform_usage(arma::mat& xnew);
 
+    /// Generate a new random conformer.
+    void gen_rand_conformer(Molecule& m) const;
+
 #if 0
     /// Check acceptance of energy.
     bool accept_energy(double enew);

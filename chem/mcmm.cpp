@@ -151,4 +151,10 @@ void Mcmm<Pot>::uniform_usage(arma::mat& xnew)
     }
 }
 
+template <class Pot>
+void Mcmm<Pot>::gen_rand_conformer(Molecule& m) const
+{
+    // Select a random dihedral angle:
+
+}
 template class Mcmm<Mopac>;

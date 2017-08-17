@@ -23,6 +23,26 @@
 #include <chem/molecule_io.h>
 #include <chem/zmatrix.h>
 
+std::vector<arma::ivec> Zmatrix::get_connectivities() const
+{
+    std::vector<arma::ivec> connect(0);
+    if (!atoms.empty()) {
+        arma::ivec ivec1(bond_connect(1));
+        connect.push_back(ivec1);
+    }
+    if (atoms.size() > 1) {
+        arma::ivec ivec2(bond_connect(2), angle_connect(2));
+        connect.push_back(ivec2);
+    }
+    if (atoms.size() > 2) {
+        for (arma::uword i = 3; i < bond_connect.size(); ++i) {
+            arma::ivec ivec3(
+                bond_connect(i), angle_connect(i), dihedral_connect(i));
+            connect.push_back(ivec3);
+        }
+    }
+    return connect;
+}
 void Zmatrix::rotate_moiety(const arma::ivec& moiety, double value)
 {
     if (atoms.size() > 3) {
