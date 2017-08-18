@@ -23,8 +23,6 @@ int main(int /* argc */, char* argv[])
     arma::vec dv_ans  = {0.1, 0.2, 0.3, 0.4, 0.5};
 
     std::map<std::string, Input> data;
-    typedef std::map<std::string, Input>::iterator Input_iter;
-
     data["integer"] = Input(i);
     data["double"]  = Input(d);
     data["string"]  = Input(s);

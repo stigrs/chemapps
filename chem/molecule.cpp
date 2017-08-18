@@ -26,17 +26,19 @@
 #include <map>
 
 Molecule::Molecule(const Molecule& mol)
-    : atoms(mol.atoms), xyz(mol.xyz), elec_state(mol.elec_state)
 {
-    title = mol.title;
-    geom_unit = mol.geom_unit;
-    charge = mol.charge;
+    title       = mol.title;
+    geom_unit   = mol.geom_unit;
+    atoms       = mol.atoms;
+    xyz         = mol.xyz;
+    elec_state  = mol.elec_state;
+    charge      = mol.charge;
     elec_energy = mol.elec_energy;
 
     zmat = std::make_shared<Zmatrix>(*mol.zmat);
-    rot = std::make_shared<Molrot>(*mol.rot);
-    vib = std::make_shared<Molvib>(*mol.vib);
-    tor = std::make_shared<Torsion>(*mol.tor);
+    rot  = std::make_shared<Molrot>(*mol.rot);
+    vib  = std::make_shared<Molvib>(*mol.vib);
+    tor  = std::make_shared<Torsion>(*mol.tor);
 }
 
 void Molecule::print_data(std::ostream& to, const std::string& key) const

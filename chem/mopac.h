@@ -75,7 +75,7 @@ private:
 inline Mopac::Mopac()
 {
     version  = "mopac5022mn";
-    keywords = "PM6-D GEO-OK PRECISE";
+    keywords = "PM6-D EF GEO-OK PRECISE";
     jobname  = "mopac";
     opt_geom = 1;  // perform geometry optimization
 }

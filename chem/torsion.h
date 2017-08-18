@@ -61,6 +61,8 @@ public:
     Torsion(Molrot& rot_) : rot(rot_) {}
     Torsion(std::istream& from, const std::string& key, Molrot& rot_);
 
+    Torsion(const Torsion& tor);
+
     ~Torsion() {}
 
     /// Perform torsional mode analysis.

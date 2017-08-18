@@ -27,6 +27,34 @@
 #include <iostream>
 #include <map>
 
+Torsion::Torsion(const Torsion& tor) : rot(tor.rot)
+{
+    xyz_  = tor.xyz_;
+    alpha = tor.alpha;
+
+    rot_axis  = tor.rot_axis;
+    rot_top   = tor.rot_top;
+    sigma_tor = tor.sigma_tor;
+
+    rmi_tor  = tor.rmi_tor;
+    pot_tor  = tor.pot_tor;
+    freq_tor = tor.freq_tor;
+
+    x_axis = tor.x_axis;
+    y_axis = tor.y_axis;
+    z_axis = tor.z_axis;
+
+    top_origo = tor.top_origo;
+    top_com   = tor.top_com;
+
+    am = tor.am;
+    bm = tor.bm;
+    cm = tor.cm;
+    um = tor.um;
+
+    perform_torsional_analysis = tor.perform_torsional_analysis;
+}
+
 void Torsion::analysis(std::ostream& to)
 {
     chem::Format<char> line;

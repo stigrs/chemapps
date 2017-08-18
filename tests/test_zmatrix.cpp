@@ -1,13 +1,13 @@
+#include <chem/element.h>
+#include <chem/molecule.h>
+#include <chem/utils.h>
 #include <armadillo>
 #include <cmath>
 #include <exception>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
-
-#include <chem/element.h>
-#include <chem/molecule.h>
-#include <chem/utils.h>
+#include <vector>
 
 int main(int /*argc */, char* argv[])
 {
@@ -30,7 +30,7 @@ int main(int /*argc */, char* argv[])
         std::ifstream from;
         chem::fopen(from, "test_zmatrix.inp");
 
-        arma::ivec moiety = {3, 9, 10};
+        std::vector<int> moiety = {3, 9, 10};
 
         Molecule mol(from);
         mol.get_zmat()->load(from);

@@ -72,10 +72,15 @@ public:
     const arma::mat& get_xyz() const { return xyz; }
     const arma::vec& get_elec_state() const { return elec_state; }
 
-    std::shared_ptr<Zmatrix> get_zmat() const { return zmat; }
-    std::shared_ptr<Molrot> get_rot() const { return rot; }
-    std::shared_ptr<Molvib> get_vib() const { return vib; }
-    std::shared_ptr<Torsion> get_tor() const { return tor; }
+    std::shared_ptr<const Zmatrix> get_zmat() const { return zmat; }
+    std::shared_ptr<const Molrot> get_rot() const { return rot; }
+    std::shared_ptr<const Molvib> get_vib() const { return vib; }
+    std::shared_ptr<const Torsion> get_tor() const { return tor; }
+
+    std::shared_ptr<Zmatrix> get_zmat() { return zmat; }
+    std::shared_ptr<Molrot> get_rot() { return rot; }
+    std::shared_ptr<Molvib> get_vib() { return vib; }
+    std::shared_ptr<Torsion> get_tor() { return tor; }
 
     int get_charge() const { return charge; }
 

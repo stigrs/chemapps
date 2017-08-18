@@ -23,6 +23,17 @@
 #include <chem/molecule_io.h>
 #include <chem/zmatrix.h>
 
+Zmatrix::Zmatrix(const Zmatrix& zmat) : atoms(zmat.atoms), xyz(zmat.xyz)
+{
+    distances = zmat.distances;
+    angles    = zmat.angles;
+    dihedrals = zmat.dihedrals;
+
+    bond_connect     = zmat.bond_connect;
+    angle_connect    = zmat.angle_connect;
+    dihedral_connect = zmat.dihedral_connect;
+}
+
 std::vector<arma::ivec> Zmatrix::get_connectivities() const
 {
     std::vector<arma::ivec> connect(0);
@@ -43,12 +54,12 @@ std::vector<arma::ivec> Zmatrix::get_connectivities() const
     }
     return connect;
 }
-void Zmatrix::rotate_moiety(const arma::ivec& moiety, double value)
+void Zmatrix::rotate_moiety(const std::vector<int>& moiety, double value)
 {
     if (atoms.size() > 3) {
-        for (arma::uword i = 0; i < moiety.size(); ++i) {
-            double phi = get_dihedral(moiety(i));
-            set_dihedral(moiety(i), phi + value);
+        for (std::size_t i = 0; i < moiety.size(); ++i) {
+            double phi = get_dihedral(moiety[i]);
+            set_dihedral(moiety[i], phi + value);
         }
     }
 }

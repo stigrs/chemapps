@@ -43,6 +43,8 @@ public:
     Molvib() {}
     Molvib(std::istream& from, const std::string& key);
 
+    Molvib(const Molvib& vib) { freqs = vib.freqs; }
+
     ~Molvib() {}
 
     /// Get vibrational frequencies.

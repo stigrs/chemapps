@@ -16,7 +16,6 @@ int main(int /*argc */, char* argv[])
 
         Molecule mol(from);
         mol.get_zmat()->load(from);
-        mol.print_data(std::cout, "Molecule");
         Mcmm<Mopac> mc(from, mol);
         mc.solve();
     }

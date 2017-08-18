@@ -67,7 +67,7 @@ private:
     bool check_exit() const;
 
     /// Check if random conformer is ok.
-    bool accept_geom_dist() const;
+    bool accept_geom_dist(const Molecule& m) const;
 
     /**
        Function for selecting starting geometry by using the uniform
@@ -124,12 +124,25 @@ private:
 };
 
 template <class Pot>
-inline bool Mcmm<Pot>::accept_geom_dist() const
+inline void Mcmm<Pot>::gen_rand_conformer(Molecule& m)
+{
+    // Select a random dihedral angle:
+    std::vector<int> moiety = select_rand_dihedral(m);
+
+    // Apply random variation to dihedral angle:
+    std::uniform_real_distribution<> rnd_uni_real(-180.0, 180.0);
+    double delta = rnd_uni_real(mt);
+    m.get_zmat()->rotate_moiety(moiety, delta);
+}
+
+template <class Pot>
+inline bool Mcmm<Pot>::accept_geom_dist(const Molecule& m) const
 {
     bool geom_ok = true;
     arma::mat dist_mat;
-    chem::pdist_matrix(dist_mat, mol.get_xyz());
-    if (dist_mat.min() < rmin) {  // avoid too close atoms
+    chem::pdist_matrix(dist_mat, m.get_xyz());
+    // std::cout << arma::nonzeros(dist_mat).min() << '\n';
+    if (arma::nonzeros(dist_mat).min() < rmin) {  // avoid too close atoms
         geom_ok = false;
     }
     return geom_ok;

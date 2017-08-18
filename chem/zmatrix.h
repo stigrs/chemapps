@@ -49,6 +49,8 @@ class Zmatrix {
 public:
     Zmatrix(std::vector<Element>& atoms_, arma::mat& xyz_);
 
+    Zmatrix(const Zmatrix& zmat);
+
     ~Zmatrix() {}
 
     /// Get bond distance.
@@ -73,7 +75,7 @@ public:
     void set_dihedral(int index, double value);
 
     /// Rotate moiety around a given torsional bond.
-    void rotate_moiety(const arma::ivec& moiety, double value);
+    void rotate_moiety(const std::vector<int>& moiety, double value);
 
     /// Load molecular coordinates in Z matrix format.
     void load(std::istream& from);

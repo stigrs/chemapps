@@ -32,10 +32,9 @@ Mopac::Mopac(std::istream& from, const std::string& key)
 {
     // Read input data:
 
-    std::string version_def  = "mopac5022mn";
-    std::string keywords_def = "PM6-D GEO-OK PRECISE";
-    std::string jobname_def  = "mopac";
-    int opt_geom_def         = 1;
+    std::string version_def = "mopac5022mn";
+    std::string jobname_def = "mopac";
+    int opt_geom_def        = 1;
 
     std::map<std::string, Input> input_data;
     input_data["version"]  = Input(version, version_def);

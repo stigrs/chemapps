@@ -66,16 +66,29 @@ Mcmm<Pot>::Mcmm(std::istream& from,
         }
     }
     else {
-        throw Mol_error("cannot find " + key + " section");
+        throw Mcmm_error("cannot find " + key + " section");
     }
 
     // Check if initialized:
 
     for (auto it = input_data.begin(); it != input_data.end(); ++it) {
         if (!it->second.is_init()) {
-            throw Mol_error(it->first + " not initialized");
+            throw Mcmm_error(it->first + " not initialized");
         }
     }
+
+    // Initialize iterators:
+
+    kiter   = 0;
+    nreject = 0;
+    naccept = 0;
+
+    // Initialize storage containers:
+
+    xcurr   = mol.get_xyz();
+    xglobal = xcurr;
+    ecurr   = mol.get_elec_energy();
+    eglobal = ecurr;
 
     // Seed the random number engine:
 
@@ -105,26 +118,18 @@ void Mcmm<Pot>::solve()
 template <class Pot>
 void Mcmm<Pot>::new_conformer()
 {
-#if 0
+    Molecule m(mol);
+    // Generate a new random conformer by using the uniform usage scheme:
     do {
-#endif
-        // Select starting geometry:
-        arma::mat xnew;
-        //uniform_usage(xnew);
-
-        Molecule m(mol);
-        //m.set_xyz(xnew);
-
-        // Generate a new conformer:
+        arma::mat xnew = m.get_xyz();
+        uniform_usage(xnew);
+        m.set_xyz(xnew);
         gen_rand_conformer(m);
-#if 0
-    } while (!accept_geom_dist());
-#endif 
+    } while (!accept_geom_dist(m));  // check geometry constraints
 
-#if 0    
     // Perform geometry optimization:
-    pot.run(mol);
-
+    pot.run(m);
+#if 0    
     // Check acceptance:
     if (accept_energy()) {
         if (! duplicate()) { // store new conformer
@@ -158,6 +163,7 @@ template <class Pot>
 void Mcmm<Pot>::uniform_usage(arma::mat& xnew)
 {
     xnew = xcurr;
+#if 0
     if (!conformers.empty()) {
         std::vector<Conformer> index;
         int istart     = 0;
@@ -181,21 +187,15 @@ void Mcmm<Pot>::uniform_usage(arma::mat& xnew)
         conformers[istart].iter += 1;
         xnew = conformers[istart].xyz;
     }
+#endif
 }
 
 template <class Pot>
-void Mcmm<Pot>::gen_rand_conformer(Molecule& m) 
-{
-    // Select a random dihedral angle:
-    select_rand_dihedral(m);
-}
-
-template <class Pot>
-std::vector<int> Mcmm<Pot>::select_rand_dihedral(const Molecule& m) 
+std::vector<int> Mcmm<Pot>::select_rand_dihedral(const Molecule& m)
 {
     std::vector<arma::ivec> connect = m.get_zmat()->get_connectivities();
-    std::uniform_int_distribution<> rnd_uni_int(2, connect.size());
-    int index = rnd_uni_int(mt);
+    std::uniform_int_distribution<> rnd_uni_int(2, connect.size() - 1);
+    int index           = rnd_uni_int(mt);
     arma::ivec dihedral = connect[index];
 
     std::vector<int> res(0);
@@ -203,9 +203,6 @@ std::vector<int> Mcmm<Pot>::select_rand_dihedral(const Molecule& m)
         if (arma::all((connect[i] == dihedral) == 1)) {
             res.push_back(i);
         }
-    }
-    for (std::size_t i = 0; i < res.size(); ++i) {
-        std::cout << res[i] << '\n';
     }
     return res;
 }

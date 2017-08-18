@@ -27,6 +27,13 @@
 #include <cmath>
 #include <map>
 
+Molrot::Molrot(const Molrot& rot)
+    : atoms(rot.atoms), xyz(rot.xyz), pmom(rot.pmom), paxis(rot.paxis)
+{
+    sigma   = rot.sigma;
+    aligned = rot.aligned;
+}
+
 void Molrot::analysis(std::ostream& to)
 {
     if (!atoms.empty()) {

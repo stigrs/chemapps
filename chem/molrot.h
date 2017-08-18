@@ -59,6 +59,8 @@ public:
            std::vector<Element>& atoms_,
            arma::mat& xyz_);
 
+    Molrot(const Molrot& rot);
+
     ~Molrot() {}
 
     /// Perform rotational analysis.
