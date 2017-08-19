@@ -22,8 +22,7 @@ Features
 
 Licensing
 ---------
-ChemApps is released under the GNU General Public License version 3; see
-LICENSE or http://www.gnu.org/licenses for list of terms.
+ChemApps is released under the MIT license.
 
 Obtain the Source Code
 ----------------------
