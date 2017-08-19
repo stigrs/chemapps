@@ -1,15 +1,29 @@
-#include <cmath>
-#include <exception>
-#include <fstream>
-#include <iostream>
-#include <stdexcept>
+//////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #include <chem/molecule.h>
 #include <chem/utils.h>
+#include <catch/catch.hpp>
+#include <cmath>
+#include <fstream>
 
-int main(int /* argc */, char* argv[])
+TEST_CASE("test_torsion")
 {
-    try {
+    SECTION("CH2ClCH2Cl")
+    {
         std::ifstream from;
         chem::fopen(from, "test_torsion_ch2clch2cl.inp");
 
@@ -17,11 +31,18 @@ int main(int /* argc */, char* argv[])
         double rmi = mol.get_tor()->red_moment_of_inertia();
 
         const double rmi_ans = 58.76991427;  // Chuang and Truhlar (2000)
-        chem::Assert(std::abs(rmi - rmi_ans) < 9.0e-2,
-                     std::runtime_error("bad rmi"));
+        CHECK(std::abs(rmi - rmi_ans) < 9.0e-2);
     }
-    catch (std::exception& e) {
-        std::cerr << argv[0] << ": " << e.what() << '\n';
-        return 1;
+
+    SECTION("CH3OH")
+    {
+        std::ifstream from;
+        chem::fopen(from, "test_torsion_ch3oh.inp");
+
+        Molecule mol(from);
+        double rmi = mol.get_tor()->red_moment_of_inertia();
+
+        const double rmi_ans = 2.19;  // Chuang and Truhlar (2000)
+        CHECK(std::abs(rmi - rmi_ans) < 2.0e-2);
     }
 }

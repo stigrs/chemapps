@@ -1,23 +1,18 @@
-/**
-   @file molecule_io.cpp
-
-   This file is part of ChemApps - A C++ Chemistry Toolkit
-
-   Copyright (C) 2016-2017  Stig Rune Sellevag
-
-   ChemApps is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   ChemApps is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+//////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #include <chem/molecule_io.h>
 #include <chem/ptable.h>
@@ -47,10 +42,10 @@ void chem::read_xyz_format(std::istream& from,
     std::getline(from, title);
     title = chem::trim(title, " ");
 
-    /// Read XYZ coordinates:
+    // Read XYZ coordinates:
     for (int i = 0; i < natoms; ++i) {
         from >> symbol >> x >> y >> z;
-        atoms[i] = ptable::get_element(symbol);
+        atoms[i]  = ptable::get_element(symbol);
         xyz(i, 0) = x;
         xyz(i, 1) = y;
         xyz(i, 2) = z;

@@ -1,23 +1,18 @@
-/**
-   @file utils.h
-
-   This file is part of ChemApps - A C++ Chemistry Toolkit
-
-   Copyright (C) 2016-2017  Stig Rune Sellevag
-
-   ChemApps is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   ChemApps is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+//////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #ifndef CHEM_UTILS_H
 #define CHEM_UTILS_H
@@ -34,11 +29,9 @@
 
 namespace chem {
 
-//-------------------------------------------------------------------------
-
 // Assertion methods:
 
-/// Stroustrup's templated Assert() function (p. 751 in TC++PL).
+// Stroustrup's templated Assert() function (p. 751 in TC++PL).
 template <typename E, typename A>
 inline void Assert(A assertion)
 {
@@ -47,7 +40,7 @@ inline void Assert(A assertion)
     }
 }
 
-/// Stroustrup's templated Assert() function (p. 752 in TC++PL).
+// Stroustrup's templated Assert() function (p. 752 in TC++PL).
 template <typename A, typename E>
 inline void Assert(A assertion, E except)
 {
@@ -56,21 +49,19 @@ inline void Assert(A assertion, E except)
     }
 }
 
-//-------------------------------------------------------------------------
-
 // Stream handling methods:
 
-/// Derived class for reporting file opening errors.
+// Derived class for reporting file opening errors.
 struct Fopen_error : std::runtime_error {
     Fopen_error(std::string s) : std::runtime_error(s) {}
 };
 
-/// Derived class for reporting lexical cast errors.
+// Derived class for reporting lexical cast errors.
 struct Bad_lexical_cast : std::bad_cast {
     const char* what() const throw() { return "bad lexical cast"; }
 };
 
-/// Wrapper function for opening file stream for input.
+// Wrapper function for opening file stream for input.
 inline void fopen(std::ifstream& from,
                   const std::string& filename,
                   std::ios_base::openmode mode = std::ios_base::in)
@@ -81,7 +72,7 @@ inline void fopen(std::ifstream& from,
     }
 }
 
-/// Wrapper function for opening file stream for output.
+// Wrapper function for opening file stream for output.
 inline void fopen(std::ofstream& to,
                   const std::string& filename,
                   std::ios_base::openmode mode = std::ios_base::out)
@@ -92,7 +83,7 @@ inline void fopen(std::ofstream& to,
     }
 }
 
-/// Find section in input stream.
+// Find section in input stream.
 inline bool find_section(std::istream& from, const std::string& key)
 {
     from.clear();
@@ -109,7 +100,7 @@ inline bool find_section(std::istream& from, const std::string& key)
     return false;
 }
 
-/// Lexical cast (type must be able to stream into and/or out of a string).
+// Lexical cast (type must be able to stream into and/or out of a string).
 template <typename Target, typename Source>
 Target lexical_cast(Source arg)
 {
@@ -123,11 +114,7 @@ Target lexical_cast(Source arg)
     return result;
 }
 
-//-------------------------------------------------------------------------
-
 // Stream format methods:
-
-// Forward declarations.
 
 template <typename T>
 struct Bound_form;
@@ -135,7 +122,7 @@ struct Bound_form;
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const Bound_form<T>& bf);
 
-/// Stroustrup's format class, pp. 635-636 in TC++PL (slightly modified).
+// Stroustrup's format class, pp. 635-636 in TC++PL (slightly modified).
 template <typename T>
 class Format {
 public:
@@ -145,49 +132,50 @@ public:
     }
 
     Bound_form<T> operator()(T vv) const { return Bound_form<T>(*this, vv); }
-    /// Set width.
+
+    // Set width.
     Format<T>& width(int w)
     {
         wdt = w;
         return *this;
     }
 
-    /// Set fill character.
+    // Set fill character.
     Format<T>& fill(char c)
     {
         ch = c;
         return *this;
     }
 
-    /// Set precision.
+    // Set precision.
     Format<T>& precision(int p)
     {
         prc = p;
         return *this;
     }
 
-    /// Set general format.
+    // Set general format.
     Format<T>& general()
     {
         fmt = std::ios_base::fmtflags(0);
         return *this;
     }
 
-    /// Set fixed floating point format.
+    // Set fixed floating point format.
     Format<T>& fixed()
     {
         fmt = std::ios_base::fixed;
         return *this;
     }
 
-    /// Set scientific floating point format using e character.
+    // Set scientific floating point format using e character.
     Format<T>& scientific()
     {
         fmt = std::ios_base::scientific;
         return *this;
     }
 
-    /// Set scientific floating point format using E character.
+    // Set scientific floating point format using E character.
     Format<T>& scientific_E()
     {
         fmt = std::ios_base::scientific | std::ios_base::uppercase;
@@ -204,7 +192,7 @@ private:
     friend std::ostream& operator<<<>(std::ostream&, const Bound_form<T>&);
 };  // Format
 
-/// Form plus value.
+// Form plus value.
 template <typename T>
 struct Bound_form {
     const Format<T>& f;
@@ -212,6 +200,7 @@ struct Bound_form {
     T v;
 
     Bound_form(const Format<T>& ff, T vv) : f(ff), v(vv) {}
+
 private:
     Bound_form& operator=(const Bound_form&);
 };
@@ -229,21 +218,19 @@ std::ostream& operator<<(std::ostream& to, const Bound_form<T>& bf)
     return to << s.str();
 }
 
-//-------------------------------------------------------------------------
-
 // String methods:
 
-/// Derived class for reporting string cast errors.
+// Derived class for reporting string cast errors.
 struct Bad_from_string : std::runtime_error {
     Bad_from_string(std::string s) : std::runtime_error(s) {}
 };
 
-/// Derived class for handling string find errors.
+// Derived class for handling string find errors.
 struct String_find_error : std::runtime_error {
     String_find_error(std::string s) : runtime_error(s) {}
 };
 
-/// Simple convert to string method.
+// Simple convert to string method.
 template <typename T>
 std::string to_string(const T& t)
 {
@@ -252,7 +239,7 @@ std::string to_string(const T& t)
     return oss.str();
 }
 
-/// Simple extract from string method.
+// Simple extract from string method.
 template <typename T>
 T from_string(const std::string& s)
 {
@@ -264,7 +251,7 @@ T from_string(const std::string& s)
     return t;
 }
 
-/// Convert Fortran scientific D format to double.
+// Convert Fortran scientific D format to double.
 inline double from_fortran_sci_fmt(const std::string& s)
 {
     std::string ss             = s;
@@ -275,7 +262,7 @@ inline double from_fortran_sci_fmt(const std::string& s)
     return from_string<double>(ss);
 }
 
-/// Trim leading and trailing characters from string.
+// Trim leading and trailing characters from string.
 inline std::string trim(const std::string& str, const char* sep)
 {
     const std::string::size_type pos = str.find_first_not_of(sep);
@@ -284,7 +271,7 @@ inline std::string trim(const std::string& str, const char* sep)
                : str.substr(pos, str.find_last_not_of(sep) - pos + 1);
 }
 
-/// Strip suffix from filename.
+// Strip suffix from filename.
 inline std::string strip_suffix(const std::string& filename,
                                 const std::string& suffix)
 {
@@ -296,7 +283,7 @@ inline std::string strip_suffix(const std::string& filename,
     return basename.erase(pos, basename.size() - pos);
 }
 
-/// Get suffix from filename.
+// Get suffix from filename.
 inline std::string get_suffix(const std::string& filename)
 {
     std::string suffix         = filename;
@@ -307,7 +294,7 @@ inline std::string get_suffix(const std::string& filename)
     return suffix.erase(0, pos);
 }
 
-/// Check if string has only blank characters.
+// Check if string has only blank characters.
 inline bool str_has_only_blanks(const std::string& str)
 {
     if (!str.empty()) {
@@ -318,11 +305,9 @@ inline bool str_has_only_blanks(const std::string& str)
     return true;
 }
 
-/**
-   Case-insensitive string comparison.
-
-   Note: Can only handle characters in the default C locale!
-*/
+// Case-insensitive string comparison.
+//
+// Note: Can only handle characters in the default C locale!
 inline bool stricmp(const std::string& str1, const std::string& str2)
 {
     std::string s1;
@@ -346,6 +331,6 @@ inline bool stricmp(const std::string& str1, const std::string& str2)
     }
     return s1 == s2;
 }
-}  // chem::
+}  // namespace chem
 
-#endif /* CHEM_UTILS_H */
+#endif  // CHEM_UTILS_H

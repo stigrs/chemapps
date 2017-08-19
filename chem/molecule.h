@@ -1,23 +1,18 @@
-/**
-   @file molecule.h
-
-   This file is part of ChemApps - A C++ Chemistry Toolkit
-
-   Copyright (C) 2016-2017  Stig Rune Sellevag
-
-   ChemApps is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   ChemApps is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+//////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #ifndef CHEM_MOLECULE_H
 #define CHEM_MOLECULE_H
@@ -34,17 +29,15 @@
 #include <string>
 #include <vector>
 
-//----------------------------------------------------------------------------
-
 // Error reporting:
 
 struct Mol_error : std::runtime_error {
     Mol_error(std::string s) : std::runtime_error(s) {}
 };
 
-//----------------------------------------------------------------------------
-
-/// Class for holding molecule data.
+//
+// Class for holding molecule data.
+//
 class Molecule {
 public:
     Molecule()
@@ -98,15 +91,15 @@ private:
               const std::string& key,
               bool verbose);
 
-    std::string title;      ///< molecule information
-    std::string geom_unit;  ///< units for geometry
+    std::string title;      // molecule information
+    std::string geom_unit;  // units for geometry
 
-    std::vector<Element> atoms;  ///< atoms in molecule
-    arma::mat xyz;               ///< cartesian coordinates
-    arma::vec elec_state;        ///< electronic state
+    std::vector<Element> atoms;  // atoms in molecule
+    arma::mat xyz;               // cartesian coordinates
+    arma::vec elec_state;        // electronic state
 
-    int charge;          ///< molecular charge
-    double elec_energy;  ///< electronic ground-state energy [Hartree]
+    int charge;          // molecular charge
+    double elec_energy;  // electronic ground-state energy [Hartree]
 
     std::shared_ptr<Zmatrix> zmat;
     std::shared_ptr<Molrot> rot;
@@ -116,14 +109,12 @@ private:
 
 inline void Molecule::set_xyz(const arma::mat& xyz_)
 {
-    /*
-      Note: Moment of inertia for torsional modes is currently not updated when
-      the geometry is changed. This may change in future versions.
-
-      TODO: Check if torsional modes need to be updated.
-    */
+    // Note: Moment of inertia for torsional modes is currently not updated
+    // when the geometry is changed. This may change in future versions.
+    //
+    // TODO: Check if torsional modes need to be updated.
     xyz = xyz_;
     zmat->build_zmat();
 }
 
-#endif /* CHEM_MOLECULE_H */
+#endif  // CHEM_MOLECULE_H

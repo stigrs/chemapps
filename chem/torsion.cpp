@@ -1,23 +1,18 @@
-/**
-   @file torsion.cpp
-
-   This file is part of ChemApps - A C++ Chemistry Toolkit
-
-   Copyright (C) 2016-2017  Stig Rune Sellevag
-
-   ChemApps is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-
-   ChemApps is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+//////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #include <chem/datum.h>
 #include <chem/input.h>
@@ -446,9 +441,9 @@ void Torsion::top_moment_of_inertia()
         top_xyz.row(i) = xyz_.row(rot_top(i)) - top_origo;
     }
     for (arma::uword i = 0; i < top_xyz.n_rows; ++i) {
-        double x = arma::dot(top_xyz.row(i), x_axis);
-        double y = arma::dot(top_xyz.row(i), y_axis);
-        double z = arma::dot(top_xyz.row(i), z_axis);
+        double x      = arma::dot(top_xyz.row(i), x_axis);
+        double y      = arma::dot(top_xyz.row(i), y_axis);
+        double z      = arma::dot(top_xyz.row(i), z_axis);
         top_xyz(i, 0) = x;
         top_xyz(i, 1) = y;
         top_xyz(i, 2) = z;

@@ -1,14 +1,27 @@
-#include <exception>
-#include <fstream>
-#include <iostream>
-#include <stdexcept>
+//////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #include <chem/element.h>
 #include <chem/molecule.h>
 #include <chem/utils.h>
 #include <armadillo>
+#include <catch/catch.hpp>
+#include <fstream>
 
-int main(int /* argc */, char* argv[])
+TEST_CASE("test_molecule")
 {
     arma::mat xyz_ans(8, 3);
     xyz_ans(0, 0) = 0.0000;
@@ -36,18 +49,11 @@ int main(int /* argc */, char* argv[])
     xyz_ans(7, 1) = 0.5060;
     xyz_ans(7, 2) = -1.1564;
 
-    try {
-        std::ifstream from;
-        chem::fopen(from, "test_molecule.inp");
+    std::ifstream from;
+    chem::fopen(from, "test_molecule.inp");
 
-        Molecule mol(from);
-        arma::mat xyz = mol.get_xyz();
+    Molecule mol(from);
+    arma::mat xyz = mol.get_xyz();
 
-        chem::Assert(arma::approx_equal(xyz, xyz_ans, "absdiff", 1.0e-12),
-                     std::runtime_error("bad xyz coords"));
-    }
-    catch (std::exception& e) {
-        std::cerr << argv[0] << ": " << e.what() << '\n';
-        return 1;
-    }
+    CHECK(arma::approx_equal(xyz, xyz_ans, "absdiff", 1.0e-12));
 }

@@ -1,15 +1,27 @@
-#include <exception>
-#include <fstream>
-#include <iostream>
-#include <map>
-#include <stdexcept>
-#include <string>
+//////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #include <chem/input.h>
 #include <chem/utils.h>
 #include <armadillo>
+#include <catch/catch.hpp>
+#include <map>
+#include <string>
 
-int main(int /* argc */, char* argv[])
+TEST_CASE("test_input")
 {
     int i;
     double d;
@@ -31,36 +43,27 @@ int main(int /* argc */, char* argv[])
     data["dvector"] = Input(dv);
 
     std::ifstream from;
+    chem::fopen(from, "test_input.inp");
 
-    try {
-        chem::fopen(from, "test_input.inp");
-
-        std::string key;
-        while (from >> key) {
-            auto it = data.find(key);
-            if (it != data.end()) {
-                from >> it->second;
-            }
-        }
-
-        chem::Assert(i == 1, std::runtime_error("integer failed"));
-        chem::Assert(d == 2.0, std::runtime_error("double failed"));
-        chem::Assert(s == "hello", std::runtime_error("string failed"));
-        for (arma::uword it = 0; it < iv_ans.size(); ++it) {
-            chem::Assert(iv(it) == iv_ans(it),
-                         std::runtime_error("ivector failed"));
-        }
-        for (arma::uword it = 0; it < uv_ans.size(); ++it) {
-            chem::Assert(uv(it) == uv_ans(it),
-                         std::runtime_error("uvector failed"));
-        }
-        for (arma::uword it = 0; it < dv_ans.size(); ++it) {
-            chem::Assert(dv(it) == dv_ans(it),
-                         std::runtime_error("dvector failed"));
+    std::string key;
+    while (from >> key) {
+        auto it = data.find(key);
+        if (it != data.end()) {
+            from >> it->second;
         }
     }
-    catch (std::exception& e) {
-        std::cerr << argv[0] << ": " << e.what() << '\n';
-        return 1;
+
+    CHECK(i == 1);
+    CHECK(d == 2.0);
+    CHECK(s == "hello");
+
+    for (arma::uword it = 0; it < iv_ans.size(); ++it) {
+        CHECK(iv(it) == iv_ans(it));
+    }
+    for (arma::uword it = 0; it < uv_ans.size(); ++it) {
+        CHECK(uv(it) == uv_ans(it));
+    }
+    for (arma::uword it = 0; it < dv_ans.size(); ++it) {
+        CHECK(dv(it) == dv_ans(it));
     }
 }

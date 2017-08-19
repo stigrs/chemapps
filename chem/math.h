@@ -29,35 +29,37 @@
 
 namespace chem {
 
-/// Convert radians to degrees.
+// Convert radians to degrees.
 inline double radtodeg(double rad) { return rad * 180.0 / datum::pi; }
-/// Convert degrees to radians.
+
+// Convert degrees to radians.
 inline double degtorad(double deg) { return deg * datum::pi / 180.0; }
-/// Compute distance between two points.
+
+// Compute distance between two points.
 double distance(const arma::vec& a, const arma::vec& b);
 
-/// Compute angle in degrees between three points.
+// Compute angle in degrees between three points.
 double angle(const arma::vec& a, const arma::vec& b, const arma::vec& c);
 
-/// Compute dihedral angle in degrees given four points.
+// Compute dihedral angle in degrees given four points.
 double dihedral(const arma::vec& a,
                 const arma::vec& b,
                 const arma::vec& c,
                 const arma::vec& d);
 
-/// Floating point comparison.
+// Floating point comparison.
 bool approx_equal(double a, double b, double epsilon = 1.0e-12);
 
-/// Compute the pair-wise distances between observations in n-dim. space.
+// Compute the pair-wise distances between observations in n-dim. space.
 void pdist_matrix(arma::mat& dm, const arma::mat& mat);
 
-/// Perform translation.
+// Perform translation.
 void translate(arma::mat& xyz, double dx, double dy, double dz);
 
-/// Perform rotation given a rotation matrix.
+// Perform rotation given a rotation matrix.
 void rotate(arma::mat& xyz, const arma::mat33& rotm);
 
-}  // chem::
+}  // namespace chem
 
 inline double chem::distance(const arma::vec& a, const arma::vec& b)
 {
