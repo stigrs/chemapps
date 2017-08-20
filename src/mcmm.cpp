@@ -16,6 +16,7 @@
 
 #include <chem/mcmm.h>
 #include <chem/molecule.h>
+#include <chem/mopac.h>
 #include <chem/utils.h>
 #include <boost/program_options.hpp>
 #include <exception>
@@ -66,7 +67,7 @@ int main(int argc, char* argv[])
         chem::fopen(to, output_file.c_str());
 
         Molecule mol(from, to);
-        Mcmm mc(from, mol);
+        Mcmm<Mopac> mc(from, mol, "Mcmm", true);
         mc.solve(to);
     }
     catch (std::exception& e) {
