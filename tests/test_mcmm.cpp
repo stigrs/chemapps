@@ -28,6 +28,6 @@ TEST_CASE("test_mcmm")
 
     Molecule mol(from);
     mol.get_zmat()->load(from);
-    Mcmm<Mopac> mc(from, mol);
+    Mcmm<Mopac> mc(from, mol, "Mcmm", true);
     mc.solve();
 }

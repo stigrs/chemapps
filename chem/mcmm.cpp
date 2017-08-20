@@ -16,9 +16,9 @@
 
 #include <chem/input.h>
 #include <chem/mcmm.h>
+#include <chem/molecule_io.h>
 #include <chem/mopac.h>
 #include <chem/utils.h>
-#include <algorithm>
 #include <limits>
 #include <map>
 
@@ -31,11 +31,11 @@ Mcmm<Pot>::Mcmm(std::istream& from,
 {
     // Read input data:
 
-    const double emin_def = -std::numeric_limits<double>::min();
+    const double emin_def = -std::numeric_limits<double>::max();
 
     std::map<std::string, Input> input_data;
-    input_data["xtol"]      = Input(xtol, 1.0e-5);
-    input_data["etol"]      = Input(etol, 1.0e-8);
+    input_data["xtol"]      = Input(xtol, 5.0e-4);
+    input_data["etol"]      = Input(etol, 1.0e-4);
     input_data["emin"]      = Input(emin, emin_def);
     input_data["emax"]      = Input(emax, 0.0);
     input_data["rmin"]      = Input(rmin, 0.7414);  // experimental r(H-H)
@@ -80,10 +80,8 @@ Mcmm<Pot>::Mcmm(std::istream& from,
 
     // Initialize storage containers:
 
-    xcurr   = mol.get_xyz();
-    xglobal = xcurr;
-    ecurr   = mol.get_elec_energy();
-    eglobal = ecurr;
+    xcurr = mol.get_xyz();
+    ecurr = mol.get_elec_energy();
 
     // Seed the random number engine:
 
@@ -98,74 +96,167 @@ Mcmm<Pot>::Mcmm(std::istream& from,
 }
 
 template <class Pot>
-void Mcmm<Pot>::solve()
+void Mcmm<Pot>::solve(std::ostream& to)
 {
-    bool finished = false;
-    while (!finished) {
+    global_min_found = false;
+    while (!global_min_found) {
         new_conformer();
         update();
         if (check_exit()) {
-            finished = true;
+            sort_conformers();
+            global_min_found = true;
         }
     }
-}
+    if (verbose) {
+        double eglobal_min = *std::min_element(eglobal.begin(), eglobal.end());
+        chem::Format<char> line;
+        line.width(41).fill('=');
+        chem::Format<int> ifix;
+        ifix.fixed().width(5);
+        chem::Format<double> dfix;
+        dfix.fixed().width(8).precision(2);
+        to << "Monte Carlo Multiple Minima (MCMM) Solver\n"
+           << line('=') << '\n';
+        to << "Temperature:\t" << dfix(temp) << '\n'
+           << "Iterations:\t" << ifix(kiter) << " out of " << maxiter << '\n'
+           << "Rejections:\t" << ifix(nreject) << " out of " << maxreject
+           << "\n\n";
+        dfix.fixed().width(10).precision(4);
+        line.width(15).fill('-');
+        to << "Global minimum:\n"
+           << line('-') << '\n'
+           << "Energy: " << dfix(eglobal_min) << '\n';
+        chem::print_geometry(to, mol.get_atoms(), xglobal);
+        to << '\n';
 
-template <class Pot>
-void Mcmm<Pot>::new_conformer()
-{
-    Molecule m(mol);
-    // Generate a new random conformer by using the uniform usage scheme:
-    do {
-        arma::mat xnew = m.get_xyz();
-        uniform_usage(xnew);
-        m.set_xyz(xnew);
-        gen_rand_conformer(m);
-    } while (!accept_geom_dist(m));  // check geometry constraints
-
-    // Perform geometry optimization:
-    pot.run(m);
-    double enew = m.get_elec_energy();
-    std::cout << enew << '\n';
-#if 0    
-    // Check acceptance:
-    if (accept_energy()) {
-        if (! duplicate()) { // store new conformer
-            xcurr = mol.get_xyz();
-            ecurr = mol.get_elec_energy();
-            save_conformer();
-            naccept += 1;
+        line.width(13).fill('-');
+        to << "Local minima:\n" << line('-') << '\n';
+        for (std::size_t i = 0; i < conformers.size(); ++i) {
+            to << "Conformer: " << i + 1 << '\n'
+               << "Energy: " << dfix(conformers[i].energy) << '\n';
+            chem::print_geometry(to, mol.get_atoms(), conformers[i].xyz);
+            to << '\n';
         }
     }
-#endif
-}
-
-template <class Pot>
-void Mcmm<Pot>::update()
-{
-    kiter += 1;
 }
 
 template <class Pot>
 bool Mcmm<Pot>::check_exit() const
 {
     bool finished = false;
+    if (ecurr < emin) {
+        finished = true;
+    }
     if (kiter >= maxiter) {
         finished = true;
+    }
+    if (nreject >= maxreject) {
+        finished = true;
+    }
+    std::vector<double> ediff(eglobal.size());
+    std::adjacent_difference(eglobal.begin(), eglobal.end(), ediff.begin());
+    if (ediff.size() > 1) {
+        double ediff_max = *std::max_element(ediff.begin(), ediff.end());
+        if ((ediff_max < etol) && (kiter >= 10)) {
+            finished = true;
+        }
     }
     return finished;
 }
 
+template <class Pot>
+bool Mcmm<Pot>::accept_energy(double enew)
+{
+    bool accept  = false;
+    double ediff = enew - ecurr;
+    if (enew > emax) {
+        nreject += 1;
+    }
+    else if (ediff < 0.0) {
+        accept = true;
+    }
+    else {
+        double h = std::exp(-ediff / temp);
+        std::uniform_real_distribution<> rnd_real_uni(0.0, 1.0);
+        if (h > rnd_real_uni(mt)) {
+            accept = true;
+        }
+        else {
+            nreject += 1;
+        }
+    }
+    return accept;
+}
+
+template <class Pot>
+bool Mcmm<Pot>::duplicate(const Molecule& m) const
+{
+    bool duplicate = false;
+    for (std::size_t i = 0; i < conformers.size(); ++i) {  // check geometry
+        duplicate =
+            arma::approx_equal(conformers[i].xyz, m.get_xyz(), "absdiff", xtol);
+        if (duplicate) {  // check energy
+            double ediff = std::abs(conformers[i].energy - m.get_elec_energy());
+            duplicate    = ediff < etol;
+        }
+    }
+    return duplicate;
+}
+
+template <class Pot>
+void Mcmm<Pot>::new_conformer()
+{
+    // Molecule m(mol);
+    // Generate a new random conformer by using the uniform usage scheme:
+    do {
+        arma::mat xnew = mol.get_xyz();
+        uniform_usage(xnew);
+        mol.set_xyz(xnew);
+        gen_rand_conformer(mol);
+    } while (!accept_geom_dist(mol));  // check geometry constraints
+
+    // Perform geometry optimization:
+    pot.run(mol);
+
+    // Check acceptance:
+    if (accept_energy(mol.get_elec_energy())) {
+        if (!duplicate(mol)) {  // store new conformer
+            xcurr = mol.get_xyz();
+            ecurr = mol.get_elec_energy();
+            save_conformer(mol);
+            naccept += 1;
+        }
+    }
+}
+
+template <class Pot>
+void Mcmm<Pot>::update()
+{
+    kiter += 1;
+
+    // Update global minimum if appropriate:
+    if (!eglobal.empty()) {
+        if (ecurr <= *std::min_element(eglobal.begin(), eglobal.end())) {
+            eglobal.push_back(ecurr);
+            xglobal = xcurr;
+        }
+    }
+    else {
+        eglobal.push_back(ecurr);
+        xglobal = xcurr;
+    }
+}
 
 template <class Pot>
 void Mcmm<Pot>::uniform_usage(arma::mat& xnew)
 {
     xnew = xcurr;
-#if 0
     if (!conformers.empty()) {
         std::vector<Conformer> index;
         int istart     = 0;
         int min_nstart = kiter;
-        for (unsigned i = 0; i < conformers.size(); ++i) {  // find least used
+        // Find least used:
+        for (std::size_t i = 0; i < conformers.size(); ++i) {
             if (conformers[i].iter <= min_nstart) {
                 index.push_back(conformers[i]);
             }
@@ -174,7 +265,7 @@ void Mcmm<Pot>::uniform_usage(arma::mat& xnew)
             auto res = std::max_element(conformers.begin(), conformers.end());
             int it   = std::distance(conformers.begin(), res);
             double emin_ = conformers[it].energy;
-            for (unsigned i = 0; i < index.size(); ++i) {
+            for (std::size_t i = 0; i < index.size(); ++i) {
                 if (index[i].energy < emin_) {
                     emin_  = index[i].energy;
                     istart = i;
@@ -184,7 +275,20 @@ void Mcmm<Pot>::uniform_usage(arma::mat& xnew)
         conformers[istart].iter += 1;
         xnew = conformers[istart].xyz;
     }
-#endif
+}
+
+template <class Pot>
+inline void Mcmm<Pot>::sort_conformers()
+{
+    std::sort(conformers.begin(), conformers.end());
+    if (conformers.size() > nminima) {
+        std::vector<Conformer> tmp;
+        for (std::size_t i = 0; i < nminima; ++i) {
+            tmp.push_back(Conformer(conformers[i]));
+        }
+        conformers.resize(nminima);
+        conformers = tmp;
+    }
 }
 
 template <class Pot>

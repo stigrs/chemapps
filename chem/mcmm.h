@@ -20,6 +20,7 @@
 #include <chem/conformer.h>
 #include <chem/math.h>
 #include <chem/molecule.h>
+#include <algorithm>
 #include <armadillo>
 #include <iostream>
 #include <random>
@@ -47,20 +48,30 @@ public:
     ~Mcmm() {}
 
     // MCMM solver.
-    void solve();
+    void solve(std::ostream& to = std::cout);
+
+    // Get global minimum values.
+    double get_global_min_energy();
+    arma::mat get_global_min_xyz();
 
 private:
+    // Check if MCMM solver is finished.
+    bool check_exit() const;
+
+    // Check acceptance of energy.
+    bool accept_energy(double enew);
+
+    // Check if random conformer is ok.
+    bool accept_geom_dist(const Molecule& m) const;
+
+    // Check if current conformer is a duplicate.
+    bool duplicate(const Molecule& m) const;
+
     // Generate a new molecular conformer.
     void new_conformer();
 
     // Update MCMM solver.
     void update();
-
-    // Check if MCMM solver is finished.
-    bool check_exit() const;
-
-    // Check if random conformer is ok.
-    bool accept_geom_dist(const Molecule& m) const;
 
     // Function for selecting starting geometry by using the uniform
     // usage scheme.
@@ -69,19 +80,15 @@ private:
     // Generate a new random conformer.
     void gen_rand_conformer(Molecule& m);
 
+    // Save conformer (local energy minimum).
+    void save_conformer(const Molecule& m);
+
+    // Sort conformers in ascending order and cut to nminima.
+    void sort_conformers();
+
     // Select random dihedral angle.
     std::vector<int> select_rand_dihedral(const Molecule& m);
 
-#if 0
-    // Check acceptance of energy.
-    bool accept_energy(double enew);
-
-    // Sort local minima in descending order and cut to nminima.
-    void sort_minima();
-
-    // Save local minima.
-    void save_conformer(double energy, const Molecule& mol);
-#endif
     Molecule& mol;  // molecule
     Pot pot;        // potential function
 
@@ -104,16 +111,34 @@ private:
     arma::mat xcurr;    // current geometry
     arma::mat xglobal;  // geometry of global minimum
 
-    double ecurr;    // current energy
-    double eglobal;  // energy of global minimum
+    double ecurr;                 // current energy
+    std::vector<double> eglobal;  // energy of global minimum
 
     std::vector<Conformer> conformers;  // array with local energy minima
 
     bool verbose;
+    bool global_min_found = false;
 
     std::mt19937_64 mt;  // random number engine
 };
 
+template <class Pot>
+inline double Mcmm<Pot>::get_global_min_energy()
+{
+    if (!global_min_found) {
+        solve();
+    }
+    return *std::min_element(eglobal.begin(), eglobal.end());
+}
+
+template <class Pot>
+inline arma::mat Mcmm<Pot>::get_global_min_xyz()
+{
+    if (!global_min_found) {
+        solve();
+    }
+    return xglobal;
+}
 template <class Pot>
 inline void Mcmm<Pot>::gen_rand_conformer(Molecule& m)
 {
@@ -132,11 +157,17 @@ inline bool Mcmm<Pot>::accept_geom_dist(const Molecule& m) const
     bool geom_ok = true;
     arma::mat dist_mat;
     chem::pdist_matrix(dist_mat, m.get_xyz());
-    // std::cout << arma::nonzeros(dist_mat).min() << '\n';
     if (arma::nonzeros(dist_mat).min() < rmin) {  // avoid too close atoms
         geom_ok = false;
     }
     return geom_ok;
+}
+
+template <class Pot>
+void Mcmm<Pot>::save_conformer(const Molecule& m)
+{
+    Conformer c(m.get_elec_energy(), m.get_xyz());
+    conformers.push_back(c);
 }
 
 #endif  // CHEM_MCMM_H

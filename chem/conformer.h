@@ -25,6 +25,7 @@
 // Simple structure for storing conformers.
 //
 struct Conformer {
+    Conformer() {}
     explicit Conformer(double e, const arma::mat& x)
         : energy(e), atoms(0), xyz(x)
     {
@@ -36,6 +37,14 @@ struct Conformer {
     {
         iter = 0;
     }
+
+    Conformer(const Conformer& c) : atoms(c.atoms), xyz(c.xyz)
+    {
+        energy = c.energy;
+        iter   = c.iter;
+    }
+
+    ~Conformer() {}
 
     // Compare conformers by energy.
     bool operator<(const Conformer& c) const { return energy < c.energy; }

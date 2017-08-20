@@ -37,7 +37,7 @@ template <typename T>
 void print_vector(std::ostream& to, const arma::Col<T>& a)
 {
     to << a.size() << " [ ";
-    for (unsigned i = 0; i < a.size(); ++i) {
+    for (arma::uword i = 0; i < a.size(); ++i) {
         to << a(i) << " ";
         if (!((i + 1) % 7) && (i != (a.size() - 1))) {
             to << "\n  ";
@@ -49,7 +49,7 @@ void print_vector(std::ostream& to, const arma::Col<T>& a)
 template <typename T>
 void read_vector(std::istream& from, arma::Col<T>& a)
 {
-    unsigned n;
+    arma::uword n;
     from >> n;
     if (n < 1) {
         throw Arma_error("read_vector: bad size");
@@ -61,7 +61,7 @@ void read_vector(std::istream& from, arma::Col<T>& a)
     if (ch != '[') {
         throw Arma_error("read_vector: '[' missing");
     }
-    for (unsigned i = 0; i < n; ++i) {
+    for (arma::uword i = 0; i < n; ++i) {
         from >> a(i);
     }
     from >> ch;
