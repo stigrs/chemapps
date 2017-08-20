@@ -14,11 +14,13 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <chem/datum.h>
 #include <chem/mcmm.h>
 #include <chem/molecule.h>
 #include <chem/mopac.h>
 #include <chem/utils.h>
 #include <catch/catch.hpp>
+#include <cmath>
 #include <fstream>
 
 TEST_CASE("test_mcmm")
@@ -28,6 +30,8 @@ TEST_CASE("test_mcmm")
 
     Molecule mol(from);
     mol.get_zmat()->load(from);
-    Mcmm<Mopac> mc(from, mol, "Mcmm", true);
-    mc.solve();
+    Mcmm<Mopac> mc(from, mol);
+    double eglobal   = mc.get_global_min_energy();
+    double emin_anti = -31.03257 * datum::cal_to_J;
+    CHECK(std::abs(eglobal - emin_anti) < 1.0e-4);
 }
