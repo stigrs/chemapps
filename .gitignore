@@ -9,8 +9,6 @@
 *.log
 *.tmp
 tmp.*
-.vscode/.cmaketools.json
-.vscode/launch.json
 
 # Directories:
 build
