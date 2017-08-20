@@ -34,7 +34,6 @@ Requirements
 ------------
 * [CMake](https://cmake.org) 3.4.3
 * [Armadillo] (http://arma.sourceforge.net) 7.950.1
-* [Catch] (https://github.com/philsquared/Catch) 1.9.7
 
 Installation
 ------------
