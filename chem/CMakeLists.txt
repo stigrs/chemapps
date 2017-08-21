@@ -31,6 +31,7 @@ set(
     molvib.h
     mopac.h
     ptable.h
+    thermodata.h
     torsion.h
     zmatrix.h
 )
