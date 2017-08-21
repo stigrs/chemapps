@@ -19,6 +19,7 @@
 
 #include <chem/datum.h>
 #include <armadillo>
+#include <iostream>
 #include <string>
 
 //
@@ -27,6 +28,9 @@
 class Thermodata {
 public:
     Thermodata();
+    Thermodata(std::istream& from, const std::string& key);
+
+    ~Thermodata() {}
 
     arma::vec get_pressure() const { return pressure; }
     arma::vec get_temperature() const { return temperature; }
