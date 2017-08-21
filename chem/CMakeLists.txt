@@ -14,6 +14,7 @@ set(
     molrot.cpp
     molvib.cpp
     mopac.cpp
+    thermodata.cpp
     torsion.cpp
     zmatrix.cpp
 )

@@ -47,6 +47,7 @@ set(PROGRAMS
     test_torsion
     test_mopac
     test_mcmm
+    test_thermodata
 )
 
 foreach(program ${PROGRAMS})

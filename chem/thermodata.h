@@ -23,6 +23,11 @@
 #include <stdexcept>
 #include <string>
 
+// Error reporting:
+
+struct Thermodata_error : std::runtime_error {
+    Thermodata_error(std::string s) : std::runtime_error(s) {}
+};
 //
 // Class for holding thermochemical data.
 //
@@ -46,7 +51,7 @@ public:
 private:
     arma::vec pressure;
     arma::vec temperature;
-    bool incl_sigma;      // include rotational symmetry number?
+    int incl_sigma;       // include rotational symmetry number?
     std::string zeroref;  // zero reference point for vibrations (BOT or V=0)
 };
 
@@ -54,7 +59,7 @@ inline Thermodata::Thermodata()
 {
     pressure    = {datum::std_atm};
     temperature = {298.15};
-    incl_sigma  = true;
+    incl_sigma  = 1;
     zeroref     = "BOT";
 }
 

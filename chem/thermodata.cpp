@@ -16,11 +16,10 @@
 
 #include <chem/input.h>
 #include <chem/thermodata.h>
-#include <chem/utils.h
+#include <chem/utils.h>
 #include <map>
 
-Thermodata::Thermodata(std::istream& from,
-                       const std::string& key = "ThermoData")
+Thermodata::Thermodata(std::istream& from, const std::string& key)
 {
     // Read input data:
 
@@ -30,7 +29,7 @@ Thermodata::Thermodata(std::istream& from,
     std::map<std::string, Input> input_data;
     input_data["pressure"]    = Input(pressure, p_def);
     input_data["temperature"] = Input(temperature, t_def);
-    input_data["incl_sigma"]  = Input(incl_sigma, true);
+    input_data["incl_sigma"]  = Input(incl_sigma, 1);
     input_data["zeroref"]     = Input(zeroref, "BOT");
 
     bool found = chem::find_section(from, key);
