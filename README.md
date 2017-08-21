@@ -38,7 +38,7 @@ Requirements
 Usage of Third Party Libraries
 ------------------------------
 This project makes use of the [Catch](https://https://github.com/philsquared/catch) 
-testing library and code from the [qcl](https://github.com/ben-albrecht/qcl] 
+testing library and code from the [qcl](https://github.com/ben-albrecht/qcl) 
 project. Please see the [ThirdPartyNotices.txt](ThirdPartyNotices.txt) file 
 for details regarding the licensing of Catch and qcl.
 
