@@ -35,6 +35,13 @@ Requirements
 * [CMake](https://cmake.org) 3.4.3
 * [Armadillo] (http://arma.sourceforge.net) 7.950.1
 
+Usage of Third Party Libraries
+------------------------------
+This project makes use of the [Catch](https://https://github.com/philsquared/catch) 
+testing library and code from the [qcl](https://github.com/ben-albrecht/qcl] 
+project. Please see the [ThirdPartyNotices.txt](ThirdPartyNotices.txt) file 
+for details regarding the licensing of Catch and qcl.
+
 Installation
 ------------
 The program is installed by executing the command
