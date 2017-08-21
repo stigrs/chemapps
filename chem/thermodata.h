@@ -28,7 +28,7 @@
 class Thermodata {
 public:
     Thermodata();
-    Thermodata(std::istream& from, const std::string& key);
+    Thermodata(std::istream& from, const std::string& key = "ThermoData");
 
     ~Thermodata() {}
 
