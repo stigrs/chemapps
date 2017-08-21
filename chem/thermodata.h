@@ -20,6 +20,7 @@
 #include <chem/datum.h>
 #include <armadillo>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 
 //

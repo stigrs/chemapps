@@ -112,7 +112,7 @@ inline void Molecule::set_xyz(const arma::mat& xyz_)
     // Note: Moment of inertia for torsional modes is currently not updated
     // when the geometry is changed. This may change in future versions.
     //
-    // TODO: Check if torsional modes need to be updated.
+    // TODO (stigrs@gmail.com) Check if torsional modes need to be updated.
     xyz = xyz_;
     zmat->build_zmat();
 }
