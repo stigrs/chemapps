@@ -99,14 +99,15 @@ private:
     double rmin;  // smallest bond distance permitted
     double temp;  // temperature
 
-    int maxiter;    // maximum number of iterations (k)
-    int maxreject;  // maximum number of consecutive rejected trials
-    int nminima;    // number of local minima stored
-    int seed;       // random number generator seed
+    unsigned maxiter;    // maximum number of iterations (k)
+    unsigned maxreject;  // maximum number of consecutive rejected trials
+    unsigned nminima;    // number of local minima stored
 
-    int kiter;    // iteration parameter
-    int nreject;  // iterator for number of consecutive rejected trials
-    int naccept;  // iterator for number of accepted trials
+    int seed;  // random number generator seed
+
+    unsigned kiter;    // iteration parameter
+    unsigned nreject;  // iterator for number of consecutive rejected trials
+    unsigned naccept;  // iterator for number of accepted trials
 
     arma::mat xcurr;    // current geometry
     arma::mat xglobal;  // geometry of global minimum
