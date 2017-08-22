@@ -22,10 +22,10 @@ Features
 
 Licensing
 ---------
-ChemApps is released under the MIT license.
+ChemApps is released under the [MIT](LICENSE) license.
 
-Obtain the Source Code
-----------------------
+Obtaining the Source Code
+-------------------------
 The source code can be obtained from
 
     git clone git@gitlab.com:stigrs/chemapps.git
