@@ -14,7 +14,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <chem/input.h>
 #include <chem/thermodata.h>
 #include <chem/utils.h>
 #include <armadillo>
