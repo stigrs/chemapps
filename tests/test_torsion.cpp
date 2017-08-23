@@ -28,7 +28,7 @@ TEST_CASE("test_torsion")
         chem::fopen(from, "test_torsion_ch2clch2cl.inp");
 
         Molecule mol(from);
-        double rmi = mol.get_tor()->red_moment_of_inertia();
+        double rmi = mol.get_tor().red_moment_of_inertia();
 
         const double rmi_ans = 58.76991427;  // Chuang and Truhlar (2000)
         CHECK(std::abs(rmi - rmi_ans) < 9.0e-2);
@@ -40,7 +40,7 @@ TEST_CASE("test_torsion")
         chem::fopen(from, "test_torsion_ch3oh.inp");
 
         Molecule mol(from);
-        double rmi = mol.get_tor()->red_moment_of_inertia();
+        double rmi = mol.get_tor().red_moment_of_inertia();
 
         const double rmi_ans = 2.19;  // Chuang and Truhlar (2000)
         CHECK(std::abs(rmi - rmi_ans) < 2.0e-2);

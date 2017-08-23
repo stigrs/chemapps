@@ -46,6 +46,20 @@ double const_vol_heat_trans() { return 1.5 * datum::R; }
 // Calculate electronic partition function.
 double qelec(const Molecule& mol, double temp = 298.15);
 
+// Calculate electronic contribution to entropy.
+double entropy_elec(const Molecule& mol, double temp = 298.15);
+
+// Calculate electronic contribution to internal thermal energy.
+double thermal_energy_elec() { return 0.0; }
+
+// Calculate electronic constant volume heat capacity.
+double const_vol_heat_elec() { return 0.0; }
+
+// Rotational:
+
+// Calculate rotational partition function.
+double qrot(const Molecule& mol, double temp = 298.15, bool incl_sigma = true);
+
 }  // namespace chem
 
 inline double chem::qtrans(const Molecule& mol, double temp, double pressure)
@@ -78,4 +92,10 @@ inline double chem::thermal_energy_trans(double temp)
     return 1.5 * datum::R * temp;
 }
 
+inline double chem::entropy_elec(const Molecule& mol, double temp)
+{
+    double qe = chem::qelec(mol, temp);
+    Ensures(qe > 0.0);
+    return datum::R * std::log(qe);
+}
 #endif  // CHEM_THERMOCHEM_H

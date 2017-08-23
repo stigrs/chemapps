@@ -65,8 +65,8 @@ int main(int argc, char* argv[])
         chem::fopen(to, output_file.c_str());
 
         Molecule mol(from, to, "Molecule");
-        mol.get_rot()->analysis(to);
-        mol.get_tor()->analysis(to);
+        mol.get_rot().analysis(to);
+        mol.get_tor().analysis(to);
     }
     catch (std::exception& e) {
         std::cerr << "what: " << e.what() << '\n';

@@ -21,6 +21,7 @@
 #include <catch/catch.hpp>
 #include <cmath>
 #include <fstream>
+#include <iostream>
 
 TEST_CASE("test_thermochem")
 {
@@ -34,6 +35,10 @@ TEST_CASE("test_thermochem")
         double qtr           = chem::qtrans(mol, 298.15, datum::std_atm);
         CHECK(std::abs(qtr - qtr_ans) / qtr_ans < 5.0e-6);
 
+        const double htr_ans = 0.889 * datum::cal_to_J * 1000.0;
+        double htr           = chem::thermal_energy_trans();
+        CHECK(std::abs(htr - htr_ans) / htr_ans < 5.0e-4);
+
         const double str_ans = 36.324 * datum::cal_to_J;
         double str           = chem::entropy_trans(mol);
         CHECK(std::abs(str - str_ans) / str_ans < 1.0e-8);
@@ -41,5 +46,21 @@ TEST_CASE("test_thermochem")
         const double cv_tr_ans = 2.981 * datum::cal_to_J;
         double cv_tr           = chem::const_vol_heat_trans();
         CHECK(std::abs(cv_tr - cv_tr_ans) / cv_tr_ans < 1.0e-4);
+
+        const double qe_ans = 0.100000e+1;
+        double qe           = chem::qelec(mol);
+        CHECK(std::abs(qe - qe_ans) / qe_ans < 1.0e-8);
+
+        const double he_ans = 0.0;
+        double he           = chem::thermal_energy_elec();
+        CHECK(std::abs(he - he_ans) < 1.0e-9);
+
+        const double cv_e_ans = 0.0;
+        double cv_e           = chem::const_vol_heat_elec();
+        CHECK(std::abs(cv_e - cv_e_ans) < 1.0e-9);
+
+        const double qr_ans = 0.314134e+4;
+        double qr           = chem::qrot(mol);
+        CHECK(std::abs(qr - qr_ans) / qr_ans < 1.0e-5);
     }
 }

@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
         output_file = chem::strip_suffix(input_file, ".inp");
 
         if (vm["xyz"].as<bool>()) {
-            mol.get_zmat()->load(from);
+            mol.get_zmat().load(from);
             output_file = output_file + ".xyz";
             chem::fopen(to, output_file.c_str());
             chem::print_xyz_format(to, mol.get_atoms(), mol.get_xyz(), "");
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
         else if (vm["zmat"].as<bool>()) {
             output_file = output_file + ".zmat";
             chem::fopen(to, output_file.c_str());
-            mol.get_zmat()->print(to);
+            mol.get_zmat().print(to);
         }
     }
     catch (std::exception& e) {

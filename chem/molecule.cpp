@@ -30,10 +30,10 @@ Molecule::Molecule(const Molecule& mol)
     charge      = mol.charge;
     elec_energy = mol.elec_energy;
 
-    zmat = std::make_shared<Zmatrix>(*mol.zmat);
-    rot  = std::make_shared<Molrot>(*mol.rot);
-    vib  = std::make_shared<Molvib>(*mol.vib);
-    tor  = std::make_shared<Torsion>(*mol.tor);
+    zmat = std::make_unique<Zmatrix>(*mol.zmat);
+    rot  = std::make_unique<Molrot>(*mol.rot);
+    vib  = std::make_unique<Molvib>(*mol.vib);
+    tor  = std::make_unique<Torsion>(*mol.tor);
 }
 
 void Molecule::print_data(std::ostream& to, const std::string& key) const
@@ -104,19 +104,19 @@ void Molecule::init(std::istream& from,
 
     // Initialize Z matrix object:
 
-    zmat = std::make_shared<Zmatrix>(atoms, xyz);
+    zmat = std::make_unique<Zmatrix>(atoms, xyz);
 
     // Initialize molecular rotations object:
 
-    rot = std::make_shared<Molrot>(from, key, atoms, xyz);
+    rot = std::make_unique<Molrot>(from, key, atoms, xyz);
 
     // Initialize molecular vibrations object:
 
-    vib = std::make_shared<Molvib>(from, key);
+    vib = std::make_unique<Molvib>(from, key);
 
     // Initialize molecular torsions object:
 
-    tor = std::make_shared<Torsion>(from, key, *rot);
+    tor = std::make_unique<Torsion>(from, key, *rot);
 
     // Write input data to output stream:
 

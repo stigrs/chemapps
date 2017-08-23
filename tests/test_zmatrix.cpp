@@ -46,8 +46,8 @@ TEST_CASE("test_zmatrix")
     std::vector<int> moiety = {3, 9, 10};
 
     Molecule mol(from);
-    mol.get_zmat()->load(from);
-    mol.get_zmat()->rotate_moiety(moiety, 90.0);
+    mol.get_zmat().load(from);
+    mol.get_zmat().rotate_moiety(moiety, 90.0);
     arma::mat xyz = mol.get_xyz();
 
     CHECK(arma::approx_equal(xyz_ans, xyz, "absdiff", 1.0e-8));

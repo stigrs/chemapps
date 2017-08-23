@@ -89,6 +89,7 @@ extern const double au_to_s;     // Conversion from au to s
 extern const double au_to_K;     // Conversion from au to K
 extern const double au_to_kg;    // Conversion from au to kg
 extern const double au_to_kgm2;  // Conversion from amu bohr^2 to kg m^2
+extern const double GHz_to_K;    // Conversion from GHz to K
 }  // namespace datum
 
 #endif  // CHEM_DATUM_H

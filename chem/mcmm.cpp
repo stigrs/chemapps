@@ -21,6 +21,7 @@
 #include <chem/utils.h>
 #include <limits>
 #include <map>
+#include <numeric>
 
 template <class Pot>
 Mcmm<Pot>::Mcmm(std::istream& from,
@@ -294,7 +295,7 @@ inline void Mcmm<Pot>::sort_conformers()
 template <class Pot>
 std::vector<int> Mcmm<Pot>::select_rand_dihedral(const Molecule& m)
 {
-    std::vector<arma::ivec> connect = m.get_zmat()->get_connectivities();
+    std::vector<arma::ivec> connect = m.get_zmat().get_connectivities();
     std::uniform_int_distribution<> rnd_uni_int(2, connect.size() - 1);
     int index           = rnd_uni_int(mt);
     arma::ivec dihedral = connect[index];

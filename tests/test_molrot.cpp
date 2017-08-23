@@ -30,7 +30,7 @@ TEST_CASE("test_molrot")
     chem::fopen(from, "test_molrot.inp");
 
     Molecule mol(from);
-    arma::vec3 rotc = mol.get_rot()->constants();
+    arma::vec3 rotc = mol.get_rot().constants();
 
     for (arma::uword i = 0; i < rotc.size(); ++i) {
         CHECK(std::abs(rotc(i) - rotc_ans(i)) < 1.0e-4);

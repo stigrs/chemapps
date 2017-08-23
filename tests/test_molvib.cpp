@@ -31,7 +31,7 @@ TEST_CASE("test_molvib")
     chem::fopen(from, "test_molvib.inp");
 
     Molecule mol(from);
-    double zpe = mol.get_vib()->zero_point_energy() / datum::au_to_icm;
+    double zpe = mol.get_vib().zero_point_energy() / datum::au_to_icm;
 
     CHECK(std::abs(zpe - zpe_ans) < 1.0e-6);
 }

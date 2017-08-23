@@ -79,5 +79,6 @@ const double au_to_s    = h_bar / E_h;
 const double au_to_K    = E_h / k;
 const double au_to_kg   = m_e;
 const double au_to_kgm2 = m_u * a_0 * a_0 * 1.0e-20;
+const double GHz_to_K   = giga * 4.79924470000e-11;
 
 }  // namespace datum

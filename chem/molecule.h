@@ -42,10 +42,10 @@ class Molecule {
 public:
     Molecule()
     {
-        zmat = std::make_shared<Zmatrix>(atoms, xyz);
-        rot  = std::make_shared<Molrot>(atoms, xyz);
-        vib  = std::make_shared<Molvib>();
-        tor  = std::make_shared<Torsion>(*rot);
+        zmat = std::make_unique<Zmatrix>(atoms, xyz);
+        rot  = std::make_unique<Molrot>(atoms, xyz);
+        vib  = std::make_unique<Molvib>();
+        tor  = std::make_unique<Torsion>(*rot);
     }
 
     Molecule(std::istream& from,
@@ -68,15 +68,10 @@ public:
     const arma::mat& get_xyz() const { return xyz; }
     const arma::vec& get_elec_state() const { return elec_state; }
 
-    std::shared_ptr<const Zmatrix> get_zmat() const { return zmat; }
-    std::shared_ptr<const Molrot> get_rot() const { return rot; }
-    std::shared_ptr<const Molvib> get_vib() const { return vib; }
-    std::shared_ptr<const Torsion> get_tor() const { return tor; }
-
-    std::shared_ptr<Zmatrix> get_zmat() { return zmat; }
-    std::shared_ptr<Molrot> get_rot() { return rot; }
-    std::shared_ptr<Molvib> get_vib() { return vib; }
-    std::shared_ptr<Torsion> get_tor() { return tor; }
+    Zmatrix& get_zmat() const { return *zmat; }
+    Molrot& get_rot() const { return *rot; }
+    Molvib& get_vib() const { return *vib; }
+    Torsion& get_tor() const { return *tor; }
 
     int get_charge() const { return charge; }
     double get_elec_energy() const { return elec_energy; }
@@ -103,10 +98,10 @@ private:
     int charge;          // molecular charge
     double elec_energy;  // electronic ground-state energy [Hartree]
 
-    std::shared_ptr<Zmatrix> zmat;
-    std::shared_ptr<Molrot> rot;
-    std::shared_ptr<Molvib> vib;
-    std::shared_ptr<Torsion> tor;
+    std::unique_ptr<Zmatrix> zmat;
+    std::unique_ptr<Molrot> rot;
+    std::unique_ptr<Molvib> vib;
+    std::unique_ptr<Torsion> tor;
 };
 
 inline void Molecule::set_xyz(const arma::mat& xyz_)

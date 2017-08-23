@@ -62,14 +62,13 @@ int main(int argc, char* argv[])
         std::string output_file;
         output_file = chem::strip_suffix(input_file, ".inp");
         output_file = output_file + ".out";
-        std::cout << output_file << '\n';
 
         chem::fopen(from, input_file);
         chem::fopen(to, output_file.c_str());
 
         Molecule mol(from, to);
         Mcmm<Mopac> mc(from, mol, "Mcmm", true);
-        mc.solve();
+        mc.solve(to);
     }
     catch (std::exception& e) {
         std::cerr << "what: " << e.what() << '\n';

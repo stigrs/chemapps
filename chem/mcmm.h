@@ -149,7 +149,7 @@ inline void Mcmm<Pot>::gen_rand_conformer(Molecule& m)
     // Apply random variation to dihedral angle:
     std::uniform_real_distribution<> rnd_uni_real(-180.0, 180.0);
     double delta = rnd_uni_real(mt);
-    m.get_zmat()->rotate_moiety(moiety, delta);
+    m.get_zmat().rotate_moiety(moiety, delta);
 }
 
 template <class Pot>

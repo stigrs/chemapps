@@ -29,7 +29,7 @@ TEST_CASE("test_mcmm")
     chem::fopen(from, "test_mcmm.inp");
 
     Molecule mol(from);
-    mol.get_zmat()->load(from);
+    mol.get_zmat().load(from);
     Mcmm<Mopac> mc(from, mol);
     double eglobal   = mc.get_global_min_energy();
     double emin_anti = -31.03257 * datum::cal_to_J;

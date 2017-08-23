@@ -45,7 +45,7 @@ void chem::read_xyz_format(std::istream& from,
     // Read XYZ coordinates:
     for (int i = 0; i < natoms; ++i) {
         from >> symbol >> x >> y >> z;
-        atoms[i] = ptable::get_element(symbol);
+        atoms[i]  = ptable::get_element(symbol);
         xyz(i, 0) = x;
         xyz(i, 1) = y;
         xyz(i, 2) = z;
@@ -74,8 +74,9 @@ void chem::read_zmat_format(std::istream& from,
 
     std::string line;
     std::string symbol;
-    int natoms = 0;
-    long pos   = 0;
+
+    int natoms         = 0;
+    std::streamoff pos = 0;
 
     // Count number of atoms:
 
