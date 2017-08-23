@@ -24,6 +24,8 @@
 
 namespace chem {
 
+// Translational:
+
 // Calculate translational partitition function.
 double qtrans(const Molecule& mol, double temp = 298.15, double pressure = 0.0);
 
@@ -34,6 +36,14 @@ double entropy_trans(const Molecule& mol,
 
 // Calculate translational contribution to internal thermal energy:
 double thermal_energy_trans(double temp = 298.15);
+
+// Calculate translational constant volume heat capacity.
+double const_vol_heat_trans() { return 1.5 * datum::R; }
+
+// Electronic:
+
+// Calculate electronic partition function.
+double qelec(const Molecule& mol, double temp = 298.15);
 
 }  // namespace chem
 
@@ -65,6 +75,12 @@ inline double chem::thermal_energy_trans(double temp)
 {
     Expects(temp >= 0.0);
     return 1.5 * datum::R * temp;
+}
+
+inline double chem::qelec(const Molecule& mol, double temp)
+{
+    qe = 0.0;
+    return qe;
 }
 
 #endif  // CHEM_THERMOCHEM_H

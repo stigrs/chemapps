@@ -37,5 +37,9 @@ TEST_CASE("test_thermochem")
         const double str_ans = 36.324 * datum::cal_to_J;
         double str           = chem::entropy_trans(mol);
         CHECK(std::abs(str - str_ans) / str_ans < 1.0e-8);
+
+        const double cv_tr_ans = 2.981 * datum::cal_to_J;
+        double cv_tr           = chem::const_vol_heat_trans();
+        CHECK(std::abs(cv_tr - cv_tr_ans) / cv_tr_ans < 1.0e-4);
     }
 }
