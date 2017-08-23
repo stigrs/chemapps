@@ -24,12 +24,12 @@
 
 TEST_CASE("test_thermochem")
 {
-    std::ifstream from;
-    chem::fopen(from, "test_thermochem_ch3oh.inp");
-    Molecule mol(from);
-
     SECTION("CH3OH")
     {
+        std::ifstream from;
+        chem::fopen(from, "test_thermochem_ch3oh.inp");
+        Molecule mol(from);
+
         const double qtr_ans = 0.712383e+7;
         double qtr           = chem::qtrans(mol, 298.15, datum::std_atm);
         CHECK(std::abs(qtr - qtr_ans) / qtr_ans < 5.0e-6);
