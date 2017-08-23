@@ -57,6 +57,9 @@ public:
     // Perform rotational analysis.
     void analysis(std::ostream& to = std::cout);
 
+    // Calculate total molecular mass.
+    double tot_mass() const;
+
     // Compute rotational constants.
     arma::vec3 constants();
 
@@ -74,9 +77,6 @@ protected:
 
     // Move geometry to center of mass.
     void move_to_com();
-
-    // Calculate total molecular mass.
-    double tot_mass() const;
 
     // Compute center of mass coordinates.
     arma::vec3 center_of_mass() const;

@@ -41,6 +41,15 @@ void Molrot::analysis(std::ostream& to)
     }
 }
 
+double Molrot::tot_mass() const
+{
+    double totmass = 0.0;
+    for (std::size_t i = 0; i < atoms.size(); ++i) {
+        totmass += atoms[i].atomic_mass;
+    }
+    return totmass;
+}
+
 arma::vec3 Molrot::constants()
 {
     using namespace datum;
@@ -129,15 +138,6 @@ void Molrot::init(std::istream& from, const std::string& key)
             throw Molrot_error(it->first + " not initialized");
         }
     }
-}
-
-double Molrot::tot_mass() const
-{
-    double totmass = 0.0;
-    for (std::size_t i = 0; i < atoms.size(); ++i) {
-        totmass += atoms[i].atomic_mass;
-    }
-    return totmass;
 }
 
 arma::vec3 Molrot::center_of_mass() const

@@ -7,8 +7,8 @@ set(CMAKE_INSTALL_PREFIX $ENV{HOME})
 # Export compile commands.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Enforce C++1 standard.
-set(CMAKE_CXX_STANDARD 11)
+# Enforce C++14 standard (needed for GSL).
+set(CMAKE_CXX_STANDARD 14)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
@@ -26,6 +26,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -pedantic -Wall -Wshadow")
         add_definitions(-DARMA_NO_DEBUG)
+        add_definitions(-DGSL_THROW_ON_CONTRACT_VIOLATION)
     endif()
     if(APPLE)
         set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -framework Accelerate")
@@ -38,6 +39,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pg -pedantic -Wall -Wshadow")
         set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -pg")
         add_definitions(-DARMA_EXTRA_DEBUG)
+        add_definitions(-DGSL_THROW_ON_CONTRACT_VIOLATION)
     endif()
 endif()
 
@@ -47,6 +49,9 @@ find_package(Armadillo 7.950.1 REQUIRED)
 # Boost library is required.
 find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED)
 set(Boost_USE_STATIC_LIBS OFF)
+
+# GSL library is required.
+find_path(GSL_INCLUDE_DIR gsl HINTS /usr/include /usr/local/include)
 
 add_subdirectory(chem)
 add_subdirectory(src)

@@ -60,6 +60,9 @@ public:
 
     ~Molecule() {}
 
+    // Calculate total molecular mass.
+    double tot_mass() const { return rot->tot_mass(); }
+
     const std::string get_title() const { return title; }
     const std::vector<Element>& get_atoms() const { return atoms; }
     const arma::mat& get_xyz() const { return xyz; }
@@ -76,7 +79,6 @@ public:
     std::shared_ptr<Torsion> get_tor() { return tor; }
 
     int get_charge() const { return charge; }
-
     double get_elec_energy() const { return elec_energy; }
 
     void set_xyz(const arma::mat& xyz_);

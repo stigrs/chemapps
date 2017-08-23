@@ -34,6 +34,14 @@ Requirements
 ------------
 * [CMake](https://cmake.org) 3.4.3
 * [Armadillo] (http://arma.sourceforge.net) 7.950.1
+* [GSL] (https://github.com/Microsoft/GSL)
+
+Supported Platforms
+-------------------
+The test suite that exercises ChemApps has been built and passes successfully 
+on the following platforms:
+* GNU/Linux using GCC 5.4.0
+* OS X El Capitan (10.12) using AppleClang X.X.
 
 Usage of Third Party Libraries
 ------------------------------
