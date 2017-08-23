@@ -20,6 +20,7 @@
 #include <chem/datum.h>
 #include <chem/molecule.h>
 #include <chem/utils.h>
+#include <cmath>
 #include <gsl/gsl>
 
 namespace chem {
@@ -75,12 +76,6 @@ inline double chem::thermal_energy_trans(double temp)
 {
     Expects(temp >= 0.0);
     return 1.5 * datum::R * temp;
-}
-
-inline double chem::qelec(const Molecule& mol, double temp)
-{
-    qe = 0.0;
-    return qe;
 }
 
 #endif  // CHEM_THERMOCHEM_H
