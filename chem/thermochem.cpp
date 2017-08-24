@@ -32,9 +32,7 @@ double chem::qrot(const Molecule& mol, double temp, bool incl_sigma)
 {
     Expects(temp >= 0.0);
 
-    std::string rot_symm     = mol.get_rot().symmetry();
-    mol.get_rot().symmetry() = "all";
-    std::cout << mol.get_rot().symmetry() << std::endl;
+    std::string rot_symm = mol.get_rot().symmetry();
 
     double qr = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {
@@ -58,4 +56,51 @@ double chem::qrot(const Molecule& mol, double temp, bool incl_sigma)
         qr = rsig * std::pow(temp, 1.5) / std::sqrt(b);
     }
     return qr;
+}
+
+double chem::entropy_rot(const Molecule& mol, double temp, bool incl_sigma)
+{
+    std::string rot_symm = mol.get_rot().symmetry();
+
+    double srot = 0.0;
+    if (rot_symm.find("atom") != std::string::npos) {
+        srot = 1.0;
+    }
+    else {
+        double factor = 1.5;
+        if (rot_symm.find("linear") != std::string::npos) {
+            factor = 1.0;
+        }
+        double qr = chem::qrot(mol, temp, incl_sigma);
+        Ensures(qr > 0.0);
+        srot = datum::R * (std::log(qr) + factor);
+    }
+    return srot;
+}
+
+double chem::qvib(const Molecule& mol, double temp, const std::string& zeroref)
+{
+    std::string rot_symm = mol.get_rot().symmetry();
+
+    double qv = 0.0;
+    if (rot_symm.find("atom") != std::string::npos) {
+        qv = 1.0;
+    }
+    else {
+        Expects(temp > 0.0);
+        arma::vec w = datum::icm_to_K * mol.get_vib().get_freqs();
+        qv          = 1.0;
+        if (zeroref == "V=0") {  // zero at first vibrational level
+            for (arma::uword i = 0; i < w.size(); ++i) {
+                qv /= (1.0 - std::exp(-w(i) / temp));
+            }
+        }
+        else if (zeroref == "BOT") {  // zero at the bottom of the well
+            for (arma::uword i = 0; i < w.size(); ++i) {
+                qv *= std::exp(-w(i) / (2.0 * temp)) /
+                      (1.0 - std::exp(-w(i) / temp));
+            }
+        }
+    }
+    return qv;
 }
