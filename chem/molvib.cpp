@@ -36,6 +36,7 @@ Molvib::Molvib(std::istream& from, const std::string& key)
     else {
         throw Molvib_error("cannot find " + key + " section");
     }
+    // TODO (stigrs@gmail.com) Validate input data
 }
 
 void Molvib::print(std::ostream& to)

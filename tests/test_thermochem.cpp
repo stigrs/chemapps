@@ -62,5 +62,21 @@ TEST_CASE("test_thermochem")
         const double qr_ans = 0.314134e+4;
         double qr           = chem::qrot(mol);
         CHECK(std::abs(qr - qr_ans) / qr_ans < 1.0e-5);
+
+        const double sr_ans = 18.983 * datum::cal_to_J;
+        double sr           = chem::entropy_rot(mol);
+        CHECK(std::abs(sr - sr_ans) / sr_ans < 3.0e-5);
+
+        const double er_ans = 0.889 * datum::cal_to_J * 1000.0;
+        double er           = chem::thermal_energy_rot(mol);
+        CHECK(std::abs(er - er_ans) / er_ans < 5.0e-4);
+
+        const double cv_r_ans = 2.981 * datum::cal_to_J;
+        double cv_r           = chem::const_vol_heat_rot(mol);
+        CHECK(std::abs(cv_r - cv_r_ans) / cv_r_ans < 1.0e-4);
+
+        const double qv_ans = 0.148820e-23;
+        double qv           = chem::qvib(mol);
+        CHECK(std::abs(qv - qv_ans) / qv_ans < 1.0e-4);
     }
 }

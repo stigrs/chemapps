@@ -60,6 +60,24 @@ double const_vol_heat_elec() { return 0.0; }
 // Calculate rotational partition function.
 double qrot(const Molecule& mol, double temp = 298.15, bool incl_sigma = true);
 
+// Calculate rotational contribution to entropy.
+double entropy_rot(const Molecule& mol,
+                   double temp     = 298.15,
+                   bool incl_sigma = true);
+
+// Calculate rotational contribution ot internal thermal energy.
+double thermal_energy_rot(const Molecule& mol, double temp = 298.15);
+
+// Calculate rotational contribution to constant volume heat capacity.
+double const_vol_heat_rot(const Molecule& mol);
+
+// Vibrational:
+
+// Calculate vibrational partition function.
+double qvib(const Molecule& mol,
+            double temp                = 298.15,
+            const std::string& zeroref = "BOT");
+
 }  // namespace chem
 
 inline double chem::qtrans(const Molecule& mol, double temp, double pressure)
@@ -98,4 +116,29 @@ inline double chem::entropy_elec(const Molecule& mol, double temp)
     Ensures(qe > 0.0);
     return datum::R * std::log(qe);
 }
+
+inline double chem::thermal_energy_rot(const Molecule& mol, double temp)
+{
+    Expects(temp >= 0.0);
+    return chem::const_vol_heat_rot(mol) * temp;
+}
+
+inline double chem::const_vol_heat_rot(const Molecule& mol)
+{
+    std::string rot_symm = mol.get_rot().symmetry();
+
+    double cv_rot = 0.0;
+    if (rot_symm.find("atom") != std::string::npos) {
+        cv_rot = 0.0;
+    }
+    else {
+        double factor = 1.5;
+        if (rot_symm.find("linear") != std::string::npos) {
+            factor = 1.0;
+        }
+        cv_rot = factor * datum::R;
+    }
+    return cv_rot;
+}
+
 #endif  // CHEM_THERMOCHEM_H
