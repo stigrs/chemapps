@@ -62,9 +62,9 @@ double chem::entropy_rot(const Molecule& mol, double temp, bool incl_sigma)
 {
     std::string rot_symm = mol.get_rot().symmetry();
 
-    double srot = 0.0;
+    double sr = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {
-        srot = 1.0;
+        sr = 1.0;
     }
     else {
         double factor = 1.5;
@@ -73,9 +73,9 @@ double chem::entropy_rot(const Molecule& mol, double temp, bool incl_sigma)
         }
         double qr = chem::qrot(mol, temp, incl_sigma);
         Ensures(qr > 0.0);
-        srot = datum::R * (std::log(qr) + factor);
+        sr = datum::R * (std::log(qr) + factor);
     }
-    return srot;
+    return sr;
 }
 
 double chem::qvib(const Molecule& mol, double temp, const std::string& zeroref)
@@ -103,4 +103,63 @@ double chem::qvib(const Molecule& mol, double temp, const std::string& zeroref)
         }
     }
     return qv;
+}
+
+double chem::entropy_vib(const Molecule& mol, double temp)
+{
+    std::string rot_symm = mol.get_rot().symmetry();
+
+    double sv = 0.0;
+    if (rot_symm.find("atom") != std::string::npos) {
+        sv = 0.0;
+    }
+    else {
+        Expects(temp > 0.0);
+        arma::vec w = datum::icm_to_K * mol.get_vib().get_freqs();
+        for (arma::uword i = 0; i < w.size(); ++i) {
+            double wt = w(i) / temp;
+            sv += wt / (std::exp(wt) - 1.0) - std::log(1.0 - std::exp(-wt));
+        }
+        sv *= datum::R;
+    }
+    return sv;
+}
+
+double chem::thermal_energy_vib(const Molecule& mol, double temp)
+{
+    std::string rot_symm = mol.get_rot().symmetry();
+
+    double ev = 0.0;
+    if (rot_symm.find("atom") != std::string::npos) {
+        ev = 0.0;
+    }
+    else {
+        Expects(temp > 0.0);
+        arma::vec w = datum::icm_to_K * mol.get_vib().get_freqs();
+        for (arma::uword i = 0; i < w.size(); ++i) {
+            ev += w(i) * (0.5 + 1.0 / (std::exp(w(i) / temp) - 1.0));
+        }
+        ev *= datum::R;
+    }
+    return ev;
+}
+
+double chem::const_vol_heat_vib(const Molecule& mol, double temp)
+{
+    std::string rot_symm = mol.get_rot().symmetry();
+
+    double cv_v = 0.0;
+    if (rot_symm.find("atom") != std::string::npos) {
+        cv_v = 0.0;
+    }
+    else {
+        Expects(temp > 0.0);
+        arma::vec w = datum::icm_to_K * mol.get_vib().get_freqs();
+        for (arma::uword i = 0; i < w.size(); ++i) {
+            double wt = w(i) / temp;
+            cv_v += wt * wt * std::exp(wt) / std::pow(std::exp(wt) - 1.0, 2.0);
+        }
+        cv_v *= datum::R;
+    }
+    return cv_v;
 }

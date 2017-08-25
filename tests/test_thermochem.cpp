@@ -78,5 +78,17 @@ TEST_CASE("test_thermochem")
         const double qv_ans = 0.148820e-23;
         double qv           = chem::qvib(mol);
         CHECK(std::abs(qv - qv_ans) / qv_ans < 1.0e-4);
+
+        const double sv_ans = 1.441 * datum::cal_to_J;
+        double sv           = chem::entropy_vib(mol);
+        CHECK(std::abs(sv - sv_ans) / sv_ans < 2.0e-4);
+
+        const double ev_ans = 32.936 * datum::cal_to_J * 1000.0;
+        double ev           = chem::thermal_energy_vib(mol);
+        CHECK(std::abs(ev - ev_ans) / ev_ans < 5.0e-5);
+
+        const double cv_v_ans = 2.696 * datum::cal_to_J;
+        double cv_v           = chem::const_vol_heat_vib(mol);
+        CHECK(std::abs(cv_v - cv_v_ans) / cv_v_ans < 2.0e-4);
     }
 }

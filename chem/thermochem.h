@@ -78,6 +78,17 @@ double qvib(const Molecule& mol,
             double temp                = 298.15,
             const std::string& zeroref = "BOT");
 
+// Calculate vibrational contribution to entropy.
+double entropy_vib(const Molecule& mol, double temp = 298.15);
+
+// Calculate vibrational contribution to internal thermal energy.
+double thermal_energy_vib(const Molecule& mol, double temp = 298.15);
+
+// Calculate vibrational constant volume heat capacity.
+double const_vol_heat_vib(const Molecule& mol, double temp = 298.15);
+
+// Torsional:
+
 }  // namespace chem
 
 inline double chem::qtrans(const Molecule& mol, double temp, double pressure)
@@ -99,9 +110,9 @@ inline double chem::entropy_trans(const Molecule& mol,
                                   double temp,
                                   double pressure)
 {
-    double qtr = chem::qtrans(mol, temp, pressure);
-    Ensures(qtr > 0.0);
-    return datum::R * (std::log(qtr) + 2.5);
+    double qt = chem::qtrans(mol, temp, pressure);
+    Ensures(qt > 0.0);
+    return datum::R * (std::log(qt) + 2.5);
 }
 
 inline double chem::thermal_energy_trans(double temp)
@@ -127,18 +138,18 @@ inline double chem::const_vol_heat_rot(const Molecule& mol)
 {
     std::string rot_symm = mol.get_rot().symmetry();
 
-    double cv_rot = 0.0;
+    double cv_r = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {
-        cv_rot = 0.0;
+        cv_r = 0.0;
     }
     else {
         double factor = 1.5;
         if (rot_symm.find("linear") != std::string::npos) {
             factor = 1.0;
         }
-        cv_rot = factor * datum::R;
+        cv_r = factor * datum::R;
     }
-    return cv_rot;
+    return cv_r;
 }
 
 #endif  // CHEM_THERMOCHEM_H
