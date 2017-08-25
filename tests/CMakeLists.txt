@@ -1,6 +1,12 @@
+cmake_minimum_required(VERSION 3.4.3)
+project(ChemTests CXX)
+
 include_directories (${ChemApps_SOURCE_DIR})
 include_directories (${ARMADILLO_INCLUDE_DIRS})
 link_directories (${ChemApps_BINARY_DIR}/chem)
+if (WIN32)
+    link_directories($ENV{MKLROOT})
+endif()
 
 # Copy *.inp files to build directory.
 file(GLOB INP_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -12,6 +18,7 @@ endforeach()
 
 # Prepare "Catch" library for other executables.
 set(CATCH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+message(STATUS "CATCH = " ${CATCH_INCLUDE_DIR})
 add_library(Catch INTERFACE)
 target_include_directories(Catch INTERFACE ${CATCH_INCLUDE_DIR})
 
@@ -24,12 +31,24 @@ target_link_libraries(
 
 function(add_chemapps_test name)
     add_executable(${name} ${name}.cpp)
-    target_link_libraries(
-        ${name}
-        chem
-        ${ARMADILLO_LIBRARIES}
-        test_catch
-    )
+    if (WIN32)
+        target_link_libraries (
+            ${program} 
+            chem 
+            mkl_intel_c.lib
+            mkl_sequential.lib 
+            mkl_core.lib 
+            test_catch
+        ) 
+    else()
+        target_link_libraries (
+            ${program} 
+            chem 
+            ${ARMADILLO_LIBRARIES} 
+            ${Boost_LIBRARIES}
+            test_catch
+        )
+    endif()
     add_dependencies(${name} Catch)
     add_test(NAME ${name} COMMAND ${name})
 endfunction()

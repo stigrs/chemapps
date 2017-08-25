@@ -14,7 +14,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif()
 
-if(MSVC)
+if(WIN32)
     option(BUILD_SHARED_LIBS "Compile shared libraries." OFF)
 else()
     option(BUILD_SHARED_LIBS "Compile shared libraries." ON)
@@ -43,14 +43,24 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 # Armadillo library is required.
-find_package(Armadillo 7.950.1 REQUIRED)
+if(WIN32)
+    find_path(ARMADILLO_INCLUDE_DIRS armadillo HINTS $ENV{HOME}/include)
+    add_definitions(-DARMA_USE_BLAS)
+    add_definitions(-DARMA_USE_LAPACK)
+else()
+    find_package(Armadillo 7.950.1 REQUIRED)
+endif()
 
 # Boost library is required.
-find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED)
+find_package(Boost REQUIRED)
+message(STATUS "BOOST_INCLUDE_DIRS = " ${Boost_INCLUDE_DIRS})
 set(Boost_USE_STATIC_LIBS OFF)
+if(WIN32)
+    add_definitions(-DBOOST_ALL_NO_LIB)
+endif()
 
 # GSL library is required.
-find_path(GSL_INCLUDE_DIR gsl HINTS /usr/include /usr/local/include)
+find_path(GSL_INCLUDE_DIR gsl HINTS $ENV{HOME}/include /usr/include /usr/local/include)
 
 add_subdirectory(chem)
 add_subdirectory(src)

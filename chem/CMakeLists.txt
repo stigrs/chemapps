@@ -1,7 +1,13 @@
-include_directories (${ChemApps_SOURCE_DIR})
-include_directories (${ARMADILLO_INCLUDE_DIRS})
-include_directories (${GSL_INCLUDE_DIR})
-link_directories (${ChemApps_BINARY_DIR})
+cmake_minimum_required(VERSION 3.4.3)
+project(ChemLib CXX)
+
+include_directories(${ChemApps_SOURCE_DIR})
+include_directories(${ARMADILLO_INCLUDE_DIRS})
+include_directories(${GSL_INCLUDE_DIR})
+link_directories(${ChemApps_BINARY_DIR})
+if(WIN32)
+    link_directories($ENV{MKLROOT})
+endif()
 
 set(
     SRC_FILES
@@ -38,15 +44,25 @@ set(
     torsion.h
     zmatrix.h
 )
-add_library (
+add_library(
     chem 
     ${SRC_FILES}
 ) 
-target_link_libraries (chem ${ARMADILLO_LIBRARIES}) 
+if(WIN32)
+    target_link_libraries(
+        chem 
+        mkl_intel_c.lib
+        mkl_sequential.lib
+        mkl_core.lib
+    )
+else()
+    target_link_libraries (chem ${ARMADILLO_LIBRARIES}) 
+endif()
 
 install(
     TARGETS chem
     LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
 )
 foreach(file ${HEADER_FILES})
     install(FILES ${file} DESTINATION include/chem/)

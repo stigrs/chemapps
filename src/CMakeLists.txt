@@ -1,7 +1,13 @@
-include_directories (${ChemApps_SOURCE_DIR})
-include_directories (${ARMADILLO_INCLUDE_DIRS})
-include_directories (${Boost_INCLUDE_DIRS})
-link_directories (${ChemApps_BINARY_DIR}/chem)
+cmake_minimum_required(VERSION 3.4.3)
+project(ChemExe CXX)
+
+include_directories(${ChemApps_SOURCE_DIR})
+include_directories(${ARMADILLO_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${ChemApps_BINARY_DIR}/chem)
+if (WIN32)
+    link_directories($ENV{MKLROOT})
+endif()
 
 set(
     PROGRAMS 
@@ -12,11 +18,22 @@ set(
 
 foreach(program ${PROGRAMS})
     add_executable(${program} ${program}.cpp)
-    target_link_libraries (
-        ${program} 
-        chem 
-        ${ARMADILLO_LIBRARIES}
-        ${Boost_LIBRARIES}
-    ) 
+    if (WIN32)
+        target_link_libraries (
+            ${program} 
+            chem 
+            mkl_intel_c.lib 
+            mkl_sequential.lib 
+            mkl_core.lib
+            ${Boost_LIBRARIES}
+        ) 
+    else()
+        target_link_libraries (
+            ${program} 
+            chem 
+            ${ARMADILLO_LIBRARIES} 
+            ${Boost_LIBRARIES}
+        )
+    endif()
 endforeach()
 
