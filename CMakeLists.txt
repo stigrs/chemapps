@@ -52,9 +52,7 @@ else()
 endif()
 
 # Boost library is required.
-find_package(Boost REQUIRED)
-message(STATUS "BOOST_INCLUDE_DIRS = " ${Boost_INCLUDE_DIRS})
-set(Boost_USE_STATIC_LIBS OFF)
+find_package(Boost COMPONENTS program_options REQUIRED)
 if(WIN32)
     add_definitions(-DBOOST_ALL_NO_LIB)
 endif()
