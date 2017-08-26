@@ -5,7 +5,7 @@ include_directories(${ChemApps_SOURCE_DIR})
 include_directories(${ARMADILLO_INCLUDE_DIRS})
 include_directories(${GSL_INCLUDE_DIR})
 link_directories(${ChemApps_BINARY_DIR})
-if(WIN32)
+if(MSVC)
     link_directories($ENV{MKLROOT})
 endif()
 
@@ -47,8 +47,8 @@ set(
 add_library(
     chem 
     ${SRC_FILES}
-) 
-if(WIN32)
+)
+if(MSVC)
     target_link_libraries(
         chem 
         mkl_intel_c.lib

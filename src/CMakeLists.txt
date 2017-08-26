@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.4.3)
-project(ChemExe CXX)
+project(ChemProgs CXX)
 
 include_directories(${ChemApps_SOURCE_DIR})
 include_directories(${ARMADILLO_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${ChemApps_BINARY_DIR}/chem)
-if (WIN32)
+if (MSVC)
     link_directories($ENV{MKLROOT})
+    link_directories($ENV{BOOST_LIBRARYDIR})
 endif()
 
 set(
@@ -18,7 +19,7 @@ set(
 
 foreach(program ${PROGRAMS})
     add_executable(${program} ${program}.cpp)
-    if (WIN32)
+    if (MSVC)
         target_link_libraries (
             ${program} 
             chem 
@@ -36,4 +37,3 @@ foreach(program ${PROGRAMS})
         )
     endif()
 endforeach()
-
