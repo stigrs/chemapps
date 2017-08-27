@@ -14,6 +14,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4505)  // caused by boost/program_options.hpp
+#endif  // _MSC_VER
+
 #include <chem/molecule.h>
 #include <chem/molecule_io.h>
 #include <chem/utils.h>

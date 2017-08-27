@@ -14,6 +14,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4100)  // caused by armadillo
+#endif  // _MSC_VER
+
 #include <chem/datum.h>
 #include <chem/input.h>
 #include <chem/torsion.h>
