@@ -163,3 +163,14 @@ double chem::const_vol_heat_vib(const Molecule& mol, double temp)
     }
     return cv_v;
 }
+
+double chem::qctcw(const Molecule& mol, double temp)
+{
+    double qtor = 1.0;
+
+    std::string rot_symm = mol.get_rot().symmetry();
+    if (rot_symm.find("atom") != std::string::npos) {
+        qtor = 1.0;
+    }
+    return qtor;
+}

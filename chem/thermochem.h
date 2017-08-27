@@ -89,6 +89,10 @@ double const_vol_heat_vib(const Molecule& mol, double temp = 298.15);
 
 // Torsional:
 
+// Calculate partition function for a torsional mode using the CT-Cw scheme.
+// Chuang, Y. Y.; Truhlar, D. G. J. Chem. Phys. 2000, vol. 112, p. 1221.
+double qctcw(const Molecule& mol, double temp = 298.15);
+
 }  // namespace chem
 
 inline double chem::qtrans(const Molecule& mol, double temp, double pressure)
