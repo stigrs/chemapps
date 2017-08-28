@@ -28,7 +28,7 @@ Obtaining the Source Code
 -------------------------
 The source code can be obtained from
 
-    git clone git@gitlab.com:stigrs/chemapps.git
+        git clone git@gitlab.com:stigrs/chemapps.git
 
 Requirements
 ------------
@@ -53,6 +53,8 @@ testing library and code from the [qcl](https://github.com/ben-albrecht/qcl)
 project. Please see the [ThirdPartyNotices.txt](ThirdPartyNotices.txt) file 
 for details regarding the licensing of Catch and qcl.
 
+The user of this software needs to obtain separate licenses for [MOPAC](http://openmopac.net/index.html), [MOPAC 5.022mn](https://comp.chem.umn.edu/mopac/) or [Gaussian](http://gaussian.com/). 
+
 Quick Start
 -----------
 These steps assumes that the source code of this repository has been cloned
@@ -73,7 +75,8 @@ into a directory called `chemapps`.
         ctest -C Release
 
 All tests should pass, indicating that your platform is fully supported. 
-NB. Test cases involving Mopac could fail because of numerical roundoff 
+
+*NB*. Test cases involving Mopac could fail because of numerical roundoff 
 errors in Mopac on different platforms.
 
 Notes and References
