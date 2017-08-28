@@ -55,15 +55,19 @@ for details regarding the licensing of Catch and qcl.
 
 Quick Start
 -----------
-The program is compiled by executing the command:
+These steps assumes that the source code of this repository has been cloned
+into a directory called `chemapps`.
 
-    mkdir build [Unix] / md build [Windows]
+1. Create a directory to contain the build outputs:
+
+    mkdir build
     cd build
-    cmake ..
-    cmake --build .. --config Release 
-    make install
 
-Testing of the program can be done by executing the command:
+2. Build the software (in this case in the Release configuration):
+
+    cmake --build .. --config Release
+
+3. Run the test suite:
 
     ctest -C Release
 
