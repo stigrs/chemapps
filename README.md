@@ -60,16 +60,17 @@ into a directory called `chemapps`.
 
 1. Create a directory to contain the build outputs:
 
-    mkdir build
-    cd build
+        cd chemapps
+        mkdir build
+        cd build
 
 2. Build the software (in this case in the Release configuration):
 
-    cmake --build .. --config Release
+        cmake --build .. --config Release
 
 3. Run the test suite:
 
-    ctest -C Release
+        ctest -C Release
 
 All tests should pass, indicating that your platform is fully supported. 
 NB. Test cases involving Mopac could fail because of numerical roundoff 
