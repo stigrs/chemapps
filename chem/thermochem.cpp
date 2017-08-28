@@ -172,5 +172,5 @@ double chem::qctcw(const Molecule& mol, double temp)
     if (rot_symm.find("atom") != std::string::npos) {
         qtor = 1.0;
     }
-    return qtor;
+    return qtor * temp;
 }

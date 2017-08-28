@@ -34,6 +34,7 @@ Requirements
 ------------
 * [CMake](https://cmake.org) 3.4.3
 * [Armadillo] (http://arma.sourceforge.net) 7.950.1
+* [Boost] (http://www.boost.org/) 1.58.0
 * [GSL] (https://github.com/Microsoft/GSL)
 
 Supported Platforms
@@ -41,6 +42,7 @@ Supported Platforms
 The test suite that exercises ChemApps has been built and passes successfully 
 on the following platforms:
 * GNU/Linux using GCC 5.4.0
+* GNU/Linux using Clang 3.8.0
 * OS X El Capitan (10.12) using Apple LLVM 8.1.0
 * Windows 7 using Visual Studio 2017
 
@@ -51,18 +53,23 @@ testing library and code from the [qcl](https://github.com/ben-albrecht/qcl)
 project. Please see the [ThirdPartyNotices.txt](ThirdPartyNotices.txt) file 
 for details regarding the licensing of Catch and qcl.
 
-Installation
-------------
-The program is installed by executing the command
+Quick Start
+-----------
+The program is compiled by executing the command:
 
-    mkdir build && cd build
+    mkdir build [Unix] / md build [Windows]
+    cd build
     cmake ..
-    make 
+    cmake --build .. --config Release 
     make install
 
-Testing of the program can be done by executing the command
+Testing of the program can be done by executing the command:
 
-    make test
+    ctest -C Release
+
+All tests should pass, indicating that your platform is fully supported. 
+NB. Test cases involving Mopac could fail because of numerical roundoff 
+errors in Mopac on different platforms.
 
 Notes and References
 --------------------
