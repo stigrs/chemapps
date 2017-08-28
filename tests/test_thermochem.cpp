@@ -17,6 +17,7 @@
 #include <chem/datum.h>
 #include <chem/molecule.h>
 #include <chem/thermochem.h>
+#include <chem/thermodata.h>
 #include <chem/utils.h>
 #include <catch/catch.hpp>
 #include <cmath>
@@ -90,5 +91,22 @@ TEST_CASE("test_thermochem")
         const double cv_v_ans = 2.696 * datum::cal_to_J;
         double cv_v           = chem::const_vol_heat_vib(mol);
         CHECK(std::abs(cv_v - cv_v_ans) / cv_v_ans < 2.0e-4);
+    }
+
+    SECTION("CH2ClCH2Cl")
+    {
+        arma::vec qtor_ans{1.070, 1.745, 30.772};  // C&T (2000) erratum
+
+        std::ifstream from;
+        chem::fopen(from, "test_thermochem_ch2clch2cl.inp");
+        Molecule mol(from);
+
+        Thermodata td(from);
+        arma::vec temp = td.get_temperature();
+
+        for (arma::uword i = 0; i < temp.size(); ++i) {
+            double qtor = chem::qtor(mol, temp(i));
+            CHECK(std::abs(qtor - qtor_ans(i)) / qtor_ans(i) < 5.0e-2);
+        }
     }
 }

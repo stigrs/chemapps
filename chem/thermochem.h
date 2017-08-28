@@ -22,10 +22,12 @@
 #include <chem/utils.h>
 #include <cmath>
 #include <gsl/gsl>
+#include <limits>
 
 namespace chem {
-
+//
 // Translational:
+//
 
 // Calculate translational partitition function.
 double qtrans(const Molecule& mol, double temp = 298.15, double pressure = 0.0);
@@ -41,7 +43,9 @@ double thermal_energy_trans(double temp = 298.15);
 // Calculate translational constant volume heat capacity.
 double const_vol_heat_trans() { return 1.5 * datum::R; }
 
+//
 // Electronic:
+//
 
 // Calculate electronic partition function.
 double qelec(const Molecule& mol, double temp = 298.15);
@@ -55,7 +59,9 @@ double thermal_energy_elec() { return 0.0; }
 // Calculate electronic constant volume heat capacity.
 double const_vol_heat_elec() { return 0.0; }
 
+//
 // Rotational:
+//
 
 // Calculate rotational partition function.
 double qrot(const Molecule& mol, double temp = 298.15, bool incl_sigma = true);
@@ -71,7 +77,9 @@ double thermal_energy_rot(const Molecule& mol, double temp = 298.15);
 // Calculate rotational contribution to constant volume heat capacity.
 double const_vol_heat_rot(const Molecule& mol);
 
+//
 // Vibrational:
+//
 
 // Calculate vibrational partition function.
 double qvib(const Molecule& mol,
@@ -87,11 +95,43 @@ double thermal_energy_vib(const Molecule& mol, double temp = 298.15);
 // Calculate vibrational constant volume heat capacity.
 double const_vol_heat_vib(const Molecule& mol, double temp = 298.15);
 
+//
 // Torsional:
+//
+
+// Calculate partition function for a molecular torsional mode.
+double qtor(const Molecule& mol,
+            double temp               = 298.15,
+            const std::string& scheme = "CT-Cw");
 
 // Calculate partition function for a torsional mode using the CT-Cw scheme.
 // Chuang, Y. Y.; Truhlar, D. G. J. Chem. Phys. 2000, vol. 112, p. 1221.
 double qctcw(const Molecule& mol, double temp = 298.15);
+
+// Function for computing the derivative dln(Q)/dT for torsional modes.
+double dlnqtor_dt(const Molecule& mol,
+                  double temp               = 298.15,
+                  const std::string& scheme = "CT-Cw");
+
+// Calculate torsional contribution to entropy.
+double entropy_tor(const Molecule& mol, double temp = 298.15);
+
+// Calculate torsional contribution to internal thermal energy.
+double thermal_energy_tor(const Molecule& mol, double temp = 298.15);
+
+// Calculate torsional constant volume heat capacity.
+double const_vol_heat_tor(const Molecule& mol, double temp = 298.15);
+
+//
+// Total contributions:
+//
+
+// Calculate total molecular partition function.
+double qtot(const Molecule& mol,
+            double temp                = 298.15,
+            double pressure            = datum::std_atm,
+            bool incl_sigma            = true,
+            const std::string& zeroref = "BOT");
 
 }  // namespace chem
 
@@ -142,18 +182,91 @@ inline double chem::const_vol_heat_rot(const Molecule& mol)
 {
     std::string rot_symm = mol.get_rot().symmetry();
 
-    double cv_r = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {
-        cv_r = 0.0;
+        return 0.0;
     }
     else {
         double factor = 1.5;
         if (rot_symm.find("linear") != std::string::npos) {
             factor = 1.0;
         }
-        cv_r = factor * datum::R;
+        return factor * datum::R;
     }
-    return cv_r;
+}
+
+inline double chem::qtor(const Molecule& mol,
+                         double temp,
+                         const std::string& scheme)
+{
+    // This is a wrapper function to allow future implementations of other
+    // schemes for computing the partition function.
+
+    if (scheme == "CT-Cw") {
+        return qctcw(mol, temp);
+    }
+    else {
+        return qctcw(mol, temp);
+    }
+}
+
+inline double chem::dlnqtor_dt(const Molecule& mol,
+                               double temp,
+                               const std::string& scheme)
+{
+    // The derivative is computed numerically using central difference.
+
+    Expects(temp > 0.0);
+    double h =  // Numerical recipes, Ch. 5.7
+        std::pow(std::numeric_limits<double>::epsilon(), 1.0 / 3.0) * temp;
+    double lnqa = std::log(chem::qtor(mol, temp + h, scheme));
+    double lnqb = std::log(chem::qtor(mol, temp - h, scheme));
+    return (lnqa - lnqb) / (2.0 * h);
+}
+
+inline double chem::entropy_tor(const Molecule& mol, double temp)
+{
+    std::string rot_symm = mol.get_rot().symmetry();
+    if (rot_symm.find("atom") != std::string::npos) {
+        return 0.0;
+    }
+    else {
+        if (rot_symm.find("linear") != std::string::npos) {
+            return 0.0;  // a linear molecule cannot have torsional modes
+        }
+        else {
+            Expects(temp > 0.0);
+            return datum::R * (std::log(chem::qtor(mol, temp)) +
+                               temp * chem::dlnqtor_dt(mol, temp));
+        }
+    }
+}
+
+inline double chem::thermal_energy_tor(const Molecule& mol, double temp)
+{
+    std::string rot_symm = mol.get_rot().symmetry();
+    if (rot_symm.find("atom") != std::string::npos) {
+        return 0.0;
+    }
+    else {
+        if (rot_symm.find("linear") != std::string::npos) {
+            return 0.0;  // a linear molecule cannot have torsional modes
+        }
+        else {
+            Expects(temp > 0.0);
+            return datum::R * temp * temp * chem::dlnqtor_dt(mol, temp);
+        }
+    }
+}
+
+inline double chem::qtot(const Molecule& mol,
+                         double temp,
+                         double pressure,
+                         bool incl_sigma,
+                         const std::string& zeroref)
+{
+    return chem::qelec(mol, temp) * chem::qtrans(mol, temp, pressure) *
+           chem::qrot(mol, temp, incl_sigma) * chem::qvib(mol, temp, zeroref) *
+           chem::qtor(mol, temp);
 }
 
 #endif  // CHEM_THERMOCHEM_H

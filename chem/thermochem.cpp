@@ -34,9 +34,8 @@ double chem::qrot(const Molecule& mol, double temp, bool incl_sigma)
 
     std::string rot_symm = mol.get_rot().symmetry();
 
-    double qr = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {
-        qr = 1.0;
+        return 1.0;
     }
     else if (rot_symm.find("linear") != std::string::npos) {
         arma::vec3 rotc = datum::GHz_to_K * mol.get_rot().constants();
@@ -44,7 +43,7 @@ double chem::qrot(const Molecule& mol, double temp, bool incl_sigma)
         if (incl_sigma) {
             rsig /= mol.get_rot().get_sigma();
         }
-        qr = rsig * temp / rotc(0);
+        return rsig * temp / rotc(0);
     }
     else {  // nonlinear molecule
         arma::vec3 rotc = datum::GHz_to_K * mol.get_rot().constants();
@@ -53,18 +52,16 @@ double chem::qrot(const Molecule& mol, double temp, bool incl_sigma)
         if (incl_sigma) {
             rsig /= mol.get_rot().get_sigma();
         }
-        qr = rsig * std::pow(temp, 1.5) / std::sqrt(b);
+        return rsig * std::pow(temp, 1.5) / std::sqrt(b);
     }
-    return qr;
 }
 
 double chem::entropy_rot(const Molecule& mol, double temp, bool incl_sigma)
 {
     std::string rot_symm = mol.get_rot().symmetry();
 
-    double sr = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {
-        sr = 1.0;
+        return 1.0;
     }
     else {
         double factor = 1.5;
@@ -73,23 +70,21 @@ double chem::entropy_rot(const Molecule& mol, double temp, bool incl_sigma)
         }
         double qr = chem::qrot(mol, temp, incl_sigma);
         Ensures(qr > 0.0);
-        sr = datum::R * (std::log(qr) + factor);
+        return datum::R * (std::log(qr) + factor);
     }
-    return sr;
 }
 
 double chem::qvib(const Molecule& mol, double temp, const std::string& zeroref)
 {
     std::string rot_symm = mol.get_rot().symmetry();
 
-    double qv = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {
-        qv = 1.0;
+        return 1.0;
     }
     else {
         Expects(temp > 0.0);
         arma::vec w = datum::icm_to_K * mol.get_vib().get_freqs();
-        qv          = 1.0;
+        double qv   = 1.0;
         if (zeroref == "V=0") {  // zero at first vibrational level
             for (arma::uword i = 0; i < w.size(); ++i) {
                 qv /= (1.0 - std::exp(-w(i) / temp));
@@ -101,67 +96,67 @@ double chem::qvib(const Molecule& mol, double temp, const std::string& zeroref)
                       (1.0 - std::exp(-w(i) / temp));
             }
         }
+        return qv;
     }
-    return qv;
 }
 
 double chem::entropy_vib(const Molecule& mol, double temp)
 {
     std::string rot_symm = mol.get_rot().symmetry();
 
-    double sv = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {
-        sv = 0.0;
+        return 0.0;
     }
     else {
         Expects(temp > 0.0);
         arma::vec w = datum::icm_to_K * mol.get_vib().get_freqs();
+        double sv   = 0.0;
         for (arma::uword i = 0; i < w.size(); ++i) {
             double wt = w(i) / temp;
             sv += wt / (std::exp(wt) - 1.0) - std::log(1.0 - std::exp(-wt));
         }
         sv *= datum::R;
+        return sv;
     }
-    return sv;
 }
 
 double chem::thermal_energy_vib(const Molecule& mol, double temp)
 {
     std::string rot_symm = mol.get_rot().symmetry();
 
-    double ev = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {
-        ev = 0.0;
+        return 0.0;
     }
     else {
         Expects(temp > 0.0);
         arma::vec w = datum::icm_to_K * mol.get_vib().get_freqs();
+        double ev   = 0.0;
         for (arma::uword i = 0; i < w.size(); ++i) {
             ev += w(i) * (0.5 + 1.0 / (std::exp(w(i) / temp) - 1.0));
         }
         ev *= datum::R;
+        return ev;
     }
-    return ev;
 }
 
 double chem::const_vol_heat_vib(const Molecule& mol, double temp)
 {
     std::string rot_symm = mol.get_rot().symmetry();
 
-    double cv_v = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {
-        cv_v = 0.0;
+        return 0.0;
     }
     else {
         Expects(temp > 0.0);
         arma::vec w = datum::icm_to_K * mol.get_vib().get_freqs();
+        double cv_v = 0.0;
         for (arma::uword i = 0; i < w.size(); ++i) {
             double wt = w(i) / temp;
             cv_v += wt * wt * std::exp(wt) / std::pow(std::exp(wt) - 1.0, 2.0);
         }
         cv_v *= datum::R;
+        return cv_v;
     }
-    return cv_v;
 }
 
 double chem::qctcw(const Molecule& mol, double temp)
@@ -172,5 +167,57 @@ double chem::qctcw(const Molecule& mol, double temp)
     if (rot_symm.find("atom") != std::string::npos) {
         qtor = 1.0;
     }
-    return qtor * temp;
+    else {
+        if (mol.has_torsions()) {
+            Expects(temp > 0.0);
+            // Calculate free rotor partition function:
+            double imom = mol.get_tor().eff_moment_of_inertia();
+            imom *= datum::au_to_kgm2;
+            double sigma = mol.get_tor().symmetry_number();
+            double qfr   = std::sqrt(2.0 * datum::pi * imom * datum::k * temp) /
+                         (datum::h_bar * sigma);
+
+            // Calculate partition function for harmonic oscillator and
+            // intermediate case:
+            double qho     = 0.0;
+            double qin     = 0.0;
+            arma::vec pot  = mol.get_tor().get_pot_coeff();
+            arma::vec freq = mol.get_tor().get_freqs();
+            Expects(pot.size() == freq.size());
+            for (arma::uword i = 0; i < pot.size(); ++i) {
+                double ui = pot(i) * datum::icm_to_K;
+                double wi = freq(i) * datum::icm_to_K;
+                qho += std::exp(-(ui + 0.5 * wi) / temp) /
+                       (1.0 - std::exp(-wi / temp));
+                qin += std::exp(-ui / temp) / (wi / temp);
+            }
+            qtor = qho * std::tanh(qfr / qin);  // eq. 11 in C&T (2000).
+        }
+    }
+    return qtor;
+}
+
+double chem::const_vol_heat_tor(const Molecule& mol, double temp)
+{
+    // The constant volume heat capacity is calculated as the numerical
+    // derivative of the thermal torsional energy with respect to
+    // temperature (dEtor/dT) at constant N and V.
+
+    std::string rot_symm = mol.get_rot().symmetry();
+    if (rot_symm.find("atom") != std::string::npos) {
+        return 0.0;
+    }
+    else {
+        if (rot_symm.find("linear") != std::string::npos) {
+            return 0.0;  // a linear molecule cannot have torsional modes
+        }
+        else {
+            Expects(temp > 0.0);
+            double h = temp * std::pow(std::numeric_limits<double>::epsilon(),
+                                       1.0 / 3.0);
+            double cva = chem::thermal_energy_tor(mol, temp + h);
+            double cvb = chem::thermal_energy_tor(mol, temp - h);
+            return (cva - cvb) / (2.0 * h);
+        }
+    }
 }

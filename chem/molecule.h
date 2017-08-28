@@ -60,6 +60,9 @@ public:
 
     ~Molecule() {}
 
+    // Return true if molecule has torsional modes.
+    bool has_torsions() const { return tor->tot_minima() > 0; }
+
     // Calculate total molecular mass.
     double tot_mass() const { return rot->tot_mass(); }
 

@@ -74,6 +74,9 @@ public:
     // Calculate rotational constant for torsional mode.
     arma::vec constant();
 
+    arma::vec get_pot_coeff() const { return pot_tor; }
+    arma::vec get_freqs() const { return freq_tor; }
+
 private:
     // Initialize input data.
     void init(std::istream& from, const std::string& key);

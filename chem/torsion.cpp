@@ -17,7 +17,7 @@
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100)  // caused by armadillo
-#endif  // _MSC_VER
+#endif                           // _MSC_VER
 
 #include <chem/datum.h>
 #include <chem/input.h>
@@ -251,7 +251,6 @@ double Torsion::red_moment_of_inertia()
 void Torsion::init(std::istream& from, const std::string& key)
 {
     // Read input data:
-
     arma::uvec rot_axis_def  = arma::zeros<arma::uvec>(2);
     arma::uvec rot_top_def   = arma::zeros<arma::uvec>(0);
     arma::uvec sigma_tor_def = arma::zeros<arma::uvec>(0);
@@ -286,24 +285,21 @@ void Torsion::init(std::istream& from, const std::string& key)
     }
 
     // Check if initialized:
-
     for (auto it = input_data.begin(); it != input_data.end(); ++it) {
         if (!it->second.is_init()) {
             throw Torsion_error(it->first + " not initialized");
         }
     }
 
-    // Check if data are sensible:
-
-    validate();
-
     // Calculate reduced moment of inertia if needed:
-
     if ((rot_top.size() > 0) && rmi_tor.empty()) {
         perform_torsional_analysis = true;
         rmi_tor.set_size(1);
         rmi_tor(0) = red_moment_of_inertia();
     }
+
+    // Check if data are sensible:
+    validate();
 }
 
 void Torsion::validate() const
@@ -342,10 +338,6 @@ void Torsion::validate() const
             throw Torsion_error("bad freq_tor");
         }
     }
-    chem::Assert((sigma_tor.size() == rmi_tor.size()) &&
-                     (rmi_tor.size() == pot_tor.size()) &&
-                     (pot_tor.size() == freq_tor.size()),
-                 Torsion_error("bad torsional mode size"));
 }
 
 void Torsion::axis_system()
@@ -446,9 +438,9 @@ void Torsion::top_moment_of_inertia()
         top_xyz.row(i) = xyz_.row(rot_top(i)) - top_origo;
     }
     for (arma::uword i = 0; i < top_xyz.n_rows; ++i) {
-        double x      = arma::dot(top_xyz.row(i), x_axis);
-        double y      = arma::dot(top_xyz.row(i), y_axis);
-        double z      = arma::dot(top_xyz.row(i), z_axis);
+        double x = arma::dot(top_xyz.row(i), x_axis);
+        double y = arma::dot(top_xyz.row(i), y_axis);
+        double z = arma::dot(top_xyz.row(i), z_axis);
         top_xyz(i, 0) = x;
         top_xyz(i, 1) = y;
         top_xyz(i, 2) = z;
