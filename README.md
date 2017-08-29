@@ -66,11 +66,16 @@ into a directory called `chemapps`.
         mkdir build
         cd build
 
-2. Build the software (in this case in the Release configuration):
+2. Configure CMake to use the compiler of your choice (you can see a list by
+   running `cmake --help`):
 
-        cmake --build .. --config Release
+        cmake -G "Visual Studio 15 2017" ..
 
-3. Run the test suite:
+3. Build the software (in this case in the Release configuration):
+
+        cmake --build . --config Release
+
+4. Run the test suite:
 
         ctest -C Release
 

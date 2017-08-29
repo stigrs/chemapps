@@ -134,7 +134,7 @@ public:
     Bound_form<T> operator()(T vv) const { return Bound_form<T>(*this, vv); }
 
     // Set width.
-    Format<T>& width(int w)
+    Format<T>& width(std::size_t w)
     {
         wdt = w;
         return *this;
@@ -183,9 +183,9 @@ public:
     }
 
 private:
-    int prc;  // precision, default precision is 6
-    int wdt;  // width, 0 means as wide as necessary
-    char ch;  // fill character, default is blank
+    int prc;          // precision, default precision is 6
+    std::size_t wdt;  // width, 0 means as wide as necessary
+    char ch;          // fill character, default is blank
 
     std::ios_base::fmtflags fmt;  // format flag value
 

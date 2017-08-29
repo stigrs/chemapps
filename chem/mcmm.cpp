@@ -16,8 +16,8 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4100)  // caused by armadillo
-#endif  // _MSC_VER
+#pragma warning(disable : 4100)  // unreferenced formal parameter
+#endif                           // _MSC_VER
 
 #include <chem/input.h>
 #include <chem/mcmm.h>
@@ -269,7 +269,7 @@ void Mcmm<Pot>::uniform_usage(arma::mat& xnew)
         }
         if (!conformers.empty()) {  // find least used with lowest energy
             auto res = std::max_element(conformers.begin(), conformers.end());
-            int it   = std::distance(conformers.begin(), res);
+            auto it  = std::distance(conformers.begin(), res);
             double emin_ = conformers[it].energy;
             for (std::size_t i = 0; i < index.size(); ++i) {
                 if (index[i].energy < emin_) {

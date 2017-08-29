@@ -24,6 +24,7 @@
 #include <chem/torsion.h>
 #include <chem/utils.h>
 #include <cmath>
+#include <gsl/gsl>
 #include <iostream>
 #include <map>
 
@@ -63,7 +64,7 @@ void Torsion::analysis(std::ostream& to)
     chem::Format<double> fix;
     fix.fixed().width(10);
 
-    chem::Format<int> ifix;
+    chem::Format<std::size_t> ifix;
     ifix.fixed().width(11);
 
     chem::Format<double> sci;
@@ -161,7 +162,7 @@ int Torsion::tot_minima() const
 {
     int nminima = 0;
     for (arma::uword i = 0; i < sigma_tor.size(); ++i) {
-        nminima += sigma_tor(i);  // eq. 1 in C&T (2000)
+        nminima += gsl::narrow<int>(sigma_tor(i));  // eq. 1 in C&T (2000)
     }
     return nminima;
 }

@@ -17,6 +17,7 @@
 #include <chem/math.h>
 #include <chem/molecule_io.h>
 #include <chem/zmatrix.h>
+#include <gsl/gsl>
 
 Zmatrix::Zmatrix(const Zmatrix& zmat) : atoms(zmat.atoms), xyz(zmat.xyz)
 {
@@ -142,6 +143,7 @@ int Zmatrix::find_nearest_atom(const arma::rowvec& dist) const
 
     for (arma::uword i = 0; i < dist.size(); ++i) {
         if (chem::approx_equal(dist(i), dist_min)) {
+            // nearest_atom = gsl::narrow<int>(i);
             nearest_atom = i;
             break;
         }
@@ -156,20 +158,20 @@ int Zmatrix::find_new_connection(const arma::ivec& iatms,
     for (arma::uword idx = 1; idx < connectivity.size(); ++idx) {
         if ((!arma::any(iatms == idx)) &&
             arma::any(iatms == connectivity(idx))) {
-            connection = idx;
+            connection = gsl::narrow<int>(idx);
         }
     }
     return connection;
 }
 
-arma::rowvec Zmatrix::calc_position(int i) const
+arma::rowvec Zmatrix::calc_position(arma::sword i) const
 {
     arma::rowvec pos(3);
     double dst = 0.0;
     if (i > 1) {
-        int j          = bond_connect(i);
-        int k          = angle_connect(i);
-        int l          = dihedral_connect(i);
+        arma::sword j  = bond_connect(i);
+        arma::sword k  = angle_connect(i);
+        arma::sword l  = dihedral_connect(i);
         arma::ivec tmp = {i, j, k};
         if ((k == l) && (i > 0)) {  // prevent doubles
             l = find_new_connection(tmp, bond_connect.head(i));
@@ -204,9 +206,9 @@ arma::rowvec Zmatrix::calc_position(int i) const
         pos = avec + v3 - v1;
     }
     else if (i == 1) {  // second atom dst away from origin along Z axis
-        int j = bond_connect(i);
-        dst   = distances(i);
-        pos   = {xyz(j, 0) + dst, xyz(j, 1), xyz(j, 2)};
+        arma::sword j = bond_connect(i);
+        dst           = distances(i);
+        pos           = {xyz(j, 0) + dst, xyz(j, 1), xyz(j, 2)};
     }
     else if (i == 0) {  // first atom at the origin
         pos.zeros();

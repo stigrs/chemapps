@@ -99,7 +99,7 @@ protected:
     // Calculate position of another atom based on internal coordinates. The
     // code is based on the qcl code written by Ben Albrecht released under
     // the MIT license.
-    arma::rowvec calc_position(int i) const;
+    arma::rowvec calc_position(arma::sword i) const;
 
 private:
     std::vector<Element>& atoms;

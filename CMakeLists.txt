@@ -35,7 +35,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -pg")
 endif()
 if(MSVC)
-    set(CMAKE_CXX_FLAGS_DEBUG "/std:c++14 /EHsc /W4 /WX /MTd /GR /Zi /Od /RTC1")
+    set(CMAKE_CXX_FLAGS_DEBUG "/std:c++14 /EHsc /W4 /WX /MT /GR /Zi /Od")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/force:multiple /ignore:4075")
 endif()
 
