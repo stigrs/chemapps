@@ -143,8 +143,7 @@ int Zmatrix::find_nearest_atom(const arma::rowvec& dist) const
 
     for (arma::uword i = 0; i < dist.size(); ++i) {
         if (chem::approx_equal(dist(i), dist_min)) {
-            // nearest_atom = gsl::narrow<int>(i);
-            nearest_atom = i;
+            nearest_atom = gsl::narrow<int>(i);
             break;
         }
     }

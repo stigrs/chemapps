@@ -16,12 +16,13 @@
 
 #include <chem/ptable.h>
 #include <chem/utils.h>
+#include <array>
 
 namespace ptable {
 
-const int num_isotopes = 3352;
+constexpr int num_isotopes = 3352;
 
-const std::string isotopes[num_isotopes] = {
+const std::array<std::string, num_isotopes> isotopes = {
     "X",      "H",      "D",      "T",      "4H",     "5H",     "6H",
     "7H",     "3He",    "He",     "5He",    "6He",    "7He",    "8He",
     "9He",    "10He",   "3Li",    "4Li",    "5Li",    "6Li",    "Li",
@@ -502,7 +503,7 @@ const std::string isotopes[num_isotopes] = {
     "290Uup", "291Uup", "Lv",     "290Lv",  "291Lv",  "292Lv",  "293Lv",
     "Uus",    "292Uus", "293Uus", "294Uus", "Uuo",    "294Uuo"};
 
-const int mass_numbers[num_isotopes] = {
+const std::array<int, num_isotopes> mass_numbers = {
     0,   1,   2,   3,   4,   5,   6,   7,   3,   4,   5,   6,   7,   8,   9,
     10,  3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  5,   6,   7,
     8,   9,   10,  11,  12,  13,  14,  15,  16,  6,   7,   8,   9,   10,  11,
@@ -728,7 +729,7 @@ const int mass_numbers[num_isotopes] = {
     287, 285, 286, 287, 288, 289, 287, 288, 289, 290, 291, 289, 290, 291, 292,
     293, 291, 292, 293, 294, 293, 294};
 
-const double atomic_masses[num_isotopes] = {
+const std::array<double, num_isotopes> atomic_masses = {
     0.000000,   1.007825,   2.014102,   3.016049,   4.026430,   5.035311,
     6.044960,   7.052700,   3.016029,   4.002603,   5.012057,   6.018886,
     7.027991,   8.033934,   9.043946,   10.052790,  3.030800,   4.027190,
@@ -1289,7 +1290,7 @@ const double atomic_masses[num_isotopes] = {
     290.198640, 291.201080, 292.201740, 293.204490, 291.205530, 292.207460,
     293.208240, 294.210460, 293.213560, 294.213920};
 
-const double atomic_weights[num_isotopes] = {
+const std::array<double, num_isotopes> atomic_weights = {
     0.000000,   1.007975,   1.007975,   1.007975,   1.007975,   1.007975,
     1.007975,   1.007975,   4.002602,   4.002602,   4.002602,   4.002602,
     4.002602,   4.002602,   4.002602,   4.002602,   6.967500,   6.967500,
@@ -1850,7 +1851,7 @@ const double atomic_weights[num_isotopes] = {
     0.000000,   0.000000,   0.000000,   0.000000,   0.000000,   0.000000,
     0.000000,   0.000000,   0.000000,   0.000000};
 
-const double isotope_comp[num_isotopes] = {
+const std::array<double, num_isotopes> isotope_comp = {
     0.000000, 0.999885, 0.000115, 0.000000, 0.000000, 0.000000, 0.000000,
     0.000000, 0.000001, 0.999999, 0.000000, 0.000000, 0.000000, 0.000000,
     0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.075900, 0.924100,
@@ -2331,7 +2332,7 @@ const double isotope_comp[num_isotopes] = {
     0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000,
     0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000};
 
-const int atomic_numbers[num_isotopes] = {
+const std::array<int, num_isotopes> atomic_numbers = {
     0,   1,   1,   1,   1,   1,   1,   1,   2,   2,   2,   2,   2,   2,   2,
     2,   3,   3,   3,   3,   3,   3,   3,   3,   3,   3,   3,   4,   4,   4,
     4,   4,   4,   4,   4,   4,   4,   4,   4,   5,   5,   5,   5,   5,   5,
@@ -2562,7 +2563,7 @@ const int atomic_numbers[num_isotopes] = {
 Element get_element(const std::string& symbol)
 {
     int idx = -1;
-    for (unsigned i = 0; i < num_isotopes; ++i) {
+    for (int i = 0; i < num_isotopes; ++i) {
         if (symbol == isotopes[i]) {
             idx = i;
         }
