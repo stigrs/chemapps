@@ -54,7 +54,7 @@ void read_vector(std::istream& from, arma::Col<T>& a)
     if (n < 1) {
         throw Arma_error("read_vector: bad size");
     }
-    a.resize(n);
+    a.set_size(n);
 
     char ch;
     from >> ch;

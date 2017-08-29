@@ -16,8 +16,8 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4100)  // caused by armadillo
-#endif  // _MSC_VER
+#pragma warning(disable : 4100)  // unreferenced formal parameter
+#endif                           // _MSC_VER
 
 #include <chem/datum.h>
 #include <chem/input.h>
@@ -26,6 +26,10 @@
 #include <chem/utils.h>
 #include <cmath>
 #include <map>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
 
 Molrot::Molrot(const Molrot& rot)
     : atoms(rot.atoms), xyz(rot.xyz), pmom(rot.pmom), paxis(rot.paxis)

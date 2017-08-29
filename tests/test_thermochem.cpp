@@ -22,7 +22,6 @@
 #include <catch/catch.hpp>
 #include <cmath>
 #include <fstream>
-#include <iostream>
 
 TEST_CASE("test_thermochem")
 {
@@ -31,6 +30,8 @@ TEST_CASE("test_thermochem")
         std::ifstream from;
         chem::fopen(from, "test_thermochem_ch3oh.inp");
         Molecule mol(from);
+
+        chem::thermochemistry(mol);
 
         const double qtr_ans = 0.712383e+7;
         double qtr           = chem::qtrans(mol, 298.15, datum::std_atm);
@@ -91,6 +92,30 @@ TEST_CASE("test_thermochem")
         const double cv_v_ans = 2.696 * datum::cal_to_J;
         double cv_v           = chem::const_vol_heat_vib(mol);
         CHECK(std::abs(cv_v - cv_v_ans) / cv_v_ans < 2.0e-4);
+
+        const double qtot_ans = 0.333036e-13;
+        double qtot           = chem::qtot(mol);
+        CHECK(std::abs(qtot - qtot_ans) / qtot_ans < 1.0e-4);
+
+        const double stot_ans = 56.748 * datum::cal_to_J;
+        double stot           = chem::entropy(mol);
+        CHECK(std::abs(stot - stot_ans) / stot_ans < 1.0e-5);
+
+        const double etot_ans = 34.714 * datum::cal_to_J * 1000.0;
+        double etot           = chem::thermal_energy(mol);
+        CHECK(std::abs(etot - etot_ans) / etot_ans < 2.0e-5);
+
+        const double cv_tot_ans = 8.657 * datum::cal_to_J;
+        double cv_tot           = chem::const_vol_heat_capacity(mol);
+        CHECK(std::abs(cv_tot - cv_tot_ans) / cv_tot_ans < 3.0e-5);
+
+        const double hcorr_ans = 35.3061979 * datum::cal_to_J * 1000.0;
+        double hcorr           = chem::enthalpy(mol);
+        CHECK(std::abs(hcorr - hcorr_ans) / hcorr_ans < 5.0e-6);
+
+        const double gibbs_ans = 18.38665762 * datum::cal_to_J * 1000.0;
+        double gibbs           = chem::gibbs_energy(mol);
+        CHECK(std::abs(gibbs - gibbs_ans) / gibbs_ans < 3.0e-6);
     }
 
     SECTION("CH2ClCH2Cl")

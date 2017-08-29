@@ -16,7 +16,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4100)  // caused by armadillo
+#pragma warning(disable : 4100)  // unreferenced formal parameter
 #endif                           // _MSC_VER
 
 #include <chem/datum.h>
@@ -27,6 +27,10 @@
 #include <gsl/gsl>
 #include <iostream>
 #include <map>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
 
 Torsion::Torsion(const Torsion& tor) : rot(tor.rot)
 {
@@ -186,8 +190,8 @@ arma::vec Torsion::constant()
     arma::vec rotc = arma::zeros<arma::vec>(rmi_tor.size());
     if (!rmi_tor.empty()) {
         for (arma::uword i = 0; i < rotc.size(); ++i) {
-            rotc(i) = h_bar / (4.0 * pi * giga * m_u * a_0 * a_0 * 1.0e-20 *
-                               rmi_tor(i));
+            rotc(i) = h_bar / (4.0 * pi * giga * m_u * a_0 * a_0 * 1.0e-20
+                               * rmi_tor(i));
         }
     }
     return rotc;
@@ -238,13 +242,13 @@ double Torsion::red_moment_of_inertia()
         if (ip1 > 2) {
             ip1 = 0;
         }
-        betam(i) = alpha(2, i) * am - alpha(0, i) * bm - alpha(1, i) * cm +
-                   um * (alpha(1, im1) * rm(ip1) - alpha(1, ip1) * rm(im1));
+        betam(i) = alpha(2, i) * am - alpha(0, i) * bm - alpha(1, i) * cm
+                   + um * (alpha(1, im1) * rm(ip1) - alpha(1, ip1) * rm(im1));
     }
     double lambdam = 0.0;
     for (int i = 0; i < 3; ++i) {
-        lambdam += std::pow(alpha(1, i) * um, 2.0) / rot.tot_mass() +
-                   std::pow(betam(i), 2.0) / rot.pmom(i);
+        lambdam += std::pow(alpha(1, i) * um, 2.0) / rot.tot_mass()
+                   + std::pow(betam(i), 2.0) / rot.pmom(i);
     }
     return am - lambdam;
 }

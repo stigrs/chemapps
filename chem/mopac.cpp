@@ -16,8 +16,8 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4100)  // caused by armadillo
-#endif  // _MSC_VER
+#pragma warning(disable : 4100)  // unreferenced formal parameter
+#endif                           // _MSC_VER
 
 #include <chem/datum.h>
 #include <chem/input.h>
@@ -27,6 +27,10 @@
 #include <fstream>
 #include <map>
 #include <sstream>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
 
 Mopac::Mopac(std::istream& from, const std::string& key)
 {

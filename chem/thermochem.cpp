@@ -15,8 +15,41 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <chem/thermochem.h>
-#include <armadillo>
+#include <chem/utils.h>
 #include <string>
+
+void chem::thermochemistry(const Molecule& mol,
+                           const arma::vec& temp,
+                           const arma::vec& pressure,
+                           bool incl_sigma,
+                           std::ostream& to)
+{
+    chem::Format<char> line;
+    line.width(16).fill('=');
+
+    chem::Format<double> fix;
+    fix.fixed().precision(6);
+
+    to << "\nThermochemistry:\n" << line('=') << '\n';
+    to << "Electronic energy: " << fix(mol.get_elec_energy()) << " Hartree\n";
+
+    if (mol.has_torsions()) {
+        mol.get_tor().analysis(to);
+    }
+    mol.get_vib().print(to);
+    to << '\n';
+
+    fix.fixed().precision(3);
+
+    typedef arma::vec::const_iterator Citer;  // arma:: does not support auto
+    for (Citer p = pressure.begin(); p != pressure.end(); ++p) {
+        for (Citer t = temp.begin(); t != temp.end(); ++t) {
+            to << "Temperature: " << fix(*t) << " K. "
+               << "Pressure: " << fix(*p) << " bar\n";
+        }
+    }
+    incl_sigma;
+}
 
 double chem::qelec(const Molecule& mol, double temp)
 {
@@ -92,8 +125,8 @@ double chem::qvib(const Molecule& mol, double temp, const std::string& zeroref)
         }
         else if (zeroref == "BOT") {  // zero at the bottom of the well
             for (arma::uword i = 0; i < w.size(); ++i) {
-                qv *= std::exp(-w(i) / (2.0 * temp)) /
-                      (1.0 - std::exp(-w(i) / temp));
+                qv *= std::exp(-w(i) / (2.0 * temp))
+                      / (1.0 - std::exp(-w(i) / temp));
             }
         }
         return qv;
@@ -174,8 +207,8 @@ double chem::qctcw(const Molecule& mol, double temp)
             double imom = mol.get_tor().eff_moment_of_inertia();
             imom *= datum::au_to_kgm2;
             double sigma = mol.get_tor().symmetry_number();
-            double qfr   = std::sqrt(2.0 * datum::pi * imom * datum::k * temp) /
-                         (datum::h_bar * sigma);
+            double qfr   = std::sqrt(2.0 * datum::pi * imom * datum::k * temp)
+                         / (datum::h_bar * sigma);
 
             // Calculate partition function for harmonic oscillator and
             // intermediate case:
@@ -187,8 +220,8 @@ double chem::qctcw(const Molecule& mol, double temp)
             for (arma::uword i = 0; i < pot.size(); ++i) {
                 double ui = pot(i) * datum::icm_to_K;
                 double wi = freq(i) * datum::icm_to_K;
-                qho += std::exp(-(ui + 0.5 * wi) / temp) /
-                       (1.0 - std::exp(-wi / temp));
+                qho += std::exp(-(ui + 0.5 * wi) / temp)
+                       / (1.0 - std::exp(-wi / temp));
                 qin += std::exp(-ui / temp) / (wi / temp);
             }
             qtor = qho * std::tanh(qfr / qin);  // eq. 11 in C&T (2000).

@@ -28,6 +28,10 @@
 #include <map>
 #include <numeric>
 
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
+
 template <class Pot>
 Mcmm<Pot>::Mcmm(std::istream& from,
                 Molecule& mol_,
@@ -199,8 +203,8 @@ bool Mcmm<Pot>::duplicate(const Molecule& m) const
 {
     bool duplicate = false;
     for (std::size_t i = 0; i < conformers.size(); ++i) {  // check geometry
-        duplicate =
-            arma::approx_equal(conformers[i].xyz, m.get_xyz(), "absdiff", xtol);
+        duplicate = arma::approx_equal(
+            conformers[i].xyz, m.get_xyz(), "absdiff", xtol);
         if (duplicate) {  // check energy
             double ediff = std::abs(conformers[i].energy - m.get_elec_energy());
             duplicate    = ediff < etol;

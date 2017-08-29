@@ -20,11 +20,21 @@
 #include <chem/datum.h>
 #include <chem/molecule.h>
 #include <chem/utils.h>
+#include <armadillo>
 #include <cmath>
 #include <gsl/gsl>
+#include <iostream>
 #include <limits>
 
 namespace chem {
+
+// Perform thermochemistry analysis.
+void thermochemistry(const Molecule& mol,
+                     const arma::vec& temp     = arma::vec{298.15},
+                     const arma::vec& pressure = arma::vec{datum::std_atm},
+                     bool incl_sigma           = true,
+                     std::ostream& to          = std::cout);
+
 //
 // Translational:
 //
@@ -133,6 +143,27 @@ double qtot(const Molecule& mol,
             bool incl_sigma            = true,
             const std::string& zeroref = "BOT");
 
+// Calculate total entropy.
+double entropy(const Molecule& mol,
+               double temp     = 298.15,
+               double pressure = datum::std_atm,
+               bool incl_sigma = true);
+
+// Calculate thermal correction to the energy.
+double thermal_energy(const Molecule& mol, double temp = 298.15);
+
+// Calculate total constant volume heat capacity.
+double const_vol_heat_capacity(const Molecule& mol, double temp = 298.15);
+
+// Calculate thermal correction to enthalpy.
+double enthalpy(const Molecule& mol, double temp = 298.15);
+
+// Calculate thermal correction to Gibbs energy.
+double gibbs_energy(const Molecule& mol,
+                    double temp     = 298.15,
+                    double pressure = datum::std_atm,
+                    bool incl_sigma = true);
+
 }  // namespace chem
 
 inline double chem::qtrans(const Molecule& mol, double temp, double pressure)
@@ -235,8 +266,8 @@ inline double chem::entropy_tor(const Molecule& mol, double temp)
         }
         else {
             Expects(temp > 0.0);
-            return datum::R * (std::log(chem::qtor(mol, temp)) +
-                               temp * chem::dlnqtor_dt(mol, temp));
+            return datum::R * (std::log(chem::qtor(mol, temp))
+                               + temp * chem::dlnqtor_dt(mol, temp));
         }
     }
 }
@@ -264,9 +295,51 @@ inline double chem::qtot(const Molecule& mol,
                          bool incl_sigma,
                          const std::string& zeroref)
 {
-    return chem::qelec(mol, temp) * chem::qtrans(mol, temp, pressure) *
-           chem::qrot(mol, temp, incl_sigma) * chem::qvib(mol, temp, zeroref) *
-           chem::qtor(mol, temp);
+    return chem::qelec(mol, temp) * chem::qtrans(mol, temp, pressure)
+           * chem::qrot(mol, temp, incl_sigma) * chem::qvib(mol, temp, zeroref)
+           * chem::qtor(mol, temp);
+}
+
+inline double chem::entropy(const Molecule& mol,
+                            double temp,
+                            double pressure,
+                            bool incl_sigma)
+{
+    return chem::entropy_elec(mol, temp)
+           + chem::entropy_trans(mol, temp, pressure)
+           + chem::entropy_rot(mol, temp, incl_sigma)
+           + chem::entropy_vib(mol, temp) + chem::entropy_tor(mol, temp);
+}
+
+inline double chem::thermal_energy(const Molecule& mol, double temp)
+{
+    return chem::thermal_energy_elec() + chem::thermal_energy_trans(temp)
+           + chem::thermal_energy_rot(mol, temp)
+           + chem::thermal_energy_vib(mol, temp)
+           + chem::thermal_energy_tor(mol, temp);
+}
+
+inline double chem::const_vol_heat_capacity(const Molecule& mol, double temp)
+{
+    return chem::const_vol_heat_elec() + chem::const_vol_heat_trans()
+           + chem::const_vol_heat_rot(mol) + chem::const_vol_heat_vib(mol, temp)
+           + chem::const_vol_heat_tor(mol, temp);
+}
+
+inline double chem::enthalpy(const Molecule& mol, double temp)
+{
+    Expects(temp >= 0.0);
+    return chem::thermal_energy(mol, temp) + datum::R * temp;
+}
+
+inline double chem::gibbs_energy(const Molecule& mol,
+                                 double temp,
+                                 double pressure,
+                                 bool incl_sigma)
+{
+    Expects(temp >= 0.0);
+    return chem::enthalpy(mol, temp)
+           - temp * chem::entropy(mol, temp, pressure, incl_sigma);
 }
 
 #endif  // CHEM_THERMOCHEM_H

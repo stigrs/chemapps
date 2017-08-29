@@ -25,6 +25,10 @@
 #include <chem/utils.h>
 #include <map>
 
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
+
 Molecule::Molecule(const Molecule& mol)
 {
     title       = mol.title;

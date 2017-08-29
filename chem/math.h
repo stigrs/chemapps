@@ -25,12 +25,16 @@
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100)  // caused by armadillo
-#endif  // _MSC_VER
+#endif                           // _MSC_VER
 
 #include <chem/datum.h>
 #include <armadillo>
 #include <cmath>
 #include <iostream>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
 
 namespace chem {
 
