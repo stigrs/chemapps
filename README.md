@@ -79,10 +79,14 @@ into a directory called `chemapps`.
 
         ctest -C Release
 
+5. Install the software:
+
+        cmake --build . --config Release --target install
+
 All tests should pass, indicating that your platform is fully supported. 
 
-*NB*. Test cases involving Mopac could fail because of numerical roundoff 
-errors in Mopac on different platforms.
+*NB*. Test cases involving MOPAC could fail because of numerical roundoff 
+errors in MOPAC on different platforms.
 
 Notes and References
 --------------------
