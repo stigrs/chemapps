@@ -41,6 +41,9 @@ public:
     // Calculate Wigner tunneling correction.
     double wigner(double temp = 298.15) const;
 
+    // Calculate Eckart tunneling correction for an unsymmetrical barrier.
+    double eckart(double temp = 298.15) const;
+
 private:
     enum Method_t { Wigner, Eckart };
 
@@ -52,6 +55,8 @@ private:
 
 inline double Tunnel::wigner(double temp) const
 {
+    // Wigner, E. Z. Physik. Chem. (Leipzig), 1932, vol. B19, p. 203.
+
     Expects(temp > 0.0);
     double factor
         = datum::h * std::abs(freq_im) * 100.0 * datum::c_0 / (datum::k * temp);
