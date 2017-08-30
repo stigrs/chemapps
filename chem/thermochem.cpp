@@ -14,6 +14,7 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <chem/datum.h>
 #include <chem/thermochem.h>
 #include <chem/utils.h>
 #include <string>
@@ -30,8 +31,9 @@ void chem::thermochemistry(const Molecule& mol,
     chem::Format<double> fix;
     fix.fixed().precision(6);
 
+    double e0 = mol.get_elec_energy();
     to << "\nThermochemistry:\n" << line('=') << '\n';
-    to << "Electronic energy: " << fix(mol.get_elec_energy()) << " Hartree\n";
+    to << "Electronic energy: " << fix(e0) << " Hartree\n";
 
     if (mol.has_torsions()) {
         mol.get_tor().analysis(to);
@@ -39,16 +41,131 @@ void chem::thermochemistry(const Molecule& mol,
     mol.get_vib().print(to);
     to << '\n';
 
-    fix.fixed().precision(3);
+    double zpe          = mol.get_vib().zero_point_energy() / datum::au_to_icm;
+    const double factor = 1.0 / (datum::E_h * datum::N_A);
 
     typedef arma::vec::const_iterator Citer;  // arma:: does not support auto
     for (Citer p = pressure.begin(); p != pressure.end(); ++p) {
         for (Citer t = temp.begin(); t != temp.end(); ++t) {
+            fix.fixed().precision(3);
             to << "Temperature: " << fix(*t) << " K. "
                << "Pressure: " << fix(*p) << " bar\n";
+
+            fix.fixed().width(12).precision(6);
+            to << "Zero-point correction:\t\t\t\t" << fix(zpe) << " Hartree\n";
+
+            double ecorr = chem::thermal_energy(mol, *t) * factor;
+            to << "Thermal correction to energy:\t\t\t" << fix(ecorr) << '\n';
+
+            double hcorr = chem::enthalpy(mol, *t) * factor;
+            to << "Thermal correction to enthalpy:\t\t\t" << fix(hcorr) << '\n';
+
+            double gcorr = chem::gibbs_energy(mol, *t, *p, incl_sigma) * factor;
+            to << "Thermal correction to Gibbs energy:\t\t" << fix(gcorr)
+               << '\n';
+
+            double etot = e0 + zpe;
+            to << "Sum of electronic and zero-point energies:\t" << fix(etot)
+               << '\n';
+
+            etot = e0 + ecorr;
+            to << "Sum of electronic and thermal energies:\t\t" << fix(etot)
+               << '\n';
+
+            double htot = e0 + hcorr;
+            to << "Sum of electronic and thermal enthalpies:\t" << fix(htot)
+               << '\n';
+
+            double gtot = e0 + gcorr;
+            to << "Sum of electronic and Gibbs free energies:\t" << fix(gtot)
+               << "\n\n";
+
+            line.width(64).fill('-');
+            to << "\t\t\t"
+               << "E(thermal)\t"
+               << "CV\t\t"
+               << "S\t" << '\n'
+               << "\t\t\t"
+               << "kJ/mol\t\t"
+               << "J/mol-K\t\t"
+               << "J/mol-K\n"
+               << line('-') << '\n';
+
+            fix.width(8).precision(3);
+            etot        = ecorr * datum::au_to_icm * datum::icm_to_kJ;
+            double cv   = chem::const_vol_heat_capacity(mol, *t);
+            double stot = chem::entropy(mol, *t, *p, incl_sigma);
+            to << "Total:\t\t\t" << fix(etot) << '\t' << fix(cv) << '\t'
+               << fix(stot) << '\n';
+
+            double eelec = chem::thermal_energy_elec();
+            double celec = chem::const_vol_heat_elec();
+            double selec = chem::entropy_elec(mol, *t);
+            to << "Electronic:\t\t" << fix(eelec) << '\t' << fix(celec) << '\t'
+               << fix(selec) << '\n';
+
+            double etrans = chem::thermal_energy_trans(*t) / datum::kilo;
+            double ctrans = chem::const_vol_heat_trans();
+            double strans = chem::entropy_trans(mol, *t, *p);
+            to << "Translational:\t\t" << fix(etrans) << '\t' << fix(ctrans)
+               << '\t' << fix(strans) << '\n';
+
+            double erot = chem::thermal_energy_rot(mol, *t) / datum::kilo;
+            double crot = chem::const_vol_heat_rot(mol);
+            double srot = chem::entropy_rot(mol, *t, incl_sigma);
+            to << "Rotational:\t\t" << fix(erot) << '\t' << fix(crot) << '\t'
+               << fix(srot) << '\n';
+
+            double evib = chem::thermal_energy_vib(mol, *t) / datum::kilo;
+            double cvib = chem::const_vol_heat_vib(mol, *t);
+            double svib = chem::entropy_vib(mol, *t);
+            to << "Vibrational:\t\t" << fix(evib) << '\t' << fix(cvib) << '\t'
+               << fix(svib) << '\n';
+
+            if (mol.has_torsions()) {
+                double etor = chem::thermal_energy_tor(mol, *t) / datum::kilo;
+                double ctor = chem::const_vol_heat_tor(mol, *t);
+                double stor = chem::entropy_tor(mol, *t);
+                to << "Torsional:\t\t" << fix(etor) << '\t' << fix(ctor) << '\t'
+                   << fix(stor) << '\n';
+            }
+
+            line.width(36).fill('-');
+            to << "\n\t\t\t"
+               << "Q(" << *t << " K)\n"
+               << line('-') << '\n';
+
+            chem::Format<double> sci;
+            sci.scientific().width(12).precision(6);
+
+            double q = chem::qtot(mol, *t, *p, incl_sigma, "BOT");
+            to << "Total (BOT):\t\t" << sci(q) << '\n';
+
+            q = chem::qtot(mol, *t, *p, incl_sigma, "V=0");
+            to << "Total (V=0):\t\t" << sci(q) << '\n';
+
+            q = chem::qvib(mol, *t, "BOT");
+            to << "Vibr. (BOT):\t\t" << sci(q) << '\n';
+
+            q = chem::qvib(mol, *t, "V=0");
+            to << "Vibr. (V=0):\t\t" << sci(q) << '\n';
+
+            q = chem::qelec(mol, *t);
+            to << "Electronic:\t\t" << sci(q) << '\n';
+
+            q = chem::qtrans(mol, *t, *p);
+            to << "Translational:\t\t" << sci(q) << '\n';
+
+            q = chem::qrot(mol, *t, incl_sigma);
+            to << "Rotational:\t\t" << sci(q) << '\n';
+
+            if (mol.has_torsions()) {
+                q = chem::qtor(mol, *t);
+                to << "Torsional:\t\t" << sci(q) << '\n';
+            }
+            to << '\n';
         }
     }
-    incl_sigma;
 }
 
 double chem::qelec(const Molecule& mol, double temp)

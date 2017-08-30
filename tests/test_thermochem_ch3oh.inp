@@ -91,7 +91,7 @@ Molecule
   elec_state
     2 [ 1.0 0.0 ]
   elec_energy
-    0.0
+    -115.685778
   charge
     0
   sigma

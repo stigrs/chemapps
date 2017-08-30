@@ -265,7 +265,7 @@ void chem::print_atomic_masses(std::ostream& to,
     chem::Format<double> fix;
     fix.fixed().width(10);
 
-    chem::Format<std::size_t> gen;
+    chem::Format<int> gen;
     gen.width(3);
 
     double totmass = 0.0;
