@@ -35,6 +35,8 @@ void chem::thermochemistry(const Molecule& mol,
     to << "\nThermochemistry:\n" << line('=') << '\n';
     to << "Electronic energy: " << fix(e0) << " Hartree\n";
 
+    mol.get_rot().analysis(to);
+
     if (mol.has_torsions()) {
         mol.get_tor().analysis(to);
     }
@@ -47,9 +49,8 @@ void chem::thermochemistry(const Molecule& mol,
     typedef arma::vec::const_iterator Citer;  // arma:: does not support auto
     for (Citer p = pressure.begin(); p != pressure.end(); ++p) {
         for (Citer t = temp.begin(); t != temp.end(); ++t) {
-            fix.fixed().precision(3);
-            to << "Temperature: " << fix(*t) << " K. "
-               << "Pressure: " << fix(*p) << " bar\n";
+            to << "Temperature: " << *t << " K. "
+               << "Pressure: " << *p << " bar\n";
 
             fix.fixed().width(12).precision(6);
             to << "Zero-point correction:\t\t\t\t" << fix(zpe) << " Hartree\n";

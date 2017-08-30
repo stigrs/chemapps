@@ -14,6 +14,7 @@ set(
     PROGRAMS 
     mcmm 
     molrot 
+    thermo
     zmatxyz
 )
 
