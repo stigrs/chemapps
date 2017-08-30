@@ -38,3 +38,9 @@ foreach(program ${PROGRAMS})
         )
     endif()
 endforeach()
+
+install(
+    TARGETS ${PROGRAMS}
+    RUNTIME DESTINATION bin
+    CONFIGURATIONS Release
+)

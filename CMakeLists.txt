@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.4.3)
 project(ChemApps CXX)
 
 # By default, ChemApps is install in the HOME directory.
-set(CMAKE_INSTALL_PREFIX $ENV{HOME})
+if(WIN32)
+    set(CMAKE_INSTALL_PREFIX "C:/Users/$ENV{USERNAME}")
+else()
+    set(CMAKE_INSTALL_PREFIX $ENV{HOME})
+endif()
 
 # Export compile commands.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

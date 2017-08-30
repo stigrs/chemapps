@@ -63,6 +63,7 @@ install(
     TARGETS chem
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
+    CONFIGURATIONS Release
 )
 foreach(file ${HEADER_FILES})
     install(FILES ${file} DESTINATION include/chem/)
