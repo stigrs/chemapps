@@ -24,6 +24,7 @@ set(
     thermochem.cpp
     thermodata.cpp
     torsion.cpp
+    tunnel.cpp
     zmatrix.cpp
 )
 set(
@@ -40,8 +41,10 @@ set(
     molvib.h
     mopac.h
     ptable.h
+    thermochem.h
     thermodata.h
     torsion.h
+    tunnel.h
     zmatrix.h
 )
 add_library(
