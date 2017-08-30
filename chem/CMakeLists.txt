@@ -27,26 +27,6 @@ set(
     tunnel.cpp
     zmatrix.cpp
 )
-set(
-    HEADER_FILES
-    arma_io.h
-    conformer.h
-    datum.h
-    input.h
-    math.h
-    mcmm.h
-    molecule.h
-    molecule_io.h
-    molrot.h
-    molvib.h
-    mopac.h
-    ptable.h
-    thermochem.h
-    thermodata.h
-    torsion.h
-    tunnel.h
-    zmatrix.h
-)
 add_library(
     chem 
     ${SRC_FILES}
@@ -68,7 +48,3 @@ install(
     ARCHIVE DESTINATION lib
     CONFIGURATIONS Release
 )
-foreach(file ${HEADER_FILES})
-    install(FILES ${file} DESTINATION include/chem/)
-endforeach()
-
