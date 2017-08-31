@@ -55,18 +55,19 @@ endfunction()
 set(PROGRAMS 
     test_datum
     test_input
+    test_math
+    test_mcmm
     test_molecule
     test_molecule_io
     test_molrot
     test_molvib
+    test_mopac
     test_pdist_matrix
     test_ptable
-    test_zmatrix
-    test_torsion
-    test_mopac
-    test_mcmm
-    test_thermodata
     test_thermochem
+    test_thermodata
+    test_torsion
+    test_zmatrix
 )
 
 foreach(program ${PROGRAMS})

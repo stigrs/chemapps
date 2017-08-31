@@ -71,10 +71,11 @@ Tunnel::Tunnel(std::istream& from, const std::string& key)
 double Tunnel::eckart(double temp) const
 {
     // The implementation is based on the following papers:
+    //
     //  1. Eckart, E. Phys. Rev., 1962, vol. 35, p. 1303.
     //  2. Brown, R. L. J. Research NIST, 1981, vol. 86, p. 357.
     //  3. Johnston, H. S.; Heicklen, J. J. Phys. Chem., 1962, vol. 66, p. 532.
-
+    //
     // Algorithm:
     // ----------
     // Brown (1981) introduced a new variable
@@ -94,5 +95,47 @@ double Tunnel::eckart(double temp) const
     // the program of Brown (1962). This has not been fully tested though.
 
     Expects(temp > 0.0);
-    return temp;
+    double kt    = datum::k * temp;
+    double ifreq = std::abs(freq_im) * datum::c_0 * 100.0;
+
+    double pot1 = en_barrier * datum::kilo / datum::N_A;
+    double pot2 = (en_barrier - en_rxn) * datum::kilo / datum::N_A;
+
+    double alpha1 = 2.0 * datum::pi * pot1 / (datum::h * ifreq);
+    double alpha2 = 2.0 * datum::pi * pot2 / (datum::h * ifreq);
+
+    double u = datum::h * ifreq / kt;
+    double d = 4.0 * alpha1 * alpha2 - datum::pi * datum::pi;
+    double c
+        = 0.125 * datum::pi * u
+          * std::pow(1.0 / std::sqrt(alpha1) + 1.0 / std::sqrt(alpha2), 2.0);
+
+    double df = std::cosh(std::sqrt(d));
+    if (d <= 0.0) {
+        df = std::cos(std::sqrt(std::abs(d)));
+    }
+
+    constexpr double kappa_b     = 1.0e-10;  // this is actually 1 - kappa_b
+    constexpr double epsilon_max = 110.0;    // not the same as Brown (1981)
+
+    double epsilon_b
+        = c * std::pow(std::log(2.0 * (1.0 + df) / kappa_b) / (2.0 * datum::pi),
+                       2.0);
+    epsilon_b = std::min(epsilon_b, epsilon_max);
+
+    double v1 = pot1 / kt;
+    double v2 = pot2 / kt;
+
+    double epsilon_0 = 0.0;
+    if (v2 >= v1) {
+        epsilon_0 = -v1;
+    }
+    if (v1 > v2) {
+        epsilon_0 = -v2;
+    }
+
+    // Integrate using a 40-point Gauss-Legendre quadrature:
+
+    double kappa = 0.0;
+    return kappa;
 }

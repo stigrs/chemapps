@@ -17,7 +17,7 @@
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100)  // caused by armadillo
-#endif  // _MSC_VER
+#endif                           // _MSC_VER
 
 #include <chem/datum.h>
 #include <chem/mcmm.h>
@@ -27,6 +27,10 @@
 #include <catch/catch.hpp>
 #include <cmath>
 #include <fstream>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
 
 TEST_CASE("test_mcmm")
 {

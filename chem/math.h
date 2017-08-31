@@ -30,7 +30,6 @@
 #include <chem/datum.h>
 #include <armadillo>
 #include <cmath>
-#include <iostream>
 
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -56,9 +55,6 @@ double dihedral(const arma::vec& a,
                 const arma::vec& c,
                 const arma::vec& d);
 
-// Floating point comparison.
-bool approx_equal(double a, double b, double epsilon = 1.0e-12);
-
 // Compute the pair-wise distances between observations in n-dim. space.
 void pdist_matrix(arma::mat& dm, const arma::mat& mat);
 
@@ -67,6 +63,19 @@ void translate(arma::mat& xyz, double dx, double dy, double dz);
 
 // Perform rotation given a rotation matrix.
 void rotate(arma::mat& xyz, const arma::mat33& rotm);
+
+// Compute abscissas and weights of Gauss-Legendre n-point quadrature formula.
+void gaussleg(
+    int n, arma::vec& x, arma::vec& w, double a = -1.0, double b = 1.0);
+
+// Floating point comparison.
+bool approx_equal(double a, double b, double epsilon = 1.0e-12);
+
+// Check if integer is even.
+bool is_even(int n) { return n % 2 ? false : true; }
+
+// Check if integer is odd.
+bool is_odd(int n) { return n % 2 ? true : false; }
 
 }  // namespace chem
 

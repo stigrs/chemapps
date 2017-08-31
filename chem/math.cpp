@@ -15,7 +15,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <chem/math.h>
-#include <iostream>
+#include <boost/math/special_functions/legendre.hpp>
+#include <gsl/gsl>
+#include <vector>
 
 double chem::dihedral(const arma::vec& a,
                       const arma::vec& b,
@@ -75,4 +77,33 @@ void chem::rotate(arma::mat& xyz, const arma::mat33& rotm)
         xyz(i, 1) = xyz_new(1);
         xyz(i, 2) = xyz_new(2);
     }
+}
+
+void chem::gaussleg(int n, arma::vec& x, arma::vec& w, double a, double b)
+{
+    // Given the lower and upper limits of integration a and b, this
+    // function returns arrays x(n) and w(n) of length n, containing the
+    // abscissas and weights of the Gauss-Legendre n-point quadrature formula.
+
+    Expects(n >= 2);
+    Expects(chem::is_even(n));
+
+    x.set_size(n);
+    w.set_size(n);
+
+    std::vector<double> xp = boost::math::legendre_p_zeros<double>(n);
+
+    int nhalf = n / 2;
+    for (int i = nhalf; i < n; ++i) {  // find x and w from 0 to +1
+        int im    = i - nhalf;
+        double pp = boost::math::legendre_p_prime<double>(n, xp[im]);
+        x(i)      = xp[im];
+        w(i)      = 2.0 / ((1.0 - xp[im] * xp[im]) * pp * pp);
+    }
+    for (int i = 0; i < nhalf; ++i) {  // add symmetric counterpart
+        x(i) = -x(n - i - 1);
+        w(i) = w(n - i - 1);
+    }
+    x = 0.5 * (b - a) * x + 0.5 * (a + b);  // scale to the desired interval
+    w = 0.5 * (b - a) * w;
 }

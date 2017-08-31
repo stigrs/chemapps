@@ -18,6 +18,7 @@
 #define CHEM_TUNNEL_H
 
 #include <chem/datum.h>
+#include <cmath>
 #include <gsl/gsl>
 #include <iostream>
 #include <stdexcept>

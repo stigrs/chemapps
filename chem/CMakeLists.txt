@@ -3,6 +3,7 @@ project(ChemLib CXX)
 
 include_directories(${ChemApps_SOURCE_DIR})
 include_directories(${ARMADILLO_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GSL_INCLUDE_DIR})
 link_directories(${ChemApps_BINARY_DIR})
 if(MSVC)
