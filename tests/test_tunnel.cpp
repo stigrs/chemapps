@@ -36,7 +36,7 @@ TEST_CASE("test_tunnel")
         arma::vec temp      = td.get_temperature();
 
         for (arma::uword i = 0; i < temp.size(); ++i) {
-            double kappa = tunnel.eckart(temp(i));
+            double kappa = tunnel.factor(temp(i));
             CHECK(std::abs(kappa - kappa_ans(i)) < 5.0e-3);
         }
     }
