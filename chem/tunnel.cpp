@@ -33,7 +33,7 @@
 Tunnel::Tunnel(std::istream& from, const std::string& key)
 {
     // Read input data:
-    std::string method_def = "Wigner";
+    std::string method_def = "None";
     std::string method_str;
 
     std::map<std::string, Input> input_data;
@@ -68,7 +68,10 @@ Tunnel::Tunnel(std::istream& from, const std::string& key)
     }
 
     // Set tunneling correction method:
-    if (method_str == "Wigner") {
+    if (method_str == "None") {
+        method = None;
+    }
+    else if (method_str == "Wigner") {
         method = Wigner;
     }
     else if (method_str == "Eckart") {

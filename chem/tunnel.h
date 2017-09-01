@@ -35,6 +35,7 @@ struct Tunnel_error : std::runtime_error {
 //
 class Tunnel {
 public:
+    Tunnel() { method = None; }
     Tunnel(std::istream& from, const std::string& key = "Tunnel");
 
     ~Tunnel() {}
@@ -49,12 +50,12 @@ public:
     double factor(double temp = 298.15) const;
 
 private:
-    enum Method_t { Wigner, Eckart };
+    enum Method_t { None, Wigner, Eckart };
 
-    Method_t method = Wigner;  // tunneling correction method
-    double freq_im;            // imaginary frequency
-    double en_barrier;         // potential barrier height
-    double en_rxn;             // energy of reaction
+    Method_t method = None;  // tunneling correction method
+    double freq_im;          // imaginary frequency
+    double en_barrier;       // potential barrier height
+    double en_rxn;           // energy of reaction
 };
 
 inline double Tunnel::wigner(double temp) const
@@ -74,6 +75,8 @@ inline double Tunnel::factor(double temp) const
         return wigner(temp);
     case Eckart:
         return eckart(temp);
+    case None:
+        return 1.0;
     default:
         return 1.0;
     }
