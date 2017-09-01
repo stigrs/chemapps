@@ -14,10 +14,21 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4100)  // unreferenced formal parameter
+#endif                           // _MSC_VER
+
 #include <chem/input.h>
+#include <chem/math.h>
 #include <chem/tunnel.h>
 #include <chem/utils.h>
+#include <armadillo>
 #include <map>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
 
 Tunnel::Tunnel(std::istream& from, const std::string& key)
 {
@@ -136,6 +147,21 @@ double Tunnel::eckart(double temp) const
 
     // Integrate using a 40-point Gauss-Legendre quadrature:
 
+    const int n = 40;
+    arma::vec x(n);
+    arma::vec w(n);
+    chem::gaussleg(n, x, w, epsilon_0, epsilon_b);
+
     double kappa = 0.0;
+    for (int i = 0; i < n; ++i) {
+        double a1 = datum::pi * std::sqrt((x(i) + v1) / c);
+        double a2 = datum::pi * std::sqrt((x(i) + v2) / c);
+        double fp = std::cosh(a1 + a2);
+        double fm = std::cosh(a1 - a2);
+        kappa += w(i) * std::exp(-x(i)) * (fp - fm) / (fp + df);
+    }
+
+    // Add the analytic part:
+    kappa += std::exp(-epsilon_b);
     return kappa;
 }
