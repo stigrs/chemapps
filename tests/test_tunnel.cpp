@@ -40,4 +40,10 @@ TEST_CASE("test_tunnel")
             CHECK(std::abs(kappa - kappa_ans(i)) < 5.0e-3);
         }
     }
+
+    SECTION("none")
+    {
+        Tunnel tunnel_none;
+        CHECK(tunnel_none.factor() == 1.0);
+    }
 }

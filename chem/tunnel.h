@@ -76,7 +76,6 @@ inline double Tunnel::factor(double temp) const
     case Eckart:
         return eckart(temp);
     case None:
-        return 1.0;
     default:
         return 1.0;
     }
