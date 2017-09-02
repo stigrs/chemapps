@@ -36,11 +36,11 @@ public:
     ~Tst() {}
 
 private:
-    enum Method_t { Conventional };
-    enum Reaction_t { Unimolecular, Bimolecular };
+    enum Method_t { conventional };
+    enum Reaction_t { unimolecular, bimolecular };
 
-    Method_t method     = Conventional;  // TST method
-    Reaction_t reaction = Bimolecular;   // reaction type
+    Method_t method     = conventional;  // TST method
+    Reaction_t reaction = bimolecular;   // reaction type
 
     std::unique_ptr<Molecule> ra;  // reactant A
     std::unique_ptr<Molecule> rb;  // reactant B
