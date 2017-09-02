@@ -68,14 +68,14 @@ Tunnel::Tunnel(std::istream& from, const std::string& key)
     }
 
     // Set tunneling correction method:
-    if (method_str == "none") {
-        method = none;
+    if (method_str == "None") {
+        method = None;
     }
-    else if (method_str == "wigner") {
-        method = wigner;
+    else if (method_str == "Wigner") {
+        method = Wigner;
     }
-    else if (method_str == "eckart") {
-        method = eckart;
+    else if (method_str == "Eckart") {
+        method = Eckart;
     }
     else {
         throw Tunnel_error("unknown tunneling correction: " + method_str);

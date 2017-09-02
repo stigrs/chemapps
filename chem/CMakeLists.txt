@@ -25,6 +25,7 @@ set(
     thermochem.cpp
     thermodata.cpp
     torsion.cpp
+    tst.cpp
     tunnel.cpp
     zmatrix.cpp
 )

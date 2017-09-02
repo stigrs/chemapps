@@ -21,7 +21,14 @@
 #include <chem/tunnel.h>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <string>
+
+// Error reporting:
+
+struct Tst_error : std::runtime_error {
+    Tst_error(std::string s) : std::runtime_error(s) {}
+};
 
 //
 // Class providing Transition State Theory (TST).
@@ -31,16 +38,19 @@
 //
 class Tst {
 public:
-    Tst(std::istream& from, const std::string& key = "TST");
+    Tst(std::istream& from,
+        std::ostream& to       = std::cout,
+        const std::string& key = "TST",
+        bool verbose           = false);
 
     ~Tst() {}
 
 private:
-    enum Method_t { conventional };
-    enum Reaction_t { unimolecular, bimolecular };
+    enum Method_t { Conventional };
+    enum Reaction_t { Unimolecular, Bimolecular };
 
-    Method_t method     = conventional;  // TST method
-    Reaction_t reaction = bimolecular;   // reaction type
+    Method_t method     = Conventional;  // TST method
+    Reaction_t reaction = Bimolecular;   // reaction type
 
     std::unique_ptr<Molecule> ra;  // reactant A
     std::unique_ptr<Molecule> rb;  // reactant B
