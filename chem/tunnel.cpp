@@ -133,8 +133,9 @@ double Tunnel::eckart(double temp) const
     constexpr double epsilon_max = 110.0;    // not the same as Brown (1981)
 
     double epsilon_b
-        = c * std::pow(std::log(2.0 * (1.0 + df) / kappa_b) / (2.0 * datum::pi),
-                       2.0);
+        = c
+          * std::pow(std::log(2.0 * (1.0 + df) / kappa_b) / (2.0 * datum::pi),
+                     2.0);
     epsilon_b = std::min(epsilon_b, epsilon_max);
 
     double v1 = pot1 / kt;
