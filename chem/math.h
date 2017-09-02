@@ -44,10 +44,18 @@ inline double radtodeg(double rad) { return rad * 180.0 / datum::pi; }
 inline double degtorad(double deg) { return deg * datum::pi / 180.0; }
 
 // Compute distance between two points.
-double distance(const arma::vec& a, const arma::vec& b);
+inline double distance(const arma::vec& a, const arma::vec& b)
+{
+    return arma::norm(b - a);
+}
 
 // Compute angle in degrees between three points.
-double angle(const arma::vec& a, const arma::vec& b, const arma::vec& c);
+inline double angle(const arma::vec& a, const arma::vec& b, const arma::vec& c)
+{
+    arma::vec ab = arma::normalise(a - b);
+    arma::vec bc = arma::normalise(c - b);
+    return radtodeg(std::acos(arma::dot(ab, bc)));
+}
 
 // Compute dihedral angle in degrees given four points.
 double dihedral(const arma::vec& a,
@@ -69,34 +77,18 @@ void gaussleg(
     int n, arma::vec& x, arma::vec& w, double a = -1.0, double b = 1.0);
 
 // Floating point comparison.
-bool approx_equal(double a, double b, double epsilon = 1.0e-12);
-
-// Check if integer is even.
-bool is_even(int n) { return n % 2 ? false : true; }
-
-// Check if integer is odd.
-bool is_odd(int n) { return n % 2 ? true : false; }
-
-}  // namespace chem
-
-inline double chem::distance(const arma::vec& a, const arma::vec& b)
-{
-    return arma::norm(b - a);
-}
-
-inline double chem::angle(const arma::vec& a,
-                          const arma::vec& b,
-                          const arma::vec& c)
-{
-    arma::vec ab = arma::normalise(a - b);
-    arma::vec bc = arma::normalise(c - b);
-    return radtodeg(std::acos(arma::dot(ab, bc)));
-}
-
-inline bool chem::approx_equal(double a, double b, double epsilon)
+inline bool approx_equal(double a, double b, double epsilon = 1.0e-12)
 {
     using namespace std;
     return abs(a - b) <= ((abs(a) < abs(b) ? abs(b) : abs(a)) * epsilon);
 }
+
+// Check if integer is even.
+inline bool is_even(int n) { return n % 2 ? false : true; }
+
+// Check if integer is odd.
+inline bool is_odd(int n) { return n % 2 ? true : false; }
+
+}  // namespace chem
 
 #endif /* CHEM_MATH_H */

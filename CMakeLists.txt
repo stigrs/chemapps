@@ -64,7 +64,7 @@ endif()
 if(MSVC)
     set(Boost_USE_STATIC_LIBS ON)
 endif()
-find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED)
+find_package(Boost 1.65.0 COMPONENTS program_options REQUIRED)
 
 # GSL library is required.
 find_path(GSL_INCLUDE_DIR gsl HINTS $ENV{HOME}/include /usr/include /usr/local/include)
