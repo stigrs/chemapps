@@ -39,8 +39,7 @@ branches!** Instead, do this:
     * The new code is documented
 
 ## Coding Style Guide
-* The source code should follow *C++ Core Guidelines*;
-see http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines for details. 
+* The source code should follow [C++ Core Guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines). 
 * The source code shall follow the style supplied in the .clang-format file.
-* New features shall be tested and validated with [Catch](https://https://github.com/philsquared/catch)
+* The source code shall be tested and validated with [Catch](https://https://github.com/philsquared/catch)
 test cases.
