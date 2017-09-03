@@ -23,28 +23,6 @@ and chemical kinetics.
 
 ChemApps is released under the [MIT](LICENSE) license.
 
-## Obtaining the Source Code
-
-The source code can be obtained from
-
-        git clone git@gitlab.com:stigrs/chemapps.git
-
-# Requirements
-
-* [CMake](https://cmake.org) 3.4.3
-* [Armadillo] (http://arma.sourceforge.net) 7.950.1
-* [Boost] (http://www.boost.org/) 1.65.0
-* [GSL] (https://github.com/Microsoft/GSL)
-
-## Supported Platforms
-
-The test suite that exercises ChemApps has been built and passes successfully 
-on the following platforms:
-* GNU/Linux using GCC 5.4.0
-* GNU/Linux using Clang 3.8.0
-* OS X El Capitan (10.12) using Apple LLVM 8.1.0
-* Windows 7 using Visual Studio 2017
-
 ## Usage of Third Party Libraries
 
 This project makes use of the [Catch](https://https://github.com/philsquared/catch) 
@@ -54,7 +32,31 @@ for details regarding the licensing of Catch and qcl.
 
 The user of this software needs to obtain separate licenses for [MOPAC](http://openmopac.net/index.html), [MOPAC 5.022mn](https://comp.chem.umn.edu/mopac/) or [Gaussian](http://gaussian.com/). 
 
-## Quick Start
+## Quick Start 
+
+### Requirements
+
+* [CMake](https://cmake.org) 3.4.3
+* [Armadillo] (http://arma.sourceforge.net) 7.950.1
+* [Boost] (http://www.boost.org/) 1.65.0
+* [GSL] (https://github.com/Microsoft/GSL)
+
+### Supported Platforms
+
+The test suite that exercises ChemApps has been built and passes successfully 
+on the following platforms:
+* GNU/Linux using GCC 5.4.0
+* GNU/Linux using Clang 3.8.0
+* OS X El Capitan (10.12) using Apple LLVM 8.1.0
+* Windows 7 using Visual Studio 2017
+
+### Obtaining the Source Code
+
+The source code can be obtained from
+
+        git clone git@gitlab.com:stigrs/chemapps.git
+
+### Building the Software
 
 These steps assumes that the source code of this repository has been cloned
 into a directory called `chemapps`.
