@@ -1,11 +1,10 @@
-ChemApps - A C++ Chemistry Toolkit
-==================================
+# ChemApps - A C++ Chemistry Toolkit
 
 ChemApps provides a suite of utility tools and programs for thermochemistry
 and chemical kinetics.
 
-Features
---------
+## Features
+
 * Perform rotational analysis of molecules
 * Calculation of thermochemical properties for molecules [1]
 * Calculation of reduced moment of inertia for torsional modes by using
@@ -20,25 +19,25 @@ Features
   Minima (MCMM) technique with uniform usage scheme [8,9]
 * Conventional Transition State Theory
 
-Licensing
----------
+## Licensing
+
 ChemApps is released under the [MIT](LICENSE) license.
 
-Obtaining the Source Code
--------------------------
+## Obtaining the Source Code
+
 The source code can be obtained from
 
         git clone git@gitlab.com:stigrs/chemapps.git
 
-Requirements
-------------
+# Requirements
+
 * [CMake](https://cmake.org) 3.4.3
 * [Armadillo] (http://arma.sourceforge.net) 7.950.1
 * [Boost] (http://www.boost.org/) 1.65.0
 * [GSL] (https://github.com/Microsoft/GSL)
 
-Supported Platforms
--------------------
+## Supported Platforms
+
 The test suite that exercises ChemApps has been built and passes successfully 
 on the following platforms:
 * GNU/Linux using GCC 5.4.0
@@ -46,8 +45,8 @@ on the following platforms:
 * OS X El Capitan (10.12) using Apple LLVM 8.1.0
 * Windows 7 using Visual Studio 2017
 
-Usage of Third Party Libraries
-------------------------------
+## Usage of Third Party Libraries
+
 This project makes use of the [Catch](https://https://github.com/philsquared/catch) 
 testing library and code from the [qcl](https://github.com/ben-albrecht/qcl) 
 project. Please see the [ThirdPartyNotices.txt](ThirdPartyNotices.txt) file 
@@ -55,8 +54,8 @@ for details regarding the licensing of Catch and qcl.
 
 The user of this software needs to obtain separate licenses for [MOPAC](http://openmopac.net/index.html), [MOPAC 5.022mn](https://comp.chem.umn.edu/mopac/) or [Gaussian](http://gaussian.com/). 
 
-Quick Start
------------
+## Quick Start
+
 These steps assumes that the source code of this repository has been cloned
 into a directory called `chemapps`.
 
@@ -88,8 +87,8 @@ All tests should pass, indicating that your platform is fully supported.
 *NB*. Test cases involving MOPAC could fail because of numerical roundoff 
 errors in MOPAC on different platforms.
 
-Notes and References
---------------------
+## Notes and References
+
 1.  The thermochemical values are computed in accordance with the methods
     implemented in Gaussian (see the Thermochemistry Whitepaper available
     at http://www.gaussian.com)
@@ -102,4 +101,3 @@ Notes and References
 8.  Li, Z.; Scheraga, H. A. Proc. Natl. Acad. Sci., 1987, vol. 84, p. 6611.
 9.  Chang, G.; Guida, W. C.; Still, C. J. Am. Chem. Soc., 1989, vol. 111,
     p. 4379.
-
