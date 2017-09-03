@@ -24,9 +24,9 @@ guide to know more about coding conventions.
 ### Suggesting enhancements
 
 Suggest your change and start writing code in accordance with the coding 
-style guide if you get positive feedback from the main developer @stigrs. 
-**Never commit any changes to the master or the release branches!** Instead,
-do this:
+style guide if you get positive feedback from the main developer [Stig Rune 
+Sellevag](@stigrs). **Never commit any changes to the master or the release 
+branches!** Instead, do this:
 1. Create a fork
 2. Clone the fork
 3. Create a feature branch
