@@ -24,7 +24,7 @@ guide to know more about coding conventions.
 ### Suggesting enhancements
 
 Suggest your change and start writing code in accordance with the coding 
-style guide if you get positive feedback from the responsible developer. 
+style guide if you get positive feedback from the main developer @stigrs. 
 **Never commit any changes to the master or the release branches!** Instead,
 do this:
 1. Create a fork
@@ -39,7 +39,8 @@ do this:
     * The new code is documented
 
 ## Coding Style Guide
-* The source code shall follow *C++ Core Guidelines*;
+* The source code should follow *C++ Core Guidelines*;
 see http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines for details. 
 * The source code shall follow the style supplied in the .clang-format file.
-* New features shall be tested and validated with [Catch]((https://https://github.com/philsquared/catch)
+* New features shall be tested and validated with [Catch](https://https://github.com/philsquared/catch)
+test cases.
