@@ -21,7 +21,7 @@ description clearly describes the problem and the solution. Include the relevant
 issue number if applicable. Before submitting, please read the coding style 
 guide to know more about coding conventions.
 
-### Suggest enhancements
+### Suggesting enhancements
 
 Suggest your change and start writing code in accordance with the coding 
 style guide if you get positive feedback from the responsible developer. 
@@ -38,9 +38,8 @@ do this:
     * The new code is tested and validated
     * The new code is documented
 
-The source code shall follow *C++ Core Guidelines*;
+## Coding Style Guide
+* The source code shall follow *C++ Core Guidelines*;
 see http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines for details. 
-
-The source code shall follow the style supplied in the .clang-format file.
-
-The source code shall 
+* The source code shall follow the style supplied in the .clang-format file.
+* New features shall be tested and validated with [Catch]((https://https://github.com/philsquared/catch)
