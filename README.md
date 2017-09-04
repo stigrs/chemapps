@@ -19,6 +19,10 @@ and chemical kinetics.
   Minima (MCMM) technique with uniform usage scheme [8,9]
 * Conventional Transition State Theory
 
+## Code of Conduct
+
+This project has adopted the [Covenant Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## Licensing
 
 ChemApps is released under the [MIT](LICENSE) license.
