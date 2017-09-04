@@ -1,103 +1,120 @@
-/**
-   @file molecule.h
-   
-   This file is part of ChemApps - A C++ Chemistry Toolkit
- 
-   Copyright (C) 2016-2017  Stig Rune Sellevag
-
-   ChemApps is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
-   
-   ChemApps is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
- 
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+//////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #ifndef CHEM_MOLECULE_H
 #define CHEM_MOLECULE_H
 
-#include <iostream>
-#include <string>
-#include <stdexcept>
-#include <vector>
-#include <memory>
-#include <armadillo>
 #include <chem/element.h>
 #include <chem/molrot.h>
+#include <chem/molvib.h>
+#include <chem/torsion.h>
 #include <chem/zmatrix.h>
-
-//----------------------------------------------------------------------------
+#include <armadillo>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 // Error reporting:
 
 struct Mol_error : std::runtime_error {
-    Mol_error(std::string s) : std::runtime_error(s) { }
+    Mol_error(std::string s) : std::runtime_error(s) {}
 };
 
-//----------------------------------------------------------------------------
-
-/// Class for holding molecule data.
+//
+// Class for holding molecule data.
+//
 class Molecule {
 public:
-    Molecule() 
-    { 
-        zmat = std::make_shared<Zmatrix>(atoms, xyz);
-        rot  = std::make_shared<Molrot>(atoms, xyz); 
+    Molecule()
+    {
+        zmat = std::make_unique<Zmatrix>(atoms, xyz);
+        rot  = std::make_unique<Molrot>(atoms, xyz);
+        vib  = std::make_unique<Molvib>();
+        tor  = std::make_unique<Torsion>(*rot);
     }
 
-    Molecule(std::istream& from, 
-             std::ostream& to, 
-             const std::string& key,
-             bool verbose = false)
+    Molecule(std::istream& from,
+             std::ostream& to       = std::cout,
+             const std::string& key = "Molecule",
+             bool verbose           = false)
     {
         init(from, to, key, verbose);
     }
 
-    ~Molecule() { }
+    Molecule(const Molecule& mol);
 
-    std::string get_title() const { return title; }
+    ~Molecule() {}
 
-    const std::vector<Element>& get_atoms()      const { return atoms; }
-    const arma::mat&            get_xyz()        const { return xyz; }
-    const arma::vec&            get_elec_state() const { return elec_state; }
+    // Return true if molecule has torsional modes.
+    bool has_torsions() const { return tor->tot_minima() > 0; }
 
-    std::shared_ptr<Zmatrix> get_zmat() const { return zmat; }
-    std::shared_ptr<Molrot>  get_rot()  const { return rot; }
+    // Calculate total molecular mass.
+    double tot_mass() const { return rot->tot_mass(); }
 
-    int    get_charge()      const { return charge; }
+    const std::string get_title() const { return title; }
+    const std::vector<Element>& get_atoms() const { return atoms; }
+    const arma::mat& get_xyz() const { return xyz; }
+    const arma::vec& get_elec_state() const { return elec_state; }
+
+    Zmatrix& get_zmat() const { return *zmat; }
+    Molrot& get_rot() const { return *rot; }
+    Molvib& get_vib() const { return *vib; }
+    Torsion& get_tor() const { return *tor; }
+
+    int get_charge() const { return charge; }
     double get_elec_energy() const { return elec_energy; }
 
-    void set_xyz(const arma::mat& xyz_)       { xyz = xyz_; }
-    void set_charge(const int charge_)        { charge = charge_; }
+    void set_xyz(const arma::mat& xyz_);
+    void set_charge(const int charge_) { charge = charge_; }
     void set_elec_energy(const double energy) { elec_energy = energy; }
 
     void print_data(std::ostream& to, const std::string& key) const;
 
 private:
-    void init(std::istream& from, 
-              std::ostream& to, 
+    void init(std::istream& from,
+              std::ostream& to,
               const std::string& key,
               bool verbose);
-    
-    std::string title;     ///< molecule information
-    std::string geom_unit; ///< units for geometry
 
-    std::vector<Element> atoms;      ///< atoms in molecule 
-    arma::mat            xyz;        ///< cartesian coordinates
-    arma::vec            elec_state; ///< electronic state
+    std::string title;      // molecule information
+    std::string geom_unit;  // units for geometry
 
-    int    charge;      ///< molecular charge
-    double elec_energy; ///< electronic ground-state energy [Hartree]
-   
-    std::shared_ptr<Zmatrix> zmat;
-    std::shared_ptr<Molrot>  rot;
+    std::vector<Element> atoms;  // atoms in molecule
+    arma::mat xyz;               // cartesian coordinates
+    arma::vec elec_state;        // electronic state
+
+    int charge;          // molecular charge
+    double elec_energy;  // electronic ground-state energy [Hartree]
+
+    std::unique_ptr<Zmatrix> zmat;
+    std::unique_ptr<Molrot> rot;
+    std::unique_ptr<Molvib> vib;
+    std::unique_ptr<Torsion> tor;
 };
 
-#endif /* CHEM_MOLECULE_H */
+inline void Molecule::set_xyz(const arma::mat& xyz_)
+{
+    // Note: Moment of inertia for torsional modes is currently not updated
+    // when the geometry is changed. This may change in future versions.
+    //
+    // TODO (stigrs@gmail.com) Check if torsional modes need to be updated.
+    xyz = xyz_;
+    zmat->build_zmat();
+}
 
+#endif  // CHEM_MOLECULE_H

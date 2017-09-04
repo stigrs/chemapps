@@ -1,49 +1,54 @@
-#include <iostream>
-#include <fstream>
-#include <cmath>
-#include <stdexcept>
-#include <exception>
-#include <armadillo>
+//////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+///////////////////////////////////////////////////////////////////////////////
 
 #include <chem/element.h>
-#include <chem/utils.h>
 #include <chem/molecule.h>
+#include <chem/utils.h>
+#include <armadillo>
+#include <catch/catch.hpp>
+#include <cmath>
+#include <fstream>
+#include <vector>
 
-
-int main(int argc, char* argv[])
+TEST_CASE("test_zmatrix")
 {
-    arma::mat xyz_ans = 
-        {{0.00000000e+00, 0.00000000e+00, 0.00000000e+00},
-         {1.54000000e+00, 0.00000000e+00, 0.00000000e+00},
-         {2.06671102e+00, 8.86109501e-17, 1.44712664e+00},
-         {2.24685680e+00, 1.44712664e+00, 1.94207310e+00},
-         {-3.72801956e-01, 6.27181400e-17, 1.02426496e+00},
-         {-3.72801956e-01, 8.87039473e-01, -5.12132478e-01},
-         {-3.72801956e-01, -8.87039473e-01, -5.12132478e-01},
-         {1.91280196e+00, -8.87039473e-01, -5.12132478e-01},
-         {1.91280196e+00, 8.87039473e-01, -5.12132478e-01},
-         {3.02776125e+00, -5.12132478e-01, 1.49406052e+00},
-         {1.36067235e+00, -5.12132478e-01, 2.10083125e+00},
-         {1.96127393e+00, 2.14776513e+00, 1.15744062e+00},
-         {1.62151810e+00, 1.62228626e+00, 2.81749906e+00},
-         {3.28860700e+00, 1.62228626e+00, 2.21072833e+00}};
+    arma::mat xyz_ans = {{0.00000000e+00, 0.00000000e+00, 0.00000000e+00},
+                         {1.54000000e+00, 0.00000000e+00, 0.00000000e+00},
+                         {2.06671102e+00, 8.86109501e-17, 1.44712664e+00},
+                         {2.24685680e+00, 1.44712664e+00, 1.94207310e+00},
+                         {-3.72801956e-01, 6.27181400e-17, 1.02426496e+00},
+                         {-3.72801956e-01, 8.87039473e-01, -5.12132478e-01},
+                         {-3.72801956e-01, -8.87039473e-01, -5.12132478e-01},
+                         {1.91280196e+00, -8.87039473e-01, -5.12132478e-01},
+                         {1.91280196e+00, 8.87039473e-01, -5.12132478e-01},
+                         {3.02776125e+00, -5.12132478e-01, 1.49406052e+00},
+                         {1.36067235e+00, -5.12132478e-01, 2.10083125e+00},
+                         {1.96127393e+00, 2.14776513e+00, 1.15744062e+00},
+                         {1.62151810e+00, 1.62228626e+00, 2.81749906e+00},
+                         {3.28860700e+00, 1.62228626e+00, 2.21072833e+00}};
 
-    try {
-        std::ifstream from;
-        chem::fopen(from, "test_zmatrix.inp");
+    std::ifstream from;
+    chem::fopen(from, "test_zmatrix.inp");
 
-        arma::ivec moiety = {3, 9, 10};
+    std::vector<int> moiety = {3, 9, 10};
 
-        Molecule mol(from, std::cout, "Molecule");
-        mol.get_zmat()->load(from);
-        mol.get_zmat()->rotate_moiety(moiety, 90.0);
-        arma::mat xyz = mol.get_xyz();
+    Molecule mol(from);
+    mol.get_zmat().load(from);
+    mol.get_zmat().rotate_moiety(moiety, 90.0);
+    arma::mat xyz = mol.get_xyz();
 
-        chem::Assert(arma::approx_equal(xyz_ans, xyz, "absdiff", 1.0e-8),
-                     std::runtime_error("bad xyz coords"));
-    }
-    catch (std::exception& e) {
-        std::cerr << argv[0] << ": " << e.what() << '\n';
-        return 1;
-    }
+    CHECK(arma::approx_equal(xyz_ans, xyz, "absdiff", 1.0e-8));
 }

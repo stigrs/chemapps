@@ -1,22 +1,34 @@
-#include <stdexcept>
-#include <exception>
+//////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+///////////////////////////////////////////////////////////////////////////////
+
 #include <chem/ptable.h>
 #include <chem/utils.h>
+#include <catch/catch.hpp>
 
-
-int main(int argc, char* argv[])
+TEST_CASE("test_ptable")
 {
-    try {
+    SECTION("Carbon")
+    {
         double atomic_weight = ptable::get_element("C").atomic_weight;
-        chem::Assert(atomic_weight == (12.0096 + 12.0116)*0.5,
-                     std::runtime_error("wrong atomic weight for C"));
-
-        double atomic_mass = ptable::get_element("109Ag").atomic_mass;
-        chem::Assert(atomic_mass == 108.904755,
-                     std::runtime_error("wrong atomic mass for 109Ag"));
+        CHECK(atomic_weight == (12.0096 + 12.0116) * 0.5);
     }
-    catch (std::exception& e) {
-        std::cerr << argv[0] << ": " << e.what() << '\n';
-        return 1;
+
+    SECTION("109Ag")
+    {
+        double atomic_mass = ptable::get_element("109Ag").atomic_mass;
+        CHECK(atomic_mass == 108.904755);
     }
 }

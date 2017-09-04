@@ -1,57 +1,74 @@
-/**
-   @file molecule.cpp
-   
-   This file is part of ChemApps - A C++ Chemistry Toolkit
-   
-   Copyright (C) 2016-2017  Stig Rune Sellevag
-   
-   ChemApps is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
- 
-   ChemApps is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-   
-   You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+//////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+///////////////////////////////////////////////////////////////////////////////
 
-#include <map>
-#include <chem/molecule.h>
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4100)  // unreferenced formal parameter
+#endif                           // _MSC_VER
+
 #include <chem/input.h>
-#include <chem/utils.h>
+#include <chem/molecule.h>
 #include <chem/molecule_io.h>
+#include <chem/utils.h>
+#include <map>
 
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
+
+Molecule::Molecule(const Molecule& mol)
+{
+    title       = mol.title;
+    geom_unit   = mol.geom_unit;
+    atoms       = mol.atoms;
+    xyz         = mol.xyz;
+    elec_state  = mol.elec_state;
+    charge      = mol.charge;
+    elec_energy = mol.elec_energy;
+
+    zmat = std::make_unique<Zmatrix>(*mol.zmat);
+    rot  = std::make_unique<Molrot>(*mol.rot);
+    vib  = std::make_unique<Molvib>(*mol.vib);
+    tor  = std::make_unique<Torsion>(*mol.tor);
+}
 
 void Molecule::print_data(std::ostream& to, const std::string& key) const
 {
     chem::Format<char> line;
     line.width(15 + key.size()).fill('=');
-    
+
     chem::Format<double> fix;
     fix.fixed().precision(6);
-    
+
     to << "Input data on " << key << ":\n" << line('=') << '\n';
-        
+
     chem::print_elec_states(to, elec_state);
     to << "Electronic energy: " << fix(elec_energy) << " Hartree\n"
        << "Charge: " << charge << "\n\n"
        << "Input orientation:\n";
     chem::print_geometry(to, atoms, xyz, geom_unit);
     chem::print_atomic_masses(to, atoms);
+    vib->print(to);
 }
 
-void Molecule::init(std::istream& from, 
-                    std::ostream& to, 
+void Molecule::init(std::istream& from,
+                    std::ostream& to,
                     const std::string& key,
                     bool verbose)
 {
-    typedef std::map<std::string, Input>::iterator       Input_iter;
-    typedef std::map<std::string, Input>::const_iterator Cinput_iter;
-
     // Read input data:
 
     arma::vec elec_state_def(2);
@@ -70,38 +87,46 @@ void Molecule::init(std::istream& from,
         while (from >> token) {
             if (token == "End") {
                 break;
-            } 
-            else if (token == "geometry") { 
+            }
+            else if (token == "geometry") {
                 chem::read_xyz_format(from, atoms, xyz, title);
             }
             else {
-                Input_iter it = input_data.find(token);
+                auto it = input_data.find(token);
                 if (it != input_data.end()) {
                     from >> it->second;
                 }
             }
         }
-    } 
+    }
     else {
         throw Mol_error("cannot find " + key + " section");
     }
-    
+
     // Check if initialized:
 
-    for (Cinput_iter it = input_data.begin(); it != input_data.end(); ++it) {
-        if (! it->second.is_init()) {
+    for (auto it = input_data.begin(); it != input_data.end(); ++it) {
+        if (!it->second.is_init()) {
             throw Mol_error(it->first + " not initialized");
         }
     }
 
     // Initialize Z matrix object:
 
-    zmat = std::make_shared<Zmatrix>(atoms, xyz);
+    zmat = std::make_unique<Zmatrix>(atoms, xyz);
 
     // Initialize molecular rotations object:
 
-    rot = std::make_shared<Molrot>(from, key, atoms, xyz);
-    
+    rot = std::make_unique<Molrot>(from, key, atoms, xyz);
+
+    // Initialize molecular vibrations object:
+
+    vib = std::make_unique<Molvib>(from, key);
+
+    // Initialize molecular torsions object:
+
+    tor = std::make_unique<Torsion>(from, key, *rot);
+
     // Write input data to output stream:
 
     if (verbose) {

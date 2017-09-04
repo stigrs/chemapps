@@ -1,0 +1,63 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+///////////////////////////////////////////////////////////////////////////////
+
+#include <chem/input.h>
+#include <chem/thermodata.h>
+#include <chem/utils.h>
+#include <map>
+
+Thermodata::Thermodata(std::istream& from, const std::string& key)
+{
+    // Read input data:
+
+    arma::vec p_def = {datum::std_atm};
+    arma::vec t_def = {298.15};
+
+    std::map<std::string, Input> input_data;
+    input_data["pressure"]    = Input(pressure, p_def);
+    input_data["temperature"] = Input(temperature, t_def);
+    input_data["incl_sigma"]  = Input(incl_sigma, 1);
+    input_data["zeroref"]     = Input(zeroref, "BOT");
+
+    bool found = chem::find_section(from, key);
+    if (found) {
+        std::string token;
+        while (from >> token) {
+            if (token == "End") {
+                break;
+            }
+            else {
+                auto it = input_data.find(token);
+                if (it != input_data.end()) {
+                    from >> it->second;
+                }
+            }
+        }
+    }
+    else {
+        throw Thermodata_error("cannot find " + key + " section");
+    }
+
+    // Check if initialized:
+
+    for (auto it = input_data.begin(); it != input_data.end(); ++it) {
+        if (!it->second.is_init()) {
+            throw Thermodata_error(it->first + " not initialized");
+        }
+    }
+
+    // TODO (stigrs@gmail.com) Implement validation
+}
