@@ -26,13 +26,23 @@ void chem::thermochemistry(const Molecule& mol,
                            std::ostream& to)
 {
     chem::Format<char> line;
-    line.width(16).fill('=');
-
+    if (!mol.get_title().empty()) {
+        line.width(20 + mol.get_title().size()).fill('=');
+    }
+    else {
+        line.width(16).fill('=');
+    }
     chem::Format<double> fix;
     fix.fixed().precision(6);
 
     double e0 = mol.get_elec_energy();
-    to << "\nThermochemistry:\n" << line('=') << '\n';
+    if (!mol.get_title().empty()) {
+        to << "\nThermochemistry of " << mol.get_title() << ":\n"
+           << line('=') << '\n';
+    }
+    else {
+        to << "\nThermochemistry:\n" << line('=') << '\n';
+    }
     to << "Electronic energy: " << fix(e0) << " Hartree\n";
 
     mol.get_rot().analysis(to);
@@ -364,8 +374,9 @@ double chem::const_vol_heat_tor(const Molecule& mol, double temp)
         }
         else {
             Expects(temp > 0.0);
-            double h = temp * std::pow(std::numeric_limits<double>::epsilon(),
-                                       1.0 / 3.0);
+            double h
+                = temp
+                  * std::pow(std::numeric_limits<double>::epsilon(), 1.0 / 3.0);
             double cva = chem::thermal_energy_tor(mol, temp + h);
             double cvb = chem::thermal_energy_tor(mol, temp - h);
             return (cva - cvb) / (2.0 * h);

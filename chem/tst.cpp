@@ -14,10 +14,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#include <chem/datum.h>
 #include <chem/input.h>
+#include <chem/thermochem.h>
 #include <chem/tst.h>
 #include <chem/utils.h>
+#include <armadillo>
+#include <gsl/gsl>
 #include <map>
+#include <vector>
 
 Tst::Tst(std::istream& from,
          std::ostream& to,
@@ -86,4 +91,73 @@ Tst::Tst(std::istream& from,
         rb = std::make_unique<Molecule>(from, to, "ReactantB", verbose);
     }
     ts = std::make_unique<Molecule>(from, to, "TransitionState", verbose);
+
+    // Initialize tunneling correction:
+    kappa = std::make_unique<Tunnel>(from);
+
+    // Initialize thermochemistry parameters:
+    td = std::make_unique<Thermodata>(from);
+}
+
+void Tst::conventional(std::ostream& to) const
+{
+    arma::vec temp     = td->get_temperature();
+    arma::vec pressure = arma::zeros(1);
+
+    chem::thermochemistry(*ra, temp, pressure, false, to);
+    if (reaction == Bimolecular) {
+        chem::thermochemistry(*rb, temp, pressure, false, to);
+    }
+    chem::thermochemistry(*ts, temp, pressure, false, to);
+
+    chem::Format<char> line;
+    if (kappa->get_method() == "Eckart") {
+        line.width(59).fill('-');
+        to << "T/K\t Wigner\t Eckart  TST\t     TST/Wigner  TST/Eckart\n"
+           << line('-') << '\n';
+    }
+    else {
+        line.width(40).fill('-');
+        to << "T/K\tWigner\tTST\t\tTST/Wigner\n" << line('-') << '\n';
+    }
+
+    chem::Format<double> fix7;
+    fix7.fixed().width(7).precision(2);
+
+    chem::Format<double> fix6;
+    fix6.fixed().width(6).precision(2);
+
+    chem::Format<double> sci;
+    sci.scientific().width(10).precision(4);
+
+    for (arma::uword i = 0; i < temp.size(); ++i) {
+        double ktst = rate_conventional(temp(i));
+        double wig  = kappa->wigner(temp(i));
+        if (kappa->get_method() == "Eckart") {
+            double eck = kappa->eckart(temp(i));
+            to << fix7(temp(i)) << "  " << fix6(wig) << "  " << fix6(eck)
+               << "  " << sci(ktst) << "  " << sci(ktst * wig) << "  "
+               << sci(ktst * eck) << '\n';
+        }
+        else {
+            to << fix7(temp(i)) << "  " << fix6(wig) << "  " << sci(ktst)
+               << "  " << sci(ktst * wig) << '\n';
+        }
+    }
+}
+
+double Tst::rate_conventional(double temp) const
+{
+    Expects(temp > 0.0);
+
+    double qts = chem::qtot(*ts, temp, 0.0, false, "V=0");
+    double qa  = chem::qtot(*ra, temp, 0.0, false, "V=0");
+    double qb  = 1.0;
+    if (reaction == Bimolecular) {
+        qb = chem::qtot(*rb, temp, 0.0, false, "V=0");
+    }
+    double ktst = rxn_sigma * datum::mega * datum::k * temp / datum::h;
+    ktst *= (qts / (qa * qb))
+            * std::exp(-en_barrier * datum::kilo / (datum::R * temp));
+    return ktst;
 }

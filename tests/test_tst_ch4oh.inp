@@ -1,0 +1,92 @@
+TST 
+  method 
+    Conventional
+  reaction 
+    Bimolecular
+  en_barrier 
+    21.12 # kJ/mol (CCSD(T)/aug-cc-pVDZ//MP2/aug-cc-pVDZ)
+  rxn_sigma 
+    12
+End
+ReactantA 
+  geom_unit 
+    angstrom
+  geometry 
+    5
+    CH4 (MP2/aug-cc-pVDZ)
+    C    0.000000    0.000000   -1.778157
+    H   -0.896654   -0.517684   -2.144246
+    H    0.000000    1.035367   -2.144246
+    H    0.896654   -0.517684   -2.144246
+    H    0.000000    0.000000   -0.679950
+  sigma_rot 
+    1
+  elec_state 
+    2 [ 1.0 0.0 ]
+  vibr  
+    9 [ 1323.8777 1323.8777 1323.8827 1550.7733 1550.7733 3062.9572
+        3206.4971 3206.6414 3206.6414 ]
+End
+ReactantB 
+  geom_unit 
+    angstrom
+  geometry
+    2
+    OH radical (MP2/aug-cc-pVDZ)
+    O   0.002748    0.188658   -1.322209
+    H   0.001653   -0.776405   -1.462085
+  sigma_rot 
+    1
+  elec_state 
+    4 [ 2.0 0.0 2.0 140.0 ]
+  vibr  
+    1 [ 3768.1271 ]
+End
+TransitionState 
+  geom_unit 
+    angstrom
+  geometry
+    7
+    CH4+OH (MP2/aug-cc-pVDZ)
+    C  -0.000974   -0.029046    1.195266
+    H  -0.914820   -0.585227    1.432570
+    H   0.000969    0.976188    1.633136
+    H   0.909600   -0.589663    1.434697
+    H   0.000824    0.162601    0.015366
+    O   0.002748    0.188239   -1.322270
+    H   0.001653   -0.775986   -1.462024
+  sigma_rot 
+    1
+  elec_state 
+    2 [ 2.0 0.0 ]
+  vibr  
+    13 [ 326.8547 332.5309 775.5512 909.5669 1212.3977 1275.3228 
+        1340.0812 1451.6446 1476.6141 3103.4053 3244.1604 3247.8661 
+        3767.9277 ]
+  rot_axis  
+    2 [ 0 5 ]
+  rot_top  
+    1 [ 6 ]
+  sigma_tor  
+    1 [ 3 ]
+  freq_tor  
+    1 [ 62.3010 ]
+  pot_tor  
+    1 [ 1000.0 ]
+  rmi_tor  
+    1 [ 2.524 ]
+End
+Tunnel 
+  method 
+    Eckart
+  freq_im 
+    -1752.6530  # cm^-1
+  en_barrier 
+    21.12  # kJ/mol (CCSD(T)/aug-cc-pVDZ//MP2/aug-cc-pVDZ)
+  en_rxn 
+    -62.18  # kJ/mol (CCSD(T)/aug-cc-pVDZ//MP2/aug-cc-pVDZ)
+End
+ThermoData 
+  temperature 
+    7 [ 200.0 250.0 298.0 400.0 600.0 800.0 1000.0 ]
+End 
