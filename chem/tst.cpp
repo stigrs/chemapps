@@ -14,6 +14,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4100)  // unreferenced formal parameter
+#endif                           // _MSC_VER
+
 #include <chem/datum.h>
 #include <chem/input.h>
 #include <chem/thermochem.h>
@@ -23,6 +28,10 @@
 #include <gsl/gsl>
 #include <map>
 #include <vector>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
 
 Tst::Tst(std::istream& from,
          std::ostream& to,
@@ -111,14 +120,25 @@ void Tst::conventional(std::ostream& to) const
     chem::thermochemistry(*ts, temp, pressure, false, to);
 
     chem::Format<char> line;
+    line.width(37).fill('=');
+
+    to << "Conventional Transition State Theory:\n"
+       << line('=') << "\n\n"
+       << "Reaction Rate Coefficients [cm^3 molecule^-1 s^-1]:\n";
+
+    line.width(59).fill('-');
     if (kappa->get_method() == "Eckart") {
-        line.width(59).fill('-');
-        to << "T/K\t Wigner\t Eckart  TST\t     TST/Wigner  TST/Eckart\n"
+        to << line('-') << '\n'
+           << "T/K\t Wigner\t Eckart  TST\t     TST/Wigner  TST/Eckart\n"
+           << line('-') << '\n';
+    }
+    else if (kappa->get_method() == "Wigner") {
+        to << line('-') << '\n'
+           << "T/K\t Wigner\t TST\t     TST/Wigner\n"
            << line('-') << '\n';
     }
     else {
-        line.width(40).fill('-');
-        to << "T/K\tWigner\tTST\t\tTST/Wigner\n" << line('-') << '\n';
+        to << line('-') << '\n' << "T/K\t TST\n" << line('-') << '\n';
     }
 
     chem::Format<double> fix7;
@@ -139,11 +159,15 @@ void Tst::conventional(std::ostream& to) const
                << "  " << sci(ktst) << "  " << sci(ktst * wig) << "  "
                << sci(ktst * eck) << '\n';
         }
-        else {
+        else if (kappa->get_method() == "Wigner") {
             to << fix7(temp(i)) << "  " << fix6(wig) << "  " << sci(ktst)
                << "  " << sci(ktst * wig) << '\n';
         }
+        else {
+            to << fix7(temp(i)) << "  " << sci(ktst) << '\n';
+        }
     }
+    to << line('-') << '\n';
 }
 
 double Tst::rate_conventional(double temp) const

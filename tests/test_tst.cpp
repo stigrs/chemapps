@@ -14,12 +14,19 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <chem/thermodata.h>
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4100)  // unreferenced formal parameter
+#endif                           // _MSC_VER
+
 #include <chem/tst.h>
 #include <chem/utils.h>
-#include <armadillo>
 #include <catch/catch.hpp>
 #include <fstream>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
 
 TEST_CASE("test_tst")
 {
@@ -29,13 +36,6 @@ TEST_CASE("test_tst")
         chem::fopen(from, "test_tst_ch4oh.inp");
 
         Tst tst(from);
-        Thermodata td(from);
-
-        arma::vec temp = td.get_temperature();
-
         tst.rate();
-        for (arma::uword i = 0; i < temp.size(); ++i) {
-            std::cout << tst.rate_coeff(temp(i)) << '\n';
-        }
     }
 }

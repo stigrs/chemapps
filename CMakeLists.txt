@@ -30,7 +30,6 @@ if(APPLE)
 endif()
 if(MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "/std:c++14 /W4 /WX /GR /EHsc /MT /O2")
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "/force:multiple /ignore:4075")
 endif()
 
 # Set debugging compiler options.
@@ -40,7 +39,6 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
 endif()
 if(MSVC)
     set(CMAKE_CXX_FLAGS_DEBUG "/std:c++14 /EHsc /W4 /WX /MT /GR /Zi /Od")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/force:multiple /ignore:4075")
 endif()
 
 # Set definitions.

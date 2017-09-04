@@ -55,6 +55,9 @@ public:
     // Calculate rate coefficient for the given temperature.
     double rate_coeff(double temp = 298.15) const;
 
+    // Calculate tunneling correction.
+    double tunneling(double temp = 298.15) const;
+
 private:
     // Calculate rate coefficient for the given temperature using conventional
     // TST.
@@ -94,5 +97,7 @@ inline double Tst::rate_coeff(double temp) const
         return rate_conventional(temp);
     }
 }
+
+inline double Tst::tunneling(double temp) const { return kappa->factor(temp); }
 
 #endif  // CHEM_TST_H
