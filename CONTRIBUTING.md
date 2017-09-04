@@ -24,15 +24,14 @@ guide to know more about coding conventions.
 ### Suggesting enhancements
 
 Suggest your change and start writing code in accordance with the coding 
-style guide if you get positive feedback from the project owner. 
-**Never commit any changes to the master or the release branches!** 
-Instead, do this:
+style guide if you get positive feedback from the project owner. Propose the
+change by forking the repo and open a pull request:
 1. Create a fork
 2. Clone the fork
 3. Create a feature branch
 4. Commit to the feature branch
 5. Push the feature branch to the fork
-6. Submit a pull request, making sure that:
+6. Open a pull request, making sure that:
     * Unfinished work is not submitted
     * The commits are atomic and the commit messages are useful
     * The new code is tested and validated
@@ -40,8 +39,8 @@ Instead, do this:
 
 ## Coding Style Guide
 * The source code shall follow the [C++ Core Guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines),
-especially when it comes to naming rules.
-* The source code shall follow the style supplied in the .clang-format file.
+especially when it comes to naming rules
+* The source code shall follow the style supplied in the .clang-format file
 * The source code shall be documented
 * The source code shall be tested and validated with [Catch](https://https://github.com/philsquared/catch)
-test cases.
+test cases
