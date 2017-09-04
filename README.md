@@ -58,7 +58,7 @@ on the following platforms:
 
 The source code can be obtained from
 
-        git clone git@gitlab.com:stigrs/chemapps.git
+        git clone git@github.com:stigrs/chemapps.git
 
 ### Building the Software
 
