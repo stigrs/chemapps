@@ -42,9 +42,9 @@ The user of this software needs to obtain separate licenses for [MOPAC](http://o
 ### Requirements
 
 * [CMake](https://cmake.org) 3.4.3
-* [Armadillo] (http://arma.sourceforge.net) 7.950.1
-* [Boost] (http://www.boost.org/) 1.65.0
-* [GSL] (https://github.com/Microsoft/GSL)
+* [Armadillo](http://arma.sourceforge.net) 7.950.1
+* [Boost](http://www.boost.org/) 1.65.0
+* [GSL](https://github.com/Microsoft/GSL)
 
 ### Supported Platforms
 
