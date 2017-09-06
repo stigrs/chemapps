@@ -15,6 +15,7 @@ set(
     mcmm 
     molrot 
     thermo
+    tst
     zmatxyz
 )
 
