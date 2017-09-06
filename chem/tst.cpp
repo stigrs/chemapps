@@ -14,10 +14,24 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4100)  // unreferenced formal parameter
+#endif                           // _MSC_VER
+
+#include <chem/datum.h>
 #include <chem/input.h>
+#include <chem/thermochem.h>
 #include <chem/tst.h>
 #include <chem/utils.h>
+#include <armadillo>
+#include <gsl/gsl>
 #include <map>
+#include <vector>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
 
 Tst::Tst(std::istream& from,
          std::ostream& to,
@@ -86,4 +100,88 @@ Tst::Tst(std::istream& from,
         rb = std::make_unique<Molecule>(from, to, "ReactantB", verbose);
     }
     ts = std::make_unique<Molecule>(from, to, "TransitionState", verbose);
+
+    // Initialize tunneling correction:
+    kappa = std::make_unique<Tunnel>(from);
+
+    // Initialize thermochemistry parameters:
+    td = std::make_unique<Thermodata>(from);
+}
+
+void Tst::conventional(std::ostream& to) const
+{
+    arma::vec temp     = td->get_temperature();
+    arma::vec pressure = arma::zeros(1);
+
+    chem::thermochemistry(*ra, temp, pressure, false, to);
+    if (reaction == Bimolecular) {
+        chem::thermochemistry(*rb, temp, pressure, false, to);
+    }
+    chem::thermochemistry(*ts, temp, pressure, false, to);
+
+    chem::Format<char> line;
+    line.width(37).fill('=');
+
+    to << "Conventional Transition State Theory:\n"
+       << line('=') << "\n\n"
+       << "Reaction Rate Coefficients [cm^3 molecule^-1 s^-1]:\n";
+
+    line.width(59).fill('-');
+    if (kappa->get_method() == "Eckart") {
+        to << line('-') << '\n'
+           << "T/K\t Wigner\t Eckart  TST\t     TST/Wigner  TST/Eckart\n"
+           << line('-') << '\n';
+    }
+    else if (kappa->get_method() == "Wigner") {
+        to << line('-') << '\n'
+           << "T/K\t Wigner\t TST\t     TST/Wigner\n"
+           << line('-') << '\n';
+    }
+    else {
+        to << line('-') << '\n' << "T/K\t TST\n" << line('-') << '\n';
+    }
+
+    chem::Format<double> fix7;
+    fix7.fixed().width(7).precision(2);
+
+    chem::Format<double> fix6;
+    fix6.fixed().width(6).precision(2);
+
+    chem::Format<double> sci;
+    sci.scientific().width(10).precision(4);
+
+    for (arma::uword i = 0; i < temp.size(); ++i) {
+        double ktst = rate_conventional(temp(i));
+        double wig  = kappa->wigner(temp(i));
+        if (kappa->get_method() == "Eckart") {
+            double eck = kappa->eckart(temp(i));
+            to << fix7(temp(i)) << "  " << fix6(wig) << "  " << fix6(eck)
+               << "  " << sci(ktst) << "  " << sci(ktst * wig) << "  "
+               << sci(ktst * eck) << '\n';
+        }
+        else if (kappa->get_method() == "Wigner") {
+            to << fix7(temp(i)) << "  " << fix6(wig) << "  " << sci(ktst)
+               << "  " << sci(ktst * wig) << '\n';
+        }
+        else {
+            to << fix7(temp(i)) << "  " << sci(ktst) << '\n';
+        }
+    }
+    to << line('-') << '\n';
+}
+
+double Tst::rate_conventional(double temp) const
+{
+    Expects(temp > 0.0);
+
+    double qts = chem::qtot(*ts, temp, 0.0, false, "V=0");
+    double qa  = chem::qtot(*ra, temp, 0.0, false, "V=0");
+    double qb  = 1.0;
+    if (reaction == Bimolecular) {
+        qb = chem::qtot(*rb, temp, 0.0, false, "V=0");
+    }
+    double ktst = rxn_sigma * datum::mega * datum::k * temp / datum::h;
+    ktst *= (qts / (qa * qb))
+            * std::exp(-en_barrier * datum::kilo / (datum::R * temp));
+    return ktst;
 }

@@ -51,7 +51,7 @@ double entropy_trans(const Molecule& mol,
 double thermal_energy_trans(double temp = 298.15);
 
 // Calculate translational constant volume heat capacity.
-double const_vol_heat_trans() { return 1.5 * datum::R; }
+double const_vol_heat_trans();
 
 //
 // Electronic:
@@ -64,10 +64,10 @@ double qelec(const Molecule& mol, double temp = 298.15);
 double entropy_elec(const Molecule& mol, double temp = 298.15);
 
 // Calculate electronic contribution to internal thermal energy.
-double thermal_energy_elec() { return 0.0; }
+double thermal_energy_elec();
 
 // Calculate electronic constant volume heat capacity.
-double const_vol_heat_elec() { return 0.0; }
+double const_vol_heat_elec();
 
 //
 // Rotational:
@@ -196,12 +196,18 @@ inline double chem::thermal_energy_trans(double temp)
     return 1.5 * datum::R * temp;
 }
 
+inline double chem::const_vol_heat_trans() { return 1.5 * datum::R; }
+
 inline double chem::entropy_elec(const Molecule& mol, double temp)
 {
     double qe = chem::qelec(mol, temp);
     Ensures(qe > 0.0);
     return datum::R * std::log(qe);
 }
+
+inline double chem::thermal_energy_elec() { return 0.0; }
+
+inline double chem::const_vol_heat_elec() { return 0.0; }
 
 inline double chem::thermal_energy_rot(const Molecule& mol, double temp)
 {
@@ -266,8 +272,9 @@ inline double chem::entropy_tor(const Molecule& mol, double temp)
         }
         else {
             Expects(temp > 0.0);
-            return datum::R * (std::log(chem::qtor(mol, temp))
-                               + temp * chem::dlnqtor_dt(mol, temp));
+            return datum::R
+                   * (std::log(chem::qtor(mol, temp))
+                      + temp * chem::dlnqtor_dt(mol, temp));
         }
     }
 }

@@ -40,6 +40,9 @@ public:
 
     ~Tunnel() {}
 
+    // Get tunneling correction method.
+    std::string get_method() const;
+
     // Calculate Wigner tunneling correction.
     double wigner(double temp = 298.15) const;
 
@@ -81,4 +84,16 @@ inline double Tunnel::factor(double temp) const
     }
 }
 
+inline std::string Tunnel::get_method() const
+{
+    switch (method) {
+    case Wigner:
+        return "Wigner";
+    case Eckart:
+        return "Eckart";
+    case None:
+    default:
+        return "None";
+    }
+}
 #endif  // CHEM_TUNNEL_H

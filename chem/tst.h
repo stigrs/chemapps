@@ -18,6 +18,7 @@
 #define CHEM_TST_H
 
 #include <chem/molecule.h>
+#include <chem/thermodata.h>
 #include <chem/tunnel.h>
 #include <iostream>
 #include <memory>
@@ -45,7 +46,23 @@ public:
 
     ~Tst() {}
 
+    // Calculate rate coefficients.
+    void rate() const;
+
+    // Calculate rate coefficients using conventional TST.
+    void conventional(std::ostream& to = std::cout) const;
+
+    // Calculate rate coefficient for the given temperature.
+    double rate_coeff(double temp = 298.15) const;
+
+    // Calculate tunneling correction.
+    double tunneling(double temp = 298.15) const;
+
 private:
+    // Calculate rate coefficient for the given temperature using conventional
+    // TST.
+    double rate_conventional(double temp = 298.15) const;
+
     enum Method_t { Conventional };
     enum Reaction_t { Unimolecular, Bimolecular };
 
@@ -56,8 +73,31 @@ private:
     std::unique_ptr<Molecule> rb;  // reactant B
     std::unique_ptr<Molecule> ts;  // transition state
 
+    std::unique_ptr<Tunnel> kappa;   // tunneling correction
+    std::unique_ptr<Thermodata> td;  // thermochemistry parameters
+
     double en_barrier;  // reaction barrier (kJ/mol)
     int rxn_sigma;      // reaction symmetry number
 };
+
+inline void Tst::rate() const
+{
+    switch (method) {
+    case Conventional:
+    default:
+        conventional();
+    }
+}
+
+inline double Tst::rate_coeff(double temp) const
+{
+    switch (method) {
+    case Conventional:
+    default:
+        return rate_conventional(temp);
+    }
+}
+
+inline double Tst::tunneling(double temp) const { return kappa->factor(temp); }
 
 #endif  // CHEM_TST_H

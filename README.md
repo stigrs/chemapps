@@ -34,16 +34,17 @@ testing library and code from the [qcl](https://github.com/ben-albrecht/qcl)
 project. Please see the [ThirdPartyNotices.txt](ThirdPartyNotices.txt) file 
 for details regarding the licensing of Catch and qcl.
 
-The user of this software needs to obtain separate licenses for [MOPAC](http://openmopac.net/index.html), [MOPAC 5.022mn](https://comp.chem.umn.edu/mopac/) or [Gaussian](http://gaussian.com/). 
+The user of this software needs to obtain separate licenses for [MOPAC](http://openmopac.net/index.html), 
+[MOPAC 5.022mn](https://comp.chem.umn.edu/mopac/) or [Gaussian](http://gaussian.com/). 
 
 ## Quick Start 
 
 ### Requirements
 
 * [CMake](https://cmake.org) 3.4.3
-* [Armadillo] (http://arma.sourceforge.net) 7.950.1
-* [Boost] (http://www.boost.org/) 1.65.0
-* [GSL] (https://github.com/Microsoft/GSL)
+* [Armadillo](http://arma.sourceforge.net) 7.950.1
+* [Boost](http://www.boost.org/) 1.65.0
+* [GSL](https://github.com/Microsoft/GSL)
 
 ### Supported Platforms
 
@@ -90,7 +91,7 @@ into a directory called `chemapps`.
 
 All tests should pass, indicating that your platform is fully supported. 
 
-*NB*. Test cases involving MOPAC could fail because of numerical roundoff 
+>NOTE: Test cases involving MOPAC could fail because of numerical roundoff 
 errors in MOPAC on different platforms.
 
 ## Notes and References
