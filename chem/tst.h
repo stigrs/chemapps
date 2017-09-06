@@ -47,7 +47,7 @@ public:
     ~Tst() {}
 
     // Calculate rate coefficients.
-    void rate() const;
+    void rate(std::ostream& to = std::cout) const;
 
     // Calculate rate coefficients using conventional TST.
     void conventional(std::ostream& to = std::cout) const;
@@ -80,12 +80,12 @@ private:
     int rxn_sigma;      // reaction symmetry number
 };
 
-inline void Tst::rate() const
+inline void Tst::rate(std::ostream& to) const
 {
     switch (method) {
     case Conventional:
     default:
-        conventional();
+        conventional(to);
     }
 }
 
