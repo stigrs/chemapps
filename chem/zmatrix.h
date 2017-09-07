@@ -43,8 +43,6 @@ public:
 
     Zmatrix(const Zmatrix& zmat);
 
-    ~Zmatrix() {}
-
     // Get bond distance.
     double get_distance(int index) const;
 

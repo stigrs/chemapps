@@ -44,8 +44,6 @@ struct Conformer {
         iter   = c.iter;
     }
 
-    ~Conformer() {}
-
     // Compare conformers by energy.
     bool operator<(const Conformer& c) const { return energy < c.energy; }
 

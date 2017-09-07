@@ -40,8 +40,6 @@ public:
 
     Mopac(std::istream& from, const std::string& key = "Mopac");
 
-    ~Mopac() {}
-
     /// Run Mopac calculation.
     void run(Molecule& mol) const;
 

@@ -58,8 +58,6 @@ public:
 
     Molecule(const Molecule& mol);
 
-    ~Molecule() {}
-
     // Return true if molecule has torsional modes.
     bool has_torsions() const { return tor->tot_minima() > 0; }
 

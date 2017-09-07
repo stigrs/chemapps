@@ -122,9 +122,13 @@ void Tst::conventional(std::ostream& to) const
     chem::Format<char> line;
     line.width(37).fill('=');
 
-    to << "Conventional Transition State Theory:\n"
-       << line('=') << "\n\n"
-       << "Reaction Rate Coefficients [cm^3 molecule^-1 s^-1]:\n";
+    to << "Conventional Transition State Theory:\n" << line('=') << "\n\n";
+    if (reaction == Bimolecular) {
+        to << "Reaction Rate Coefficients [cm^3 molecule^-1 s^-1]:\n";
+    }
+    else if (reaction == Unimolecular) {
+        to << "Reaction Rate Coefficients [s^-1]:\n";
+    }
 
     line.width(59).fill('-');
     if (kappa->get_method() == "Eckart") {

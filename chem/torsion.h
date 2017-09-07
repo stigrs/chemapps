@@ -54,8 +54,6 @@ public:
 
     Torsion(const Torsion& tor);
 
-    ~Torsion() {}
-
     // Perform torsional mode analysis.
     void analysis(std::ostream& to = std::cout);
 
