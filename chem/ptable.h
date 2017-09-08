@@ -25,8 +25,11 @@
 //
 // Namespace providing the Periodic Table of Elements.
 //
-// Source: http://www.nist.gov/plm/data/comp.cfm
-// Downloaded: 2 April 2016
+// Source:
+//   Zucker, M.A., Kishore, A.R., Sukumar, R., and Dragoset, R.A. (2015),
+//   Elemental Data Index (version 2.5). [Online]
+//   Available: http://physics.nist.gov/EDI [2016, April 2].
+//   National Institute of Standards and Technology, Gaithersburg, MD.
 //
 namespace ptable {
 
@@ -37,6 +40,7 @@ struct Bad_atomic_symbol : std::domain_error {
 Element get_element(const std::string& symbol);
 std::string get_atomic_symbol(const std::string& symbol);
 
+int get_max_atomic_number() { return get_atomic_number("Uuo") }
 int get_atomic_number(const std::string& symbol);
 int get_mass_number(const std::string& symbol);
 
