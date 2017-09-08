@@ -38,6 +38,12 @@ public:
     Collision(std::istream& from, const std::string& key = "Collision");
 
 private:
+    // Populate database with local Lennard-Jones collision diameter values.
+    void set_sigma_local_values();
+
+    // Populate database with local Lennard-Jones well depth values.
+    void set_epsilon_local_values();
+
     enum Coll_model_t { generic, brw84, brw90a, brw90b };  // collision models
     enum Coll_omega22_t { troe, forst };  // collision integral equations
 
