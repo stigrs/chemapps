@@ -18,7 +18,7 @@ and chemical kinetics.
 * Calculation of Wigner [4] and Eckart tunneling corrections [5-7]
 * Conformer search using an internal coordinate Monte Carlo Multiple 
   Minima (MCMM) technique with uniform usage scheme [8,9]
-* Interface to MOPAC 7, MOPAC 5.022mn, and Gaussian  
+* Interface to MOPAC 7, MOPAC 5.022mn, and Gaussian
 
 ## Code of Conduct
 
