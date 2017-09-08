@@ -40,9 +40,10 @@ struct Bad_atomic_symbol : std::domain_error {
 Element get_element(const std::string& symbol);
 std::string get_atomic_symbol(const std::string& symbol);
 
-int get_max_atomic_number() { return get_atomic_number("Uuo") }
+int get_max_atomic_number();
 int get_atomic_number(const std::string& symbol);
 int get_mass_number(const std::string& symbol);
+
 
 double get_atomic_mass(const std::string& symbol);
 double get_atomic_weight(const std::string& symbol);
@@ -63,6 +64,8 @@ inline int ptable::get_atomic_number(const std::string& symbol)
     Element elem = get_element(symbol);
     return elem.atomic_number;
 }
+
+inline int ptable::get_max_atomic_number() { return get_atomic_number("Uuo"); }
 
 inline int ptable::get_mass_number(const std::string& symbol)
 {
