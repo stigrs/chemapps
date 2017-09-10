@@ -18,6 +18,7 @@
 #include <chem/input.h>
 #include <chem/ptable.h>
 #include <chem/utils.h>
+#include <gsl/gsl>
 #include <map>
 
 Collision::Collision(std::istream& from, const std::string& key)
@@ -73,6 +74,51 @@ Collision::Collision(std::istream& from, const std::string& key)
     }
 
     // Validate input data:
+    if (coll_model_str == "generic") {
+        coll_model = generic;
+    }
+    else if (coll_model_str == "brw84") {
+        coll_model = brw84;
+    }
+    else if (coll_model_str == "brw90a") {
+        coll_model = brw90a;
+    }
+    else if (coll_model_str == "brw90b") {
+        coll_model = brw90b;
+    }
+    else {
+        throw Collision_error("bad coll_model: " + coll_model_str);
+    }
+    if (coll_integral_str == "troe") {
+        coll_integral = troe;
+    }
+    else if (coll_integral_str == "forst") {
+        coll_integral = forst;
+    }
+    else {
+        throw Collision_error("bad coll_integral: " + coll_integral_str);
+    }
+    Expects(mass_bath > 0.0);
+    Expects(mass_mol > 0.0);
+    Expects(epsilon_bath > 0.0);
+    Expects(epsilon_mol > 0.0);
+    Expects(sigma_bath > 0.0);
+    Expects(sigma_mol > 0.0);
+    Expects(temperature > 0.0);
+    if (coll_model != generic) {
+        Expects(number_vibr >= 1);
+    }
+    if (coll_model == brw84) {
+        Expects(vibr_avg > 0.1);
+        Expects((h_factor > 0.0) && (h_factor <= 1.0));
+    }
+    if ((coll_model == brw84) || (coll_model == brw90a)) {
+        Expects(coll_energy > 0.1);
+    }
+    if ((coll_model == brw90a) || (coll_model == brw90b)) {
+        Expects(vibr_high > 0.1);
+        Expects(!mol_formula.empty());
+    }
 }
 
 void Collision::set_sigma_local_values()
