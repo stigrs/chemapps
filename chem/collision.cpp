@@ -45,8 +45,8 @@ Collision::Collision(std::istream& from, const std::string& key)
     input_data["vibr_high"]     = Input(vibr_high, 0.0);
     input_data["temperature"]   = Input(temperature);
     input_data["coll_energy"]   = Input(coll_energy, 0.0);
-    // input_data["mol_formula"]   = Input(mol_formula, mol_formula);
-    input_data["h_factor"] = Input(h_factor, 1.0);
+    input_data["mol_formula"]   = Input(mol_formula, mol_formula);
+    input_data["h_factor"]      = Input(h_factor, 1.0);
 
     if (chem::find_section(from, key)) {
         std::string token;
@@ -119,6 +119,65 @@ Collision::Collision(std::istream& from, const std::string& key)
         Expects(vibr_high > 0.1);
         Expects(!mol_formula.empty());
     }
+}
+
+double Collision::average_mass() const
+{
+    double mavg = 0.0;
+
+    int natoms = 0;
+    for (std::size_t i = 0; i < mol_formula.size(); ++i) {
+        natoms += mol_formula[i].stoich;
+        mavg += mol_formula[i].stoich
+                * ptable::get_atomic_mass(mol_formula[i].atom);
+    }
+    mavg /= gsl::narrow_cast<double>(natoms);  // avr. mass of atoms in molecule
+
+    if (coll_model == brw90a) {  // eq. 35a in Kim and Gilbert (1990)
+        mavg = 1.0 / (1.0 / reduced_mass() + 1.0 / mavg);
+    }
+    else if (coll_model == brw90b) {  // eq. 35b in Kim and Gilbert (1990)
+        mavg = 1.0 / ((1.0 / (mavg * natoms - mavg)) + (1.0 / mavg));
+    }
+    return mavg;
+}
+
+double Collision::sigma_local() const
+{
+    using namespace ptable;
+
+    double sloc = 0.0;
+
+    if ((coll_model == brw90a) || (coll_model == brw90b)) {
+        int natoms = 0;
+        for (std::size_t i = 0; i < mol_formula.size(); ++i) {
+            natoms += mol_formula[i].stoich;
+            sloc += mol_formula[i].stoich
+                    * sigma_loc_val[get_atomic_number(mol_formula[i].atom)];
+        }
+        sloc /= gsl::narrow_cast<double>(natoms);
+        sloc = 0.5 * (sloc + sigma_bath);
+    }
+    return sloc;
+}
+
+double Collision::epsilon_local() const
+{
+    using namespace ptable;
+
+    double eloc = 0.0;
+
+    if ((coll_model == brw90a) || (coll_model == brw90b)) {
+        int natoms = 0;
+        for (std::size_t i = 0; i < mol_formula.size(); ++i) {
+            natoms += mol_formula[i].stoich;
+            eloc += mol_formula[i].stoich
+                    * epsilon_loc_val[get_atomic_number(mol_formula[i].atom)];
+        }
+        eloc /= gsl::narrow_cast<double>(natoms);
+        eloc = std::sqrt(eloc * epsilon_bath);
+    }
+    return eloc;
 }
 
 void Collision::set_sigma_local_values()

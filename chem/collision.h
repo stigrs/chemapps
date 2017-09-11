@@ -18,6 +18,7 @@
 #define CHEM_COLLISION_H
 
 #include <chem/mol_formula.h>
+#include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -36,6 +37,24 @@ struct Collision_error : std::runtime_error {
 class Collision {
 public:
     Collision(std::istream& from, const std::string& key = "Collision");
+
+    // Calculate reduced mass of system.
+    double reduced_mass() const;
+
+    // Average atom/atom mass of molecule (Kim and Gilbert, 1990).
+    double average_mass() const;
+
+    // Calculate Lennard-Jones well depth of system.
+    double epsilon_complex() const;
+
+    // Calculate Lennard-Jones collision diameter of system.
+    double sigma_complex() const;
+
+    // Local Lennard-Jones well depth of system (Kim and Gilbert, 1990).
+    double epsilon_local() const;
+
+    // Local Lennard-Jones collision diam. of system (Kim and Gilbert, 1990).
+    double sigma_local() const;
 
 private:
     // Populate database with local Lennard-Jones collision diameter values.
@@ -67,5 +86,20 @@ private:
     std::vector<double> epsilon_loc_val;   // local epsilon values
     std::vector<Mol_formula> mol_formula;  // molecular formula of collider
 };
+
+inline double Collision::reduced_mass() const
+{
+    return mass_bath * mass_mol / (mass_bath + mass_mol);
+}
+
+inline double Collision::epsilon_complex() const
+{
+    return std::sqrt(epsilon_bath * epsilon_mol);
+}
+
+inline double Collision::sigma_complex() const
+{
+    return 0.5 * (sigma_bath + sigma_mol);
+}
 
 #endif  // CHEM_COLLISION_H
