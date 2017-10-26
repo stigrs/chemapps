@@ -2,11 +2,10 @@ cmake_minimum_required(VERSION 3.4.3)
 project(ChemProgs CXX)
 
 include_directories(${ChemApps_SOURCE_DIR})
-include_directories(${ARMADILLO_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${ChemApps_BINARY_DIR}/chem)
 if (MSVC)
-    link_directories($ENV{MKLROOT})
+    #link_directories($ENV{MKLROOT})
     link_directories($ENV{BOOST_LIBRARYDIR})
 endif()
 

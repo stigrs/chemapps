@@ -43,23 +43,14 @@ endif()
 
 # Set definitions.
 set(ChemApps_DEFINITIONS_DEBUG -DGSL_THROW_ON_CONTRACT_VIOLATION)
-set(ChemApps_DEFINITIONS_RELEASE -DNDEBUG -DARMA_NO_DEBUG -DGSL_THROW_ON_CONTRACT_VIOLATION)
+set(ChemApps_DEFINITIONS_RELEASE -DNDEBUG -DGSL_THROW_ON_CONTRACT_VIOLATION)
 add_compile_options(
     "$<$<CONFIG:Debug>:${ChemApps_DEFINITIONS_DEBUG}>"
     "$<$<CONFIG:Release>:${ChemApps_DEFINITIONS_RELEASE}>" 
 )
 
-# Armadillo library is required.
-if(MSVC)
-    find_path(ARMADILLO_INCLUDE_DIRS armadillo HINTS $ENV{HOME}/include)
-    add_definitions(-DARMA_USE_BLAS)
-    add_definitions(-DARMA_USE_LAPACK)
-else()
-    find_package(Armadillo 7.950.1 REQUIRED)
-endif()
-
 # Boost library is required.
-if(MSVC)
+if(WIN32)
     set(Boost_USE_STATIC_LIBS ON)
 endif()
 find_package(Boost 1.65.0 COMPONENTS program_options REQUIRED)
@@ -67,8 +58,16 @@ find_package(Boost 1.65.0 COMPONENTS program_options REQUIRED)
 # GSL library is required.
 find_path(GSL_INCLUDE_DIR gsl HINTS $ENV{HOME}/include /usr/include /usr/local/include)
 
+# LIBSRS is required.
+find_path(SRS_INCLUDE_DIR utils.h HINTS $ENV{HOME}/include/srs /usr/include/srs /usr/local/include/srs)
+if(WIN32)
+    find_path(SRS_LIB_DIR srs.lib HINTS $ENV{HOME}/lib)
+else()
+    find_path(SRS_LIB_DIR srs.lib HINTS $ENV{HOME}/lib /usr/lib /usr/local/lib)
+endif()
+
 add_subdirectory(chem)
-add_subdirectory(src)
+#add_subdirectory(src)
 
 if(BUILD_TESTS)
     enable_testing()
