@@ -16,7 +16,9 @@
 
 #include <chem/arma_io.h>
 #include <chem/input.h>
+#include <chem/ptable.h>
 #include <chem/utils.h>
+#include <gsl/gsl>
 
 std::istream& operator>>(std::istream& from, Input& inp)
 {
@@ -48,6 +50,9 @@ std::istream& operator>>(std::istream& from, Input& inp)
     case Input::t_dvector:
         inp.read_dvector(from);
         break;
+    case Input::t_mol_formula:
+        inp.read_mol_formula(from);
+        break;
     case Input::t_noval:
         throw Input_invalid("cannot read data with no type");
     default:
@@ -66,6 +71,12 @@ std::ostream& operator<<(std::ostream& to, const Input& inp)
         arma::ivec iv;
         arma::uvec uv;
         arma::vec dv;
+        std::vector<Mol_formula> mf;
+
+        chem::Format<char> line;
+        chem::Format<double> fix;
+        line.width(32).fill('-');
+        fix.fixed().width(8).precision(4);
 
         switch (inp.type) {
         case Input::t_int:
@@ -97,6 +108,18 @@ std::ostream& operator<<(std::ostream& to, const Input& inp)
         case Input::t_dvector:
             dv = *static_cast<arma::vec*>(inp.data);
             chem::print_vector(to, dv);
+            break;
+        case Input::t_mol_formula:
+            mf = *static_cast<std::vector<Mol_formula>*>(inp.data);
+            to << line('-') << '\n'
+               << "Center\tAtomic\tStoich.\tMass/amu\n"
+               << "Number\tSymbol\n"
+               << line('-') << '\n';
+            for (std::size_t i = 0; i < mf.size(); ++i) {
+                to << i + 1 << '\t' << mf[i].atom << '\t' << mf[i].stoich
+                   << '\t' << fix(ptable::get_atomic_mass(mf[i].atom)) << '\n';
+            }
+            to << line('-') << '\n';
             break;
         default:
             throw Input_invalid("unknown type; cannot write data");
@@ -183,4 +206,51 @@ void Input::read_dvector(std::istream& from)
 {
     arma::vec& v = *static_cast<arma::vec*>(data);
     chem::read_vector(from, v);
+}
+
+void Input::read_mol_formula(std::istream& from)
+{
+    std::vector<Mol_formula>& v = *static_cast<std::vector<Mol_formula>*>(data);
+
+    std::string buf;
+    from >> buf;
+
+    int n = chem::from_string<int>(buf);
+    Expects(n >= 1);
+    v.resize(n);
+
+    char ch;
+    std::string atom;
+    int stoich;
+
+    from >> ch;
+    if (ch != '[') {
+        throw Input_IO_error("'[' missing in molecular formula");
+    }
+    for (int i = 0; i < n; ++i) {
+        from >> atom >> stoich >> ch;
+        if (!from) {
+            throw Input_IO_error("found no data for molecular formula");
+        }
+        if ((ch != ',') && (ch != ';') && (ch != ']')) {
+            throw Input_IO_error("bad separator in molecular formula: "
+                                 + chem::to_string(ch));
+        }
+        if (ch == ']') {
+            from.unget();
+        }
+        if (!ptable::atomic_symbol_is_valid(atom)) {
+            throw Input_invalid("bad atomic symbol: " + atom);
+        }
+        if (stoich < 1) {
+            throw Input_invalid("bad stoichiometry: "
+                                + chem::to_string(stoich));
+        }
+        v[i].atom   = atom;
+        v[i].stoich = stoich;
+    }
+    from >> ch;
+    if (ch != ']') {
+        throw Input_IO_error("']' missing in molecular formula");
+    }
 }

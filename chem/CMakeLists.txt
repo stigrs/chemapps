@@ -12,6 +12,7 @@ endif()
 
 set(
     SRC_FILES
+    collision.cpp
     datum.cpp
     input.cpp
     ptable.cpp

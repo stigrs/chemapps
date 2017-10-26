@@ -38,8 +38,6 @@ public:
     Tunnel() { method = None; }
     Tunnel(std::istream& from, const std::string& key = "Tunnel");
 
-    ~Tunnel() {}
-
     // Get tunneling correction method.
     std::string get_method() const;
 

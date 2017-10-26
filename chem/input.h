@@ -17,10 +17,12 @@
 #ifndef CHEM_INPUT_H
 #define CHEM_INPUT_H
 
+#include <chem/mol_formula.h>
 #include <armadillo>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 // Error reporting:
 
@@ -96,6 +98,16 @@ public:
         v = vv;
     }
 
+    Input(std::vector<Mol_formula>& v)
+        : data(&v), type(t_mol_formula), state(not_init)
+    {
+    }
+    Input(std::vector<Mol_formula>& v, std::vector<Mol_formula>& vv)
+        : data(&v), type(t_mol_formula), state(def)
+    {
+        v = vv;
+    }
+
     bool is_init() const { return !(state == not_init); }
     bool is_default() const { return state == def; }
 
@@ -105,16 +117,17 @@ public:
 private:
     /// Definition of valid types.
     enum Type {
-        t_noval,    // no value
-        t_int,      // int
-        t_long,     // long
-        t_uint,     // unsigned int
-        t_ulint,    // unsigned long int
-        t_double,   // double
-        t_string,   // std::string
-        t_ivector,  // integer vector
-        t_uvector,  // unsigned vector
-        t_dvector   // double vector
+        t_noval,       // no value
+        t_int,         // int
+        t_long,        // long
+        t_uint,        // unsigned int
+        t_ulint,       // unsigned long int
+        t_double,      // double
+        t_string,      // std::string
+        t_ivector,     // integer vector
+        t_uvector,     // unsigned vector
+        t_dvector,     // double vector
+        t_mol_formula  // molecular formula
     };
 
     /// Definition of intialization states.
@@ -133,6 +146,7 @@ private:
     void read_ivector(std::istream& from);
     void read_uvector(std::istream& from);
     void read_dvector(std::istream& from);
+    void read_mol_formula(std::istream& from);
 };  // Input
 
 #endif  // CHEM_INPUT_H

@@ -44,8 +44,6 @@ public:
         const std::string& key = "TST",
         bool verbose           = false);
 
-    ~Tst() {}
-
     // Calculate rate coefficients.
     void rate(std::ostream& to = std::cout) const;
 

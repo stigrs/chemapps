@@ -36,8 +36,6 @@ public:
     Thermodata();
     Thermodata(std::istream& from, const std::string& key = "ThermoData");
 
-    ~Thermodata() {}
-
     arma::vec get_pressure() const { return pressure; }
     arma::vec get_temperature() const { return temperature; }
     bool incl_rot_symmetry() const { return incl_sigma; }

@@ -5,19 +5,20 @@ and chemical kinetics.
 
 ## Features
 
-* Perform rotational analysis of molecules
+* Conversion of Cartesian coordinates to Z matrix
+* Conversion of Z matrix to Cartesian coordinates
+* Rotational analysis of molecules
 * Calculation of thermochemical properties for molecules [1]
 * Calculation of reduced moment of inertia for torsional modes by using
   the curvilinear scheme [2]
 * Calculation of partition function for torsional modes by using the
   CT-Cw scheme [3]
+* Calculation of reaction rate coefficients using conventional Transition 
+  State Theory
 * Calculation of Wigner [4] and Eckart tunneling corrections [5-7]
-* Running Mopac 7, Mopac 5.022mn, and Gaussian calculations
-* Conversion of Cartesian coordinates to Z matrix
-* Conversion of Z matrix to Cartesian coordinates
 * Conformer search using an internal coordinate Monte Carlo Multiple 
   Minima (MCMM) technique with uniform usage scheme [8,9]
-* Conventional Transition State Theory
+* Interface to MOPAC 7, MOPAC 5.022mn, and Gaussian
 
 ## Code of Conduct
 

@@ -45,8 +45,6 @@ public:
          const std::string& key = "Mcmm",
          bool verbose_          = false);
 
-    ~Mcmm() {}
-
     // MCMM solver.
     void solve(std::ostream& to = std::cout);
 

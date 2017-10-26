@@ -40,8 +40,6 @@ public:
 
     Molvib(const Molvib& vib) { freqs = vib.freqs; }
 
-    ~Molvib() {}
-
     /// Get vibrational frequencies.
     const arma::vec& get_freqs() const { return freqs; }
 

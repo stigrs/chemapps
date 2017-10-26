@@ -52,8 +52,6 @@ public:
 
     Molrot(const Molrot& rot);
 
-    ~Molrot() {}
-
     // Perform rotational analysis.
     void analysis(std::ostream& to = std::cout);
 
