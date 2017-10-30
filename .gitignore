@@ -17,4 +17,5 @@ tmp.*
 # Directories:
 build
 tmp
+.vs
 .vscode
