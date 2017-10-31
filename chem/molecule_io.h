@@ -18,7 +18,7 @@
 #define CHEM_MOLECULE_IO_H
 
 #include <chem/element.h>
-#include <armadillo>
+#include <srs/array.h>
 #include <iostream>
 #include <vector>
 
@@ -27,42 +27,42 @@ namespace chem {
 // Read chemical XYZ file format.
 void read_xyz_format(std::istream& from,
                      std::vector<Element>& atoms,
-                     arma::mat& xyz,
+                     srs::dmatrix& xyz,
                      std::string& title);
 
 // Read chemical Z matrix format.
 void read_zmat_format(std::istream& from,
                       std::vector<Element>& atoms,
-                      arma::vec& distances,
-                      arma::vec& angles,
-                      arma::vec& dihedrals,
-                      arma::ivec& bond_connect,
-                      arma::ivec& angle_connect,
-                      arma::ivec& dihedral_connect);
+                      srs::dvector& distances,
+                      srs::dvector& angles,
+                      srs::dvector& dihedrals,
+                      srs::ivector& bond_connect,
+                      srs::ivector& angle_connect,
+                      srs::ivector& dihedral_connect);
 
 // Print chemical XYZ file format.
 void print_xyz_format(std::ostream& to,
                       const std::vector<Element>& atoms,
-                      const arma::mat& xyz,
+                      const srs::dmatrix& xyz,
                       const std::string& title);
 
 // Print chemical Z matrix format.
 void print_zmat_format(std::ostream& to,
                        std::vector<Element>& atoms,
-                       arma::vec& distances,
-                       arma::vec& angles,
-                       arma::vec& dihedrals,
-                       arma::ivec& bond_connect,
-                       arma::ivec& angle_connect,
-                       arma::ivec& dihedral_connect);
+                       srs::dvector& distances,
+                       srs::dvector& angles,
+                       srs::dvector& dihedrals,
+                       srs::ivector& bond_connect,
+                       srs::ivector& angle_connect,
+                       srs::ivector& dihedral_connect);
 
 // Print molecular electronic states.
-void print_elec_states(std::ostream& to, const arma::vec& elec_state);
+void print_elec_states(std::ostream& to, const srs::dvector& elec_state);
 
 // Print molecular geometry.
 void print_geometry(std::ostream& to,
                     const std::vector<Element>& atoms,
-                    const arma::mat& xyz,
+                    const srs::dmatrix& xyz,
                     const std::string& unit = "angstrom");
 
 // Print atomic masses.

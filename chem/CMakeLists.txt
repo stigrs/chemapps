@@ -13,7 +13,7 @@ set(
     ptable.cpp
     #mcmm.cpp
     #molecule.cpp
-    #molecule_io.cpp
+    molecule_io.cpp
     #molrot.cpp
     #molvib.cpp
     #mopac.cpp

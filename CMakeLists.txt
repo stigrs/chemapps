@@ -21,6 +21,11 @@ else()
 endif()
 option(BUILD_TESTS "Build tests." ON)
 
+# Set default MSVC compiler options to avoid D9025 error.
+if(MSVC)
+    set(CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS")
+endif()
+
 # Set release compiler options.
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wpedantic -Wall -Wshadow -Wextra -Wno-missing-braces -Werror")

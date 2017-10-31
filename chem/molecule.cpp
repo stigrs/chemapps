@@ -14,20 +14,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4100)  // unreferenced formal parameter
-#endif                           // _MSC_VER
-
-#include <chem/input.h>
 #include <chem/molecule.h>
 #include <chem/molecule_io.h>
-#include <chem/utils.h>
+#include <srs/utils.h>
 #include <map>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
 
 Molecule::Molecule(const Molecule& mol)
 {
@@ -47,10 +38,10 @@ Molecule::Molecule(const Molecule& mol)
 
 void Molecule::print_data(std::ostream& to, const std::string& key) const
 {
-    chem::Format<char> line;
+    srs::Format<char> line;
     line.width(15 + key.size()).fill('=');
 
-    chem::Format<double> fix;
+    srs::Format<double> fix;
     fix.fixed().precision(6);
 
     to << "Input data on " << key << ":\n" << line('=') << '\n';
@@ -71,7 +62,7 @@ void Molecule::init(std::istream& from,
 {
     // Read input data:
 
-    arma::vec elec_state_def(2);
+    srs::dvector elec_state_def(2);
     elec_state_def(0) = 1.0;
     elec_state_def(1) = 0.0;
 
@@ -81,7 +72,7 @@ void Molecule::init(std::istream& from,
     input_data["elec_state"]  = Input(elec_state, elec_state_def);
     input_data["elec_energy"] = Input(elec_energy, 0.0);
 
-    bool found = chem::find_section(from, key);
+    bool found = srs::find_section(from, key);
     if (found) {
         std::string token;
         while (from >> token) {

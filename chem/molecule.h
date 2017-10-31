@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,7 +12,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef CHEM_MOLECULE_H
 #define CHEM_MOLECULE_H
@@ -22,7 +22,7 @@
 #include <chem/molvib.h>
 #include <chem/torsion.h>
 #include <chem/zmatrix.h>
-#include <armadillo>
+#include <srs/array.h>
 #include <iostream>
 #include <memory>
 #include <stdexcept>
@@ -66,8 +66,8 @@ public:
 
     const std::string get_title() const { return title; }
     const std::vector<Element>& get_atoms() const { return atoms; }
-    const arma::mat& get_xyz() const { return xyz; }
-    const arma::vec& get_elec_state() const { return elec_state; }
+    const srs::dmatrix& get_xyz() const { return xyz; }
+    const srs::dvector& get_elec_state() const { return elec_state; }
 
     Zmatrix& get_zmat() const { return *zmat; }
     Molrot& get_rot() const { return *rot; }
@@ -93,8 +93,8 @@ private:
     std::string geom_unit;  // units for geometry
 
     std::vector<Element> atoms;  // atoms in molecule
-    arma::mat xyz;               // cartesian coordinates
-    arma::vec elec_state;        // electronic state
+    srs::dmatrix xyz;            // cartesian coordinates
+    srs::dvector elec_state;     // electronic state
 
     int charge;          // molecular charge
     double elec_energy;  // electronic ground-state energy [Hartree]
@@ -105,7 +105,7 @@ private:
     std::unique_ptr<Torsion> tor;
 };
 
-inline void Molecule::set_xyz(const arma::mat& xyz_)
+inline void Molecule::set_xyz(const srs::dmatrix& xyz_)
 {
     // Note: Moment of inertia for torsional modes is currently not updated
     // when the geometry is changed. This may change in future versions.
