@@ -19,3 +19,4 @@ build
 tmp
 .vs
 .vscode
+/CMakeSettings.json
