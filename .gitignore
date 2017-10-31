@@ -20,3 +20,4 @@ tmp
 .vscode
 /.vs
 /CMakeSettings.json
+/CppProperties.json
