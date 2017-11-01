@@ -6,16 +6,16 @@ include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${ChemApps_BINARY_DIR}/chem)
 if (MSVC)
     #link_directories($ENV{MKLROOT})
-    link_directories($ENV{BOOST_LIBRARYDIR})
+    #link_directories($ENV{BOOST_LIBRARYDIR})
 endif()
 
 set(
     PROGRAMS 
-    mcmm 
-    molrot 
-    thermo
-    tst
-    zmatxyz
+    #mcmm 
+    #molrot 
+    #thermo
+    #tst
+    #zmatxyz
 )
 
 foreach(program ${PROGRAMS})

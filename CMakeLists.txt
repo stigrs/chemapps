@@ -63,8 +63,19 @@ find_package(Boost 1.65.0 REQUIRED)
 # GSL library is required.
 find_path(GSL_INCLUDE_DIR gsl HINTS $ENV{HOME}/include /usr/include /usr/local/include)
 
+# Intel MKL is required.
+find_path(MKL_INCLUDE_DIR mkl.h HINTS $ENV{MKL_INCLUDE_DIR} /opt/intel/mkl/include)
+if(WIN32)
+    find_path(MKL_LIB_DIR mkl_core.lib HINTS $ENV{MKL_LIB_DIR})
+else()
+    find_path(MKL_LIB_DIR libmkl_core.a HINTS $ENV{MKL_LIB_DIR} /opt/intel/mkl/lib /opt/intel/mkl/lib/intel64)
+    if(APPLE)
+        find_path(TBB_LIB_DIR libtbb.dylib HINTS /opt/intel/tbb/lib)
+    endif()
+endif()
+ 
 # LIBSRS is required.
-find_path(SRS_INCLUDE_DIR utils.h HINTS $ENV{HOME}/include/srs /usr/include/srs /usr/local/include/srs)
+find_path(SRS_INCLUDE_DIR srs HINTS $ENV{HOME}/include /usr/include /usr/local/include)
 if(WIN32)
     find_path(SRS_LIB_DIR srs.lib HINTS $ENV{HOME}/lib)
 else()

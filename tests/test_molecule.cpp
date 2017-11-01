@@ -16,14 +16,14 @@
 
 #include <chem/element.h>
 #include <chem/molecule.h>
-#include <chem/utils.h>
-#include <armadillo>
+#include <srs/utils.h>
+#include <srs/array.h>
 #include <catch/catch.hpp>
 #include <fstream>
 
 TEST_CASE("test_molecule")
 {
-    arma::mat xyz_ans(8, 3);
+    srs::dmatrix xyz_ans(8, 3);
     xyz_ans(0, 0) = 0.0000;
     xyz_ans(0, 1) = 0.0000;
     xyz_ans(0, 2) = 0.7637;
@@ -50,10 +50,10 @@ TEST_CASE("test_molecule")
     xyz_ans(7, 2) = -1.1564;
 
     std::ifstream from;
-    chem::fopen(from, "test_molecule.inp");
+    srs::fopen(from, "test_molecule.inp");
 
     Molecule mol(from);
-    arma::mat xyz = mol.get_xyz();
+    srs::dmatrix xyz = mol.get_xyz();
 
-    CHECK(arma::approx_equal(xyz, xyz_ans, "absdiff", 1.0e-12));
+    CHECK(srs::approx_equal(xyz, xyz_ans, 1.0e-12));
 }

@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.4.3)
 project(ChemTests CXX)
 
 include_directories (${ChemApps_SOURCE_DIR})
-include_directories (${SRS_INCLUDE_DIRS})
+include_directories (${MKL_INCLUDE_DIR})
+include_directories (${SRS_INCLUDE_DIR})
 link_directories (${ChemApps_BINARY_DIR}/chem)
 link_directories (${SRS_LIB_DIR})
 
@@ -50,7 +51,7 @@ endfunction()
 set(PROGRAMS 
     #test_mcmm
     #test_molecule
-    #test_molecule_io
+    test_molecule_io
     #test_molrot
     #test_molvib
     #test_mopac
