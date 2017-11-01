@@ -18,8 +18,8 @@
 #define CHEM_MOLROT_H
 
 #include <chem/element.h>
-#include <srs/math.h>
 #include <srs/array.h>
+#include <srs/math.h>
 #include <iostream>
 #include <stdexcept>
 #include <string>

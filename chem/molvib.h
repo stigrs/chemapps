@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,12 +12,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef CHEM_MOLVIB_H
 #define CHEM_MOLVIB_H
 
-#include <armadillo>
+#include <srs/array.h>
+#include <srs/math.h>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -41,16 +42,16 @@ public:
     Molvib(const Molvib& vib) { freqs = vib.freqs; }
 
     /// Get vibrational frequencies.
-    const arma::vec& get_freqs() const { return freqs; }
+    const srs::dvector& get_freqs() const { return freqs; }
 
     /// Calculate zero-point vibrational energy.
-    double zero_point_energy() const { return 0.5 * arma::sum(freqs); }
+    double zero_point_energy() const { return 0.5 * srs::sum(freqs); }
 
     /// Print vibrational frequencies.
     void print(std::ostream& to = std::cout);
 
 private:
-    arma::vec freqs = arma::zeros<arma::vec>(0);
+    srs::dvector freqs;
 };
 
 #endif  // CHEM_MOLVIB_H
