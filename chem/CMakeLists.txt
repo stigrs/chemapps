@@ -21,7 +21,7 @@ set(
     #mopac.cpp
     #thermochem.cpp
     #thermodata.cpp
-    #torsion.cpp
+    torsion.cpp
     #tst.cpp
     #tunnel.cpp
     #zmatrix.cpp

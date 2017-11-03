@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,25 +12,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4100)  // unreferenced formal parameter
-#endif                           // _MSC_VER
-
-#include <chem/datum.h>
-#include <chem/input.h>
 #include <chem/torsion.h>
-#include <chem/utils.h>
+#include <srs/datum.h>
+#include <srs/utils.h>
+#include <algorithm>
 #include <cmath>
 #include <gsl/gsl>
 #include <iostream>
 #include <map>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
 
 Torsion::Torsion(const Torsion& tor) : rot(tor.rot)
 {
@@ -62,16 +54,16 @@ Torsion::Torsion(const Torsion& tor) : rot(tor.rot)
 
 void Torsion::analysis(std::ostream& to)
 {
-    chem::Format<char> line;
+    srs::Format<char> line;
     line.width(24).fill('=');
 
-    chem::Format<double> fix;
+    srs::Format<double> fix;
     fix.fixed().width(10);
 
-    chem::Format<std::size_t> ifix;
+    srs::Format<int> ifix;
     ifix.fixed().width(11);
 
-    chem::Format<double> sci;
+    srs::Format<double> sci;
     sci.scientific().precision(3);
 
     if (perform_torsional_analysis) {
@@ -83,7 +75,7 @@ void Torsion::analysis(std::ostream& to)
            << "Center  Atomic  Atomic\n"
            << "Number  Symbol  Mass\n"
            << line('-') << '\n';
-        for (arma::uword i = 0; i < rot_top.size(); ++i) {
+        for (int i = 0; i < rot_top.size(); ++i) {
             to << i + 1 << '\t' << rot.atoms[i].atomic_symbol << '\t'
                << fix(rot.atoms[i].atomic_mass) << '\n';
         }
@@ -123,34 +115,34 @@ void Torsion::analysis(std::ostream& to)
             to << "\nTorsional modes:\n" << line('-') << '\n';
             line.width(32).fill(' ');
             to << line(' ');
-            for (arma::uword i = 0; i < sigma_tor.size(); ++i) {
+            for (int i = 0; i < sigma_tor.size(); ++i) {
                 to << "  Minimum " << i + 1;
             }
             line.width(32 + 11 * sigma_tor.size()).fill('-');
             to << '\n' << line('-') << '\n';
 
             to << "Symmetry number:                ";
-            for (arma::uword i = 0; i < sigma_tor.size(); ++i) {
-                to << ifix(sigma_tor(i));
+            for (auto si : sigma_tor) {
+                to << ifix(si);
             }
             to << '\n';
 
             fix.width(11).precision(3);
             to << "Moment of inertia [amu bohr^2]: ";
-            for (arma::uword i = 0; i < rmi_tor.size(); ++i) {
-                to << fix(rmi_tor(i));
+            for (auto ri : rmi_tor) {
+                to << fix(ri);
             }
             to << '\n';
 
             to << "Potential energy [cm^-1]:       ";
-            for (arma::uword i = 0; i < pot_tor.size(); ++i) {
-                to << fix(pot_tor(i));
+            for (auto pi : pot_tor) {
+                to << fix(pi);
             }
             to << '\n';
 
             to << "Vibrational frequency [cm^-1]:  ";
-            for (arma::uword i = 0; i < freq_tor.size(); ++i) {
-                to << fix(freq_tor(i));
+            for (auto vi : freq_tor) {
+                to << fix(vi);
             }
             to << '\n' << line('-') << '\n';
 
@@ -162,20 +154,11 @@ void Torsion::analysis(std::ostream& to)
     }
 }
 
-int Torsion::tot_minima() const
-{
-    int nminima = 0;
-    for (arma::uword i = 0; i < sigma_tor.size(); ++i) {
-        nminima += gsl::narrow<int>(sigma_tor(i));  // eq. 1 in C&T (2000)
-    }
-    return nminima;
-}
-
 double Torsion::eff_moment_of_inertia() const
 {
     double imom_eff = 0.0;
     if (tot_minima() > 0) {
-        for (arma::uword i = 0; i < sigma_tor.size(); ++i) {
+        for (int i = 0; i < sigma_tor.size(); ++i) {
             imom_eff += sigma_tor(i) * rmi_tor(i);  // eq. 7 in C&T (2000)
         }
         imom_eff /= static_cast<double>(tot_minima());
@@ -183,15 +166,16 @@ double Torsion::eff_moment_of_inertia() const
     return imom_eff;
 }
 
-arma::vec Torsion::constant()
+srs::dvector Torsion::constant() const
 {
     using namespace datum;
 
-    arma::vec rotc = arma::zeros<arma::vec>(rmi_tor.size());
+    srs::dvector rotc(rmi_tor.size(), 0.0);
     if (!rmi_tor.empty()) {
-        for (arma::uword i = 0; i < rotc.size(); ++i) {
-            rotc(i) = h_bar / (4.0 * pi * giga * m_u * a_0 * a_0 * 1.0e-20
-                               * rmi_tor(i));
+        for (int i = 0; i < rotc.size(); ++i) {
+            rotc(i)
+                = h_bar
+                  / (4.0 * pi * giga * m_u * a_0 * a_0 * 1.0e-20 * rmi_tor(i));
         }
     }
     return rotc;
@@ -220,9 +204,9 @@ double Torsion::red_moment_of_inertia()
     // Compute projection of vector from C.O.M. of the molecule to the
     // origin of the coordinates of the top onto the principal axes:
 
-    arma::rowvec rm = arma::zeros<arma::rowvec>(3);
-    for (arma::uword i = 0; i < rm.size(); ++i) {
-        rm(i) = arma::dot(top_origo, rot.paxis.row(i));
+    srs::dvector rm(3);
+    for (int i = 0; i < rm.size(); ++i) {
+        rm(i) = srs::dot(top_origo, rot.paxis.row(i));
     }
 
     // Calculate moment of inertia of rotating top:
@@ -231,7 +215,7 @@ double Torsion::red_moment_of_inertia()
 
     // Calculrate reduced moment of inertia (eq. 1):
 
-    arma::rowvec betam = arma::zeros<arma::rowvec>(3);
+    srs::dvector betam(3);
 
     for (int i = 0; i < 3; ++i) {
         int im1 = i - 1;
@@ -256,22 +240,22 @@ double Torsion::red_moment_of_inertia()
 void Torsion::init(std::istream& from, const std::string& key)
 {
     // Read input data:
-    arma::uvec rot_axis_def  = arma::zeros<arma::uvec>(2);
-    arma::uvec rot_top_def   = arma::zeros<arma::uvec>(0);
-    arma::uvec sigma_tor_def = arma::zeros<arma::uvec>(0);
-    arma::vec rmi_tor_def    = arma::zeros<arma::vec>(0);
-    arma::vec pot_tor_def    = arma::zeros<arma::vec>(0);
-    arma::vec freq_tor_def   = arma::zeros<arma::vec>(0);
+    srs::ivector rot_axis_def(2);
+    srs::ivector rot_top_def;
+    srs::ivector sigma_tor_def;
+    srs::dvector rmi_tor_def;
+    srs::dvector pot_tor_def;
+    srs::dvector freq_tor_def;
 
-    std::map<std::string, Input> input_data;
-    input_data["rot_axis"]  = Input(rot_axis, rot_axis_def);
-    input_data["rot_top"]   = Input(rot_top, rot_top_def);
-    input_data["sigma_tor"] = Input(sigma_tor, sigma_tor_def);
-    input_data["rmi_tor"]   = Input(rmi_tor, rmi_tor_def);
-    input_data["pot_tor"]   = Input(pot_tor, pot_tor_def);
-    input_data["freq_tor"]  = Input(freq_tor, freq_tor_def);
+    std::map<std::string, srs::Input> input_data;
+    input_data["rot_axis"]  = srs::Input(rot_axis, rot_axis_def);
+    input_data["rot_top"]   = srs::Input(rot_top, rot_top_def);
+    input_data["sigma_tor"] = srs::Input(sigma_tor, sigma_tor_def);
+    input_data["rmi_tor"]   = srs::Input(rmi_tor, rmi_tor_def);
+    input_data["pot_tor"]   = srs::Input(pot_tor, pot_tor_def);
+    input_data["freq_tor"]  = srs::Input(freq_tor, freq_tor_def);
 
-    if (chem::find_section(from, key)) {
+    if (srs::find_section(from, key)) {
         std::string token;
         while (from >> token) {
             if (token == "End") {
@@ -299,7 +283,7 @@ void Torsion::init(std::istream& from, const std::string& key)
     // Calculate reduced moment of inertia if needed:
     if ((rot_top.size() > 0) && rmi_tor.empty()) {
         perform_torsional_analysis = true;
-        rmi_tor.set_size(1);
+        rmi_tor.resize(1);
         rmi_tor(0) = red_moment_of_inertia();
     }
 
@@ -318,33 +302,41 @@ void Torsion::validate() const
     if (rot_top.size() > rot.atoms.size()) {
         throw Torsion_error("bad rot_top size");
     }
-    for (arma::uword i = 0; i < rot_top.size(); ++i) {
-        if (rot_top(i) > rot.atoms.size()) {
+    for (auto ri : rot_top) {
+        if (ri > rot.atoms.size()) {
             throw Torsion_error("bad center in rot_top");
         }
     }
-    if (sigma_tor.size() > 0) {
-        if (arma::any(sigma_tor < 1)) {
+    if (!sigma_tor.empty()) {
+        if (std::any_of(sigma_tor.begin(), sigma_tor.end(), [](int i) {
+                return i < 1;
+            })) {
             throw Torsion_error("bad sigma_tor");
         }
     }
-    if (rmi_tor.size() > 0) {
-        if (arma::any(rmi_tor <= 0.0)) {
+    if (!rmi_tor.empty()) {
+        if (std::any_of(rmi_tor.begin(), rmi_tor.end(), [](double d) {
+                return d <= 0.0;
+            })) {
             throw Torsion_error("bad rmi_tor");
         }
     }
-    if (pot_tor.size() > 0) {
-        if (arma::any(pot_tor < 0.0)) {
+    if (!pot_tor.empty()) {
+        if (std::any_of(pot_tor.begin(), pot_tor.end(), [](double d) {
+                return d < 0.0;
+            })) {
             throw Torsion_error("bad pot_tor");
         }
     }
-    if (freq_tor.size() > 0) {
-        if (arma::any(freq_tor <= 0.0)) {
+    if (!freq_tor.empty()) {
+        if (std::any_of(freq_tor.begin(), freq_tor.end(), [](double d) {
+                return d <= 0.0;
+            })) {
             throw Torsion_error("bad freq_tor");
         }
     }
 }
-
+#if 0
 void Torsion::axis_system()
 {
     /*
@@ -443,9 +435,9 @@ void Torsion::top_moment_of_inertia()
         top_xyz.row(i) = xyz_.row(rot_top(i)) - top_origo;
     }
     for (arma::uword i = 0; i < top_xyz.n_rows; ++i) {
-        double x = arma::dot(top_xyz.row(i), x_axis);
-        double y = arma::dot(top_xyz.row(i), y_axis);
-        double z = arma::dot(top_xyz.row(i), z_axis);
+        double x      = arma::dot(top_xyz.row(i), x_axis);
+        double y      = arma::dot(top_xyz.row(i), y_axis);
+        double z      = arma::dot(top_xyz.row(i), z_axis);
         top_xyz(i, 0) = x;
         top_xyz(i, 1) = y;
         top_xyz(i, 2) = z;
@@ -469,3 +461,4 @@ void Torsion::top_moment_of_inertia()
         um += mass * xi;
     }
 }
+#endif
