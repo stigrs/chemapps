@@ -296,47 +296,38 @@ void Torsion::validate() const
     if (rot_axis.size() != 2) {
         throw Torsion_error("bad rot_axis size");
     }
-    if (rot_axis(1) > rot.atoms.size()) {
+    if (rot_axis(1) > gsl::narrow_cast<int>(rot.atoms.size())) {
         throw Torsion_error("bad rot_axis");
     }
-    if (rot_top.size() > rot.atoms.size()) {
+    if (rot_top.size() > gsl::narrow_cast<int>(rot.atoms.size())) {
         throw Torsion_error("bad rot_top size");
     }
     for (auto ri : rot_top) {
-        if (ri > rot.atoms.size()) {
+        if (ri > gsl::narrow_cast<int>(rot.atoms.size())) {
             throw Torsion_error("bad center in rot_top");
         }
     }
     if (!sigma_tor.empty()) {
-        if (std::any_of(sigma_tor.begin(), sigma_tor.end(), [](int i) {
-                return i < 1;
-            })) {
+        if (srs::min(sigma_tor) < 1) {
             throw Torsion_error("bad sigma_tor");
         }
     }
     if (!rmi_tor.empty()) {
-        if (std::any_of(rmi_tor.begin(), rmi_tor.end(), [](double d) {
-                return d <= 0.0;
-            })) {
+        if (srs::min(rmi_tor) <= 0.0) {
             throw Torsion_error("bad rmi_tor");
         }
     }
     if (!pot_tor.empty()) {
-        if (std::any_of(pot_tor.begin(), pot_tor.end(), [](double d) {
-                return d < 0.0;
-            })) {
+        if (srs::min(pot_tor) < 0.0) {
             throw Torsion_error("bad pot_tor");
         }
     }
     if (!freq_tor.empty()) {
-        if (std::any_of(freq_tor.begin(), freq_tor.end(), [](double d) {
-                return d <= 0.0;
-            })) {
+        if (srs::min(freq_tor) <= 0.0) {
             throw Torsion_error("bad freq_tor");
         }
     }
 }
-#if 0
 void Torsion::axis_system()
 {
     /*
@@ -357,45 +348,44 @@ void Torsion::axis_system()
     // Calculate center of mass of rotating top and work on a local copy.
 
     center_of_mass();
-    arma::rowvec top_com_(top_com);
+    srs::dvector top_com_(top_com);
 
     // Set up z axis - the rotation axis - and its norm:
 
     z_axis        = xyz_.row(rot_axis(1)) - xyz_.row(rot_axis(0));
-    double z_norm = arma::norm(z_axis);
+    double z_norm = srs::norm(z_axis);
 
     // Find the vector from C1 to C.O.M.:
 
-    arma::rowvec r_vec = top_com - xyz_.row(rot_axis(0));
-    double r_norm      = arma::norm(r_vec);
+    srs::dvector r_vec = top_com - xyz_.row(rot_axis(0));
+    double r_norm      = srs::norm(r_vec);
 
     // Project r vector onto z axis and find the intersection point:
 
     const double tol = 1.0e-12;
-    double theta     = arma::dot(r_vec, z_axis) / (r_norm * z_norm);
+    double theta     = srs::dot(r_vec, z_axis) / (r_norm * z_norm);
     if ((std::abs(theta) - 1.0) < tol) {  // r and z are parallel
         top_com = xyz_.row(rot_top(0));
         r_vec   = top_com - xyz_.row(rot_axis(0));
-        r_norm  = arma::norm(r_vec);
-        theta   = arma::dot(r_vec, z_axis) / (r_norm * z_norm);
+        r_norm  = srs::norm(r_vec);
+        theta   = srs::dot(r_vec, z_axis) / (r_norm * z_norm);
     }
-    top_origo = xyz_.row(rot_axis(0)) + theta * z_axis * r_norm / z_norm;
+    top_origo = xyz_.row(rot_axis(0)) + theta * z_axis * (r_norm / z_norm);
 
     // Set up x axis:
 
     x_axis        = top_com - top_origo;
-    double x_norm = arma::norm(x_axis);
+    double x_norm = srs::norm(x_axis);
 
     // Check if x and z axes are perpendicular:
 
-    double xz_angle = arma::dot(x_axis, z_axis) / (x_norm * z_norm);
-    chem::Assert(std::abs(xz_angle) < tol,
-                 Torsion_error("x and z axes are not parallel"));
+    double xz_angle = srs::dot(x_axis, z_axis) / (x_norm * z_norm);
+    Expects(std::abs(xz_angle) < tol);
 
     // Generate y axis perpendicular to x and z axes:
 
-    y_axis        = arma::cross(z_axis, x_axis);
-    double y_norm = arma::norm(y_axis);
+    y_axis        = srs::cross(z_axis, x_axis);
+    double y_norm = srs::norm(y_axis);
 
     // Finalize by generating unit vectors:
 
@@ -406,9 +396,9 @@ void Torsion::axis_system()
 
 void Torsion::center_of_mass()
 {
-    for (arma::uword j = 0; j < xyz_.n_cols; ++j) {
+    for (int j = 0; j < xyz_.cols(); ++j) {
         double sum = 0.0;
-        for (arma::uword i = 0; i < rot_top.size(); ++i) {
+        for (int i = 0; i < rot_top.size(); ++i) {
             sum += rot.atoms[i].atomic_mass * xyz_(i, j);
         }
         top_com(j) = sum / rot.tot_mass();
@@ -417,27 +407,26 @@ void Torsion::center_of_mass()
 
 void Torsion::direction_cosines()
 {
-    for (arma::uword i = 0; i < 3; ++i) {
-        alpha(0, i) = arma::dot(x_axis, rot.paxis.col(i));
-        alpha(1, i) = arma::dot(y_axis, rot.paxis.col(i));
-        alpha(2, i) = arma::dot(z_axis, rot.paxis.col(i));
+    for (int i = 0; i < 3; ++i) {
+        alpha(0, i) = srs::dot(x_axis, rot.paxis.column(i));
+        alpha(1, i) = srs::dot(y_axis, rot.paxis.column(i));
+        alpha(2, i) = srs::dot(z_axis, rot.paxis.column(i));
     }
-    chem::Assert(std::abs(arma::det(alpha) - 1.0) < 1.0e-12,  // should be +1
-                 Torsion_error("bad direction cosines matrix"));
+    Ensures(std::abs(srs::det(alpha) - 1.0) < 1.0e-12);
 }
 
 void Torsion::top_moment_of_inertia()
 {
     // Project coordinates of rotating top onto the (x,y,z) coordinate system:
 
-    arma::mat top_xyz(rot_top.size(), 3);
-    for (arma::uword i = 0; i < rot_top.size(); ++i) {
+    srs::dmatrix top_xyz(rot_top.size(), 3);
+    for (int i = 0; i < rot_top.size(); ++i) {
         top_xyz.row(i) = xyz_.row(rot_top(i)) - top_origo;
     }
-    for (arma::uword i = 0; i < top_xyz.n_rows; ++i) {
-        double x      = arma::dot(top_xyz.row(i), x_axis);
-        double y      = arma::dot(top_xyz.row(i), y_axis);
-        double z      = arma::dot(top_xyz.row(i), z_axis);
+    for (int i = 0; i < top_xyz.rows(); ++i) {
+        double x      = srs::dot(top_xyz.row(i), x_axis);
+        double y      = srs::dot(top_xyz.row(i), y_axis);
+        double z      = srs::dot(top_xyz.row(i), z_axis);
         top_xyz(i, 0) = x;
         top_xyz(i, 1) = y;
         top_xyz(i, 2) = z;
@@ -450,7 +439,7 @@ void Torsion::top_moment_of_inertia()
     cm = 0.0;
     um = 0.0;
 
-    for (arma::uword i = 0; i < top_xyz.n_rows; ++i) {
+    for (int i = 0; i < top_xyz.rows(); ++i) {
         double mass = rot.atoms[rot_top(i)].atomic_mass;
         double xi   = top_xyz(i, 0);
         double yi   = top_xyz(i, 1);
@@ -461,4 +450,3 @@ void Torsion::top_moment_of_inertia()
         um += mass * xi;
     }
 }
-#endif
