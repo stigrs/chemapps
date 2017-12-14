@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,13 +12,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef CHEM_ZMATRIX_H
 #define CHEM_ZMATRIX_H
 
 #include <chem/element.h>
-#include <armadillo>
+#include <srs/array.h>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -39,7 +39,7 @@ class Molecule;
 //
 class Zmatrix {
 public:
-    Zmatrix(std::vector<Element>& atoms_, arma::mat& xyz_);
+    Zmatrix(std::vector<Element>& atoms_, srs::dmatrix& xyz_);
 
     Zmatrix(const Zmatrix& zmat);
 
@@ -53,7 +53,7 @@ public:
     double get_dihedral(int index) const;
 
     // Get connectivities.
-    std::vector<arma::ivec> get_connectivities() const;
+    std::vector<srs::ivector> get_connectivities() const;
 
     // Set bond distance.
     void set_distance(int index, double value);
@@ -88,40 +88,40 @@ protected:
     void build_xyz();
 
     // Find index to nearest atom.
-    int find_nearest_atom(const arma::rowvec& dist) const;
+    int find_nearest_atom(const srs::dvector& dist) const;
 
     // Find new connection.
-    int find_new_connection(const arma::ivec& iatms,
-                            const arma::ivec& connectivity) const;
+    int find_new_connection(const srs::ivector& iatms,
+                            const srs::ivector& connectivity) const;
 
     // Calculate position of another atom based on internal coordinates. The
     // code is based on the qcl code written by Ben Albrecht released under
     // the MIT license.
-    arma::rowvec calc_position(arma::sword i) const;
+    srs::dvector calc_position(int i) const;
 
 private:
     std::vector<Element>& atoms;
-    arma::mat& xyz;
+    srs::dmatrix& xyz;
 
-    arma::vec distances;
-    arma::vec angles;
-    arma::vec dihedrals;
+    srs::dvector distances;
+    srs::dvector angles;
+    srs::dvector dihedrals;
 
-    arma::ivec bond_connect;
-    arma::ivec angle_connect;
-    arma::ivec dihedral_connect;
+    srs::ivector bond_connect;
+    srs::ivector angle_connect;
+    srs::ivector dihedral_connect;
 };
 
-inline Zmatrix::Zmatrix(std::vector<Element>& atoms_, arma::mat& xyz_)
+inline Zmatrix::Zmatrix(std::vector<Element>& atoms_, srs::dmatrix& xyz_)
     : atoms(atoms_), xyz(xyz_)
 {
-    distances = arma::zeros<arma::vec>(atoms.size());
-    angles    = arma::zeros<arma::vec>(atoms.size());
-    dihedrals = arma::zeros<arma::vec>(atoms.size());
+    distances.resize(atoms.size(), 0.0);
+    angles.resize(atoms.size(), 0.0);
+    dihedrals.resize(atoms.size(), 0.0);
 
-    bond_connect     = arma::zeros<arma::ivec>(atoms.size());
-    angle_connect    = arma::zeros<arma::ivec>(atoms.size());
-    dihedral_connect = arma::zeros<arma::ivec>(atoms.size());
+    bond_connect.resize(atoms.size(), 0);
+    angle_connect.resize(atoms.size(), 0);
+    dihedral_connect.resize(atoms.size(), 0);
 
     build_zmat();
 }
