@@ -14,9 +14,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <chem/math.h>
 #include <chem/molecule_io.h>
 #include <chem/zmatrix.h>
+#include <srs/math.h>
 #include <gsl/gsl>
 
 Zmatrix::Zmatrix(const Zmatrix& zmat) : atoms(zmat.atoms), xyz(zmat.xyz)
@@ -30,21 +30,21 @@ Zmatrix::Zmatrix(const Zmatrix& zmat) : atoms(zmat.atoms), xyz(zmat.xyz)
     dihedral_connect = zmat.dihedral_connect;
 }
 
-std::vector<arma::ivec> Zmatrix::get_connectivities() const
+std::vector<srs::ivector> Zmatrix::get_connectivities() const
 {
-    std::vector<arma::ivec> connect(0);
+    std::vector<srs::ivector> connect(0);
     if (!atoms.empty()) {
-        arma::ivec ivec1 = {bond_connect(1)};
+        srs::ivector ivec1 = {bond_connect(1)};
         connect.push_back(ivec1);
     }
     if (atoms.size() > 1) {
-        arma::ivec ivec2 = {bond_connect(2), angle_connect(2)};
+        srs::ivector ivec2 = {bond_connect(2), angle_connect(2)};
         connect.push_back(ivec2);
     }
     if (atoms.size() > 2) {
-        for (arma::uword i = 3; i < bond_connect.size(); ++i) {
-            arma::ivec ivec3 = {
-                bond_connect(i), angle_connect(i), dihedral_connect(i)};
+        for (int i = 3; i < bond_connect.size(); ++i) {
+            srs::ivector ivec3
+                = {bond_connect(i), angle_connect(i), dihedral_connect(i)};
             connect.push_back(ivec3);
         }
     }
@@ -87,15 +87,15 @@ void Zmatrix::print(std::ostream& to)
 
 void Zmatrix::build_zmat()
 {
-    arma::mat dist_mat;
+    srs::dmatrix dist_mat;
     chem::pdist_matrix(dist_mat, xyz);
 
     for (std::size_t atom = 1; atom < atoms.size(); ++atom) {
-        arma::rowvec dist  = dist_mat.row(atom).head(atom);
+        srs::dvector dist  = dist_mat.row(atom).head(atom);
         bond_connect(atom) = find_nearest_atom(dist);
         distances(atom)    = dist.min();
         if (atom >= 2) {
-            arma::ivec iatms(3);
+            srs::ivector iatms(3);
             iatms(0) = atom;
             iatms(1) = bond_connect(iatms(0));
             iatms(2) = bond_connect(iatms(1));
@@ -103,27 +103,29 @@ void Zmatrix::build_zmat()
                 iatms(2) = find_new_connection(iatms, bond_connect.head(atom));
             }
             angle_connect(atom) = iatms(2);
-            arma::vec ai = arma::conv_to<arma::vec>::from(xyz.row(iatms(0)));
-            arma::vec aj = arma::conv_to<arma::vec>::from(xyz.row(iatms(1)));
-            arma::vec ak = arma::conv_to<arma::vec>::from(xyz.row(iatms(2)));
-            angles(atom) = chem::angle(ai, aj, ak);
+            srs::dvector ai     = xyz.row(iatms(0));
+            srs::dvector aj     = xyz.row(iatms(1));
+            srs::dvector ak     = xyz.row(iatms(2));
+            angles(atom)        = chem::angle(ai, aj, ak);
         }
         if (atom >= 3) {
-            arma::ivec iatms(4);
-            iatms(0)       = atom;
-            iatms(1)       = bond_connect(iatms(0));
-            iatms(2)       = angle_connect(iatms(0));
-            iatms(3)       = angle_connect(iatms(1));
-            arma::uvec tmp = arma::find(iatms.head(3) == iatms(3));
-            if (!tmp.empty()) {
+            srs::ivector iatms(4);
+            iatms(0) = atom;
+            iatms(1) = bond_connect(iatms(0));
+            iatms(2) = angle_connect(iatms(0));
+            iatms(3) = angle_connect(iatms(1));
+            // Continue here:
+            auto tmp = iatms.head(3);
+            auto it std::find(tmp.begin(), tmp.end(), iatms(3));
+            if (it != tmp.end()) {
                 iatms(3) = find_new_connection(iatms, bond_connect.head(atom));
             }
             dihedral_connect(atom) = iatms(3);
-            arma::vec ai    = arma::conv_to<arma::vec>::from(xyz.row(iatms(0)));
-            arma::vec aj    = arma::conv_to<arma::vec>::from(xyz.row(iatms(1)));
-            arma::vec ak    = arma::conv_to<arma::vec>::from(xyz.row(iatms(2)));
-            arma::vec al    = arma::conv_to<arma::vec>::from(xyz.row(iatms(3)));
-            dihedrals(atom) = chem::dihedral(ai, aj, ak, al);
+            srs::dvector ai        = xyz.row(iatms(0));
+            srs::dvector aj        = xyz.row(iatms(1));
+            srs::dvector ak        = xyz.row(iatms(2));
+            srs::dvector al        = xyz.row(iatms(3));
+            dihedrals(atom)        = chem::dihedral(ai, aj, ak, al);
         }
     }
 }
@@ -155,8 +157,8 @@ int Zmatrix::find_new_connection(const arma::ivec& iatms,
 {
     int connection = 0;
     for (arma::uword idx = 1; idx < connectivity.size(); ++idx) {
-        if ((!arma::any(iatms == idx)) &&
-            arma::any(iatms == connectivity(idx))) {
+        if ((!arma::any(iatms == idx))
+            && arma::any(iatms == connectivity(idx))) {
             connection = gsl::narrow<int>(idx);
         }
     }
