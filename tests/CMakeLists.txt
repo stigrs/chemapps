@@ -51,15 +51,15 @@ endfunction()
 
 set(PROGRAMS 
     #test_mcmm
-    #test_molecule
+    test_molecule
     test_molecule_io
-    #test_molrot
-    #test_molvib
+    test_molrot
+    test_molvib
     #test_mopac
     test_ptable
     #test_thermochem
     #test_thermodata
-    #test_torsion
+    test_torsion
     #test_tst
     #test_tunnel
     test_zmatrix

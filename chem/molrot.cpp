@@ -167,8 +167,10 @@ void Molrot::principal_moments()
     srs::translate(xyz_, -com(0), -com(1), -com(2));
 
     // Compute principal moments:
-    paxis.resize(3, 3, 0.0);
-    pmom.resize(3, 0.0);
+    paxis.resize(3, 3);
+    pmom.resize(3);
+    paxis = 0.0;
+    pmom  = 0.0;
 
     if (atoms.size() > 1) {
         for (std::size_t i = 0; i < atoms.size(); ++i) {
