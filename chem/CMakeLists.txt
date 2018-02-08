@@ -14,7 +14,7 @@ set(
     #collision.cpp
     ptable.cpp
     #mcmm.cpp
-    #molecule.cpp
+    molecule.cpp
     molecule_io.cpp
     molrot.cpp
     molvib.cpp
@@ -24,7 +24,7 @@ set(
     torsion.cpp
     #tst.cpp
     #tunnel.cpp
-    #zmatrix.cpp
+    zmatrix.cpp
 )
 add_library(
     chem 

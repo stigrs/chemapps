@@ -77,7 +77,7 @@ public:
     int get_charge() const { return charge; }
     double get_elec_energy() const { return elec_energy; }
 
-    void set_xyz(const arma::mat& xyz_);
+    void set_xyz(const srs::dmatrix& xyz_);
     void set_charge(const int charge_) { charge = charge_; }
     void set_elec_energy(const double energy) { elec_energy = energy; }
 

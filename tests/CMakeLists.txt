@@ -5,6 +5,7 @@ include_directories (${ChemApps_SOURCE_DIR})
 include_directories (${MKL_INCLUDE_DIR})
 include_directories (${SRS_INCLUDE_DIR})
 link_directories (${ChemApps_BINARY_DIR}/chem)
+link_directories (${MKL_LIB_DIR})
 link_directories (${SRS_LIB_DIR})
 
 # Copy *.inp files to build directory.
@@ -61,7 +62,7 @@ set(PROGRAMS
     #test_torsion
     #test_tst
     #test_tunnel
-    #test_zmatrix
+    test_zmatrix
 )
 
 foreach(program ${PROGRAMS})

@@ -66,11 +66,11 @@ void Molecule::init(std::istream& from,
     elec_state_def(0) = 1.0;
     elec_state_def(1) = 0.0;
 
-    std::map<std::string, Input> input_data;
-    input_data["geom_unit"]   = Input(geom_unit, "angstrom");
-    input_data["charge"]      = Input(charge, 0);
-    input_data["elec_state"]  = Input(elec_state, elec_state_def);
-    input_data["elec_energy"] = Input(elec_energy, 0.0);
+    std::map<std::string, srs::Input> input_data;
+    input_data["geom_unit"]   = srs::Input(geom_unit, "angstrom");
+    input_data["charge"]      = srs::Input(charge, 0);
+    input_data["elec_state"]  = srs::Input(elec_state, elec_state_def);
+    input_data["elec_energy"] = srs::Input(elec_energy, 0.0);
 
     bool found = srs::find_section(from, key);
     if (found) {

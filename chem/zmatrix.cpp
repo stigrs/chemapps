@@ -88,12 +88,13 @@ void Zmatrix::print(std::ostream& to)
 void Zmatrix::build_zmat()
 {
     srs::dmatrix dist_mat;
-    chem::pdist_matrix(dist_mat, xyz);
+    srs::pdist_matrix(dist_mat, xyz);
 
     for (std::size_t atom = 1; atom < atoms.size(); ++atom) {
-        srs::dvector dist  = dist_mat.row(atom).head(atom);
-        bond_connect(atom) = find_nearest_atom(dist);
-        distances(atom)    = dist.min();
+        srs::dvector dmat_row = dist_mat.row(atom);
+        srs::dvector dist     = dmat_row.head(atom);
+        bond_connect(atom)    = find_nearest_atom(dist);
+        distances(atom)       = srs::min(dist);
         if (atom >= 2) {
             srs::ivector iatms(3);
             iatms(0) = atom;
@@ -106,7 +107,7 @@ void Zmatrix::build_zmat()
             srs::dvector ai     = xyz.row(iatms(0));
             srs::dvector aj     = xyz.row(iatms(1));
             srs::dvector ak     = xyz.row(iatms(2));
-            angles(atom)        = chem::angle(ai, aj, ak);
+            angles(atom)        = srs::angle(ai, aj, ak);
         }
         if (atom >= 3) {
             srs::ivector iatms(4);
@@ -114,9 +115,8 @@ void Zmatrix::build_zmat()
             iatms(1) = bond_connect(iatms(0));
             iatms(2) = angle_connect(iatms(0));
             iatms(3) = angle_connect(iatms(1));
-            // Continue here:
             auto tmp = iatms.head(3);
-            auto it std::find(tmp.begin(), tmp.end(), iatms(3));
+            auto it  = std::find(tmp.begin(), tmp.end(), iatms(3));
             if (it != tmp.end()) {
                 iatms(3) = find_new_connection(iatms, bond_connect.head(atom));
             }
@@ -125,26 +125,26 @@ void Zmatrix::build_zmat()
             srs::dvector aj        = xyz.row(iatms(1));
             srs::dvector ak        = xyz.row(iatms(2));
             srs::dvector al        = xyz.row(iatms(3));
-            dihedrals(atom)        = chem::dihedral(ai, aj, ak, al);
+            dihedrals(atom)        = srs::dihedral(ai, aj, ak, al);
         }
     }
 }
 
 void Zmatrix::build_xyz()
 {
-    xyz = arma::zeros<arma::mat>(atoms.size(), 3);
+    xyz.resize(atoms.size(), 3);
     for (std::size_t atom = 0; atom < atoms.size(); ++atom) {
         xyz.row(atom) = calc_position(atom);
     }
 }
 
-int Zmatrix::find_nearest_atom(const arma::rowvec& dist) const
+int Zmatrix::find_nearest_atom(const srs::dvector& dist) const
 {
-    double dist_min  = dist.min();
+    double dist_min  = srs::min(dist);
     int nearest_atom = -1;
 
-    for (arma::uword i = 0; i < dist.size(); ++i) {
-        if (chem::approx_equal(dist(i), dist_min)) {
+    for (int i = 0; i < dist.size(); ++i) {
+        if (srs::approx_equal(dist(i), dist_min, 1.0e-12)) {
             nearest_atom = gsl::narrow<int>(i);
             break;
         }
@@ -152,67 +152,69 @@ int Zmatrix::find_nearest_atom(const arma::rowvec& dist) const
     return nearest_atom;
 }
 
-int Zmatrix::find_new_connection(const arma::ivec& iatms,
-                                 const arma::ivec& connectivity) const
+int Zmatrix::find_new_connection(const srs::ivector& iatms,
+                                 const srs::ivector& connectivity) const
 {
     int connection = 0;
-    for (arma::uword idx = 1; idx < connectivity.size(); ++idx) {
-        if ((!arma::any(iatms == idx))
-            && arma::any(iatms == connectivity(idx))) {
+    for (int idx = 1; idx < connectivity.size(); ++idx) {
+        // clang-format off
+        if (std::find(iatms.begin(), iatms.end(), idx) == iatms.end()
+            && std::find(iatms.begin(), iatms.end(), connectivity(idx)) == iatms.end()) {
+            // clang-format on
             connection = gsl::narrow<int>(idx);
         }
     }
     return connection;
 }
 
-arma::rowvec Zmatrix::calc_position(arma::sword i) const
+srs::dvector Zmatrix::calc_position(int i) const
 {
-    arma::rowvec pos(3);
+    srs::dvector pos(3);
     double dst = 0.0;
     if (i > 1) {
-        arma::sword j  = bond_connect(i);
-        arma::sword k  = angle_connect(i);
-        arma::sword l  = dihedral_connect(i);
-        arma::ivec tmp = {i, j, k};
+        int j            = bond_connect(i);
+        int k            = angle_connect(i);
+        int l            = dihedral_connect(i);
+        srs::ivector tmp = {i, j, k};
         if ((k == l) && (i > 0)) {  // prevent doubles
             l = find_new_connection(tmp, bond_connect.head(i));
         }
-        arma::rowvec avec = xyz.row(j);
-        arma::rowvec bvec = xyz.row(k);
+        srs::dvector avec = xyz.row(j);
+        srs::dvector bvec = xyz.row(k);
         dst               = distances(i);
-        double ang        = chem::degtorad(angles(i));
+        double ang        = srs::degtorad(angles(i));
         double tor;
-        arma::rowvec cvec;
+        srs::dvector cvec;
         if (i == 2) {  // third atom will be in the same plane as first two
-            tor  = 90.0 * arma::datum::pi / 180.0;
+            tor  = 90.0 * datum::pi / 180.0;
             cvec = {0.0, 1.0, 0.0};
         }
         else {  // fourth+ atoms require dihedral angle
-            tor  = chem::degtorad(dihedrals(i));
+            tor  = srs::degtorad(dihedrals(i));
             cvec = xyz.row(l);
         }
-        arma::rowvec v1 = avec - bvec;
-        arma::rowvec v2 = avec - cvec;
-        arma::rowvec n  = arma::cross(v1, v2);
-        arma::rowvec nn = arma::cross(v1, n);
-        n /= arma::norm(n);
-        nn /= arma::norm(nn);
+        srs::dvector v1 = avec - bvec;
+        srs::dvector v2 = avec - cvec;
+        srs::dvector n  = srs::cross(v1, v2);
+        srs::dvector nn = srs::cross(v1, n);
+        n /= srs::norm(n);
+        nn /= srs::norm(nn);
         n *= -std::sin(tor);
         nn *= std::cos(tor);
-        arma::rowvec v3 = n + nn;
-        v3 /= arma::norm(v3);
+        srs::dvector v3 = n + nn;
+        v3 /= srs::norm(v3);
         v3 *= dst * std::sin(ang);
-        v1 /= arma::norm(v1);
+        v1 /= srs::norm(v1);
         v1 *= dst * std::cos(ang);
         pos = avec + v3 - v1;
     }
     else if (i == 1) {  // second atom dst away from origin along Z axis
-        arma::sword j = bond_connect(i);
-        dst           = distances(i);
-        pos           = {xyz(j, 0) + dst, xyz(j, 1), xyz(j, 2)};
+        int j = bond_connect(i);
+        dst   = distances(i);
+        pos   = {xyz(j, 0) + dst, xyz(j, 1), xyz(j, 2)};
     }
     else if (i == 0) {  // first atom at the origin
-        pos.zeros();
+        pos = 0.0;
     }
     return pos;
 }
