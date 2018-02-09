@@ -61,7 +61,7 @@ set(PROGRAMS
     test_thermodata
     test_torsion
     #test_tst
-    #test_tunnel
+    test_tunnel
     test_zmatrix
 )
 

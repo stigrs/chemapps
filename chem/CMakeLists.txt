@@ -23,7 +23,7 @@ set(
     thermodata.cpp
     torsion.cpp
     #tst.cpp
-    #tunnel.cpp
+    tunnel.cpp
     zmatrix.cpp
 )
 add_library(

@@ -17,7 +17,7 @@
 #ifndef CHEM_TUNNEL_H
 #define CHEM_TUNNEL_H
 
-#include <chem/datum.h>
+#include <srs/datum.h>
 #include <cmath>
 #include <gsl/gsl>
 #include <iostream>

@@ -16,8 +16,8 @@
 
 #include <chem/thermodata.h>
 #include <chem/tunnel.h>
-#include <chem/utils.h>
-#include <armadillo>
+#include <srs/array.h>
+#include <srs/utils.h>
 #include <catch/catch.hpp>
 #include <fstream>
 
@@ -26,16 +26,16 @@ TEST_CASE("test_tunnel")
     SECTION("eckart")
     {
         std::ifstream from;
-        chem::fopen(from, "test_tunnel.inp");
+        srs::fopen(from, "test_tunnel.inp");
 
         Tunnel tunnel(from);
         Thermodata td(from);
 
         // Results from Brown (1981):
-        arma::vec kappa_ans = {6.3946, 2.4444, 1.3019, 1.1761, 1.1189};
-        arma::vec temp      = td.get_temperature();
+        srs::dvector kappa_ans = {6.3946, 2.4444, 1.3019, 1.1761, 1.1189};
+        srs::dvector temp      = td.get_temperature();
 
-        for (arma::uword i = 0; i < temp.size(); ++i) {
+        for (int i = 0; i < temp.size(); ++i) {
             double kappa = tunnel.factor(temp(i));
             CHECK(std::abs(kappa - kappa_ans(i)) < 5.0e-3);
         }
