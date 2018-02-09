@@ -348,7 +348,7 @@ void Torsion::axis_system()
     // Calculate center of mass of rotating top and work on a local copy.
 
     center_of_mass();
-    srs::dvector top_com_(top_com);
+    srs::dvector top_com_ = top_com;
 
     // Set up z axis - the rotation axis - and its norm:
 
@@ -357,7 +357,7 @@ void Torsion::axis_system()
 
     // Find the vector from C1 to C.O.M.:
 
-    srs::dvector r_vec = top_com - xyz_.row(rot_axis(0));
+    srs::dvector r_vec = top_com_ - xyz_.row(rot_axis(0));
     double r_norm      = srs::norm(r_vec);
 
     // Project r vector onto z axis and find the intersection point:
@@ -365,16 +365,16 @@ void Torsion::axis_system()
     const double tol = 1.0e-12;
     double theta     = srs::dot(r_vec, z_axis) / (r_norm * z_norm);
     if ((std::abs(theta) - 1.0) < tol) {  // r and z are parallel
-        top_com = xyz_.row(rot_top(0));
-        r_vec   = top_com - xyz_.row(rot_axis(0));
-        r_norm  = srs::norm(r_vec);
-        theta   = srs::dot(r_vec, z_axis) / (r_norm * z_norm);
+        top_com_ = xyz_.row(rot_top(0));
+        r_vec    = top_com_ - xyz_.row(rot_axis(0));
+        r_norm   = srs::norm(r_vec);
+        theta    = srs::dot(r_vec, z_axis) / (r_norm * z_norm);
     }
     top_origo = xyz_.row(rot_axis(0)) + theta * z_axis * (r_norm / z_norm);
 
     // Set up x axis:
 
-    x_axis        = top_com - top_origo;
+    x_axis        = top_com_ - top_origo;
     double x_norm = srs::norm(x_axis);
 
     // Check if x and z axes are perpendicular:
@@ -396,6 +396,7 @@ void Torsion::axis_system()
 
 void Torsion::center_of_mass()
 {
+    std::cout << top_com.size() << std::endl;
     for (int j = 0; j < xyz_.cols(); ++j) {
         double sum = 0.0;
         for (int i = 0; i < rot_top.size(); ++i) {

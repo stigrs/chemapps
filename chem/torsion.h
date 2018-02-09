@@ -95,23 +95,23 @@ private:
     // Calculate moment of inertia of rotating top.
     void top_moment_of_inertia();
 
-    srs::dmatrix xyz_;              // local copy of xyz
-    srs::dmatrix alpha{3, 3, 0.0};  // direction cosines
+    srs::dmatrix xyz_;                                    // local copy of xyz
+    srs::dmatrix alpha = srs::zeros<srs::dmatrix>(3, 3);  // direction cosines
 
-    srs::ivector rot_axis{2, 0};  // rotational axis
-    srs::ivector rot_top;         // rotating top moiety
-    srs::ivector sigma_tor;       // symmetry number
+    srs::ivector rot_axis = srs::zeros<srs::ivector>(2);  // rotational axis
+    srs::ivector rot_top;                                 // rotating top moiety
+    srs::ivector sigma_tor;                               // symmetry number
 
     srs::dvector rmi_tor;   // red. moment of inertia
     srs::dvector pot_tor;   // potential coefficients
     srs::dvector freq_tor;  // torsional frequencies
 
-    srs::dvector x_axis{3, 0.0};  // x axis of rot. top
-    srs::dvector y_axis{3, 0.0};  // y axis of rot. top
-    srs::dvector z_axis{3, 0.0};  // z axis of rot. top
+    srs::dvector x_axis = srs::zeros<srs::dvector>(3);  // x axis of rot. top
+    srs::dvector y_axis = srs::zeros<srs::dvector>(3);  // y axis of rot. top
+    srs::dvector z_axis = srs::zeros<srs::dvector>(3);  // z axis of rot. top
 
-    srs::dvector top_origo{3, 0.0};  // origo
-    srs::dvector top_com{3, 0.0};    // center of mass
+    srs::dvector top_origo = srs::zeros<srs::dvector>(3);  // origo
+    srs::dvector top_com   = srs::zeros<srs::dvector>(3);  // center of mass
 
     double am;  // moment of inertia of rotating top
     double bm;  // xz product of inertia
