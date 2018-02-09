@@ -18,7 +18,7 @@ set(
     molecule_io.cpp
     molrot.cpp
     molvib.cpp
-    #mopac.cpp
+    mopac.cpp
     thermochem.cpp
     thermodata.cpp
     torsion.cpp

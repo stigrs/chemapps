@@ -55,7 +55,7 @@ set(PROGRAMS
     test_molecule_io
     test_molrot
     test_molvib
-    #test_mopac
+    test_mopac
     test_ptable
     test_thermochem
     test_thermodata
