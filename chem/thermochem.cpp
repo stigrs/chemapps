@@ -14,25 +14,24 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <chem/datum.h>
 #include <chem/thermochem.h>
-#include <chem/utils.h>
+#include <srs/math.h>
 #include <string>
 
 void chem::thermochemistry(const Molecule& mol,
-                           const arma::vec& temp,
-                           const arma::vec& pressure,
+                           const srs::dvector& temp,
+                           const srs::dvector& pressure,
                            bool incl_sigma,
                            std::ostream& to)
 {
-    chem::Format<char> line;
+    srs::Format<char> line;
     if (!mol.get_title().empty()) {
         line.width(20 + mol.get_title().size()).fill('=');
     }
     else {
         line.width(16).fill('=');
     }
-    chem::Format<double> fix;
+    srs::Format<double> fix;
     fix.fixed().precision(6);
 
     double e0 = mol.get_elec_energy();
@@ -56,9 +55,8 @@ void chem::thermochemistry(const Molecule& mol,
     double zpe          = mol.get_vib().zero_point_energy() / datum::au_to_icm;
     const double factor = 1.0 / (datum::E_h * datum::N_A);
 
-    typedef arma::vec::const_iterator Citer;  // arma:: does not support auto
-    for (Citer p = pressure.begin(); p != pressure.end(); ++p) {
-        for (Citer t = temp.begin(); t != temp.end(); ++t) {
+    for (auto p = pressure.begin(); p != pressure.end(); ++p) {
+        for (auto t = temp.begin(); t != temp.end(); ++t) {
             to << "Temperature: " << *t << " K. "
                << "Pressure: " << *p << " bar\n";
 
@@ -146,7 +144,7 @@ void chem::thermochemistry(const Molecule& mol,
                << "Q(" << *t << " K)\n"
                << line('-') << '\n';
 
-            chem::Format<double> sci;
+            srs::Format<double> sci;
             sci.scientific().width(12).precision(6);
 
             double q = chem::qtot(mol, *t, *p, incl_sigma, "BOT");
@@ -181,9 +179,9 @@ void chem::thermochemistry(const Molecule& mol,
 
 double chem::qelec(const Molecule& mol, double temp)
 {
-    arma::vec elec = mol.get_elec_state();
-    double qe      = 0.0;
-    for (arma::uword i = 0; i < elec.size(); i += 2) {
+    srs::dvector elec = mol.get_elec_state();
+    double qe         = 0.0;
+    for (int i = 0; i < elec.size(); i += 2) {
         qe += elec(i) * std::exp(-elec(i + 1) * datum::icm_to_K / temp);
     }
     return qe;
@@ -199,17 +197,17 @@ double chem::qrot(const Molecule& mol, double temp, bool incl_sigma)
         return 1.0;
     }
     else if (rot_symm.find("linear") != std::string::npos) {
-        arma::vec3 rotc = datum::GHz_to_K * mol.get_rot().constants();
-        double rsig     = 1.0;
+        srs::dvector rotc = datum::GHz_to_K * mol.get_rot().constants();
+        double rsig       = 1.0;
         if (incl_sigma) {
             rsig /= mol.get_rot().get_sigma();
         }
         return rsig * temp / rotc(0);
     }
     else {  // nonlinear molecule
-        arma::vec3 rotc = datum::GHz_to_K * mol.get_rot().constants();
-        double b        = arma::prod(rotc);
-        double rsig     = std::sqrt(datum::pi);
+        srs::dvector rotc = datum::GHz_to_K * mol.get_rot().constants();
+        double b          = srs::prod(rotc);
+        double rsig       = std::sqrt(datum::pi);
         if (incl_sigma) {
             rsig /= mol.get_rot().get_sigma();
         }
@@ -244,15 +242,15 @@ double chem::qvib(const Molecule& mol, double temp, const std::string& zeroref)
     }
     else {
         Expects(temp > 0.0);
-        arma::vec w = datum::icm_to_K * mol.get_vib().get_freqs();
-        double qv   = 1.0;
+        srs::dvector w = datum::icm_to_K * mol.get_vib().get_freqs();
+        double qv      = 1.0;
         if (zeroref == "V=0") {  // zero at first vibrational level
-            for (arma::uword i = 0; i < w.size(); ++i) {
+            for (int i = 0; i < w.size(); ++i) {
                 qv /= (1.0 - std::exp(-w(i) / temp));
             }
         }
         else if (zeroref == "BOT") {  // zero at the bottom of the well
-            for (arma::uword i = 0; i < w.size(); ++i) {
+            for (int i = 0; i < w.size(); ++i) {
                 qv *= std::exp(-w(i) / (2.0 * temp))
                       / (1.0 - std::exp(-w(i) / temp));
             }
@@ -270,9 +268,9 @@ double chem::entropy_vib(const Molecule& mol, double temp)
     }
     else {
         Expects(temp > 0.0);
-        arma::vec w = datum::icm_to_K * mol.get_vib().get_freqs();
-        double sv   = 0.0;
-        for (arma::uword i = 0; i < w.size(); ++i) {
+        srs::dvector w = datum::icm_to_K * mol.get_vib().get_freqs();
+        double sv      = 0.0;
+        for (int i = 0; i < w.size(); ++i) {
             double wt = w(i) / temp;
             sv += wt / (std::exp(wt) - 1.0) - std::log(1.0 - std::exp(-wt));
         }
@@ -290,9 +288,9 @@ double chem::thermal_energy_vib(const Molecule& mol, double temp)
     }
     else {
         Expects(temp > 0.0);
-        arma::vec w = datum::icm_to_K * mol.get_vib().get_freqs();
-        double ev   = 0.0;
-        for (arma::uword i = 0; i < w.size(); ++i) {
+        srs::dvector w = datum::icm_to_K * mol.get_vib().get_freqs();
+        double ev      = 0.0;
+        for (int i = 0; i < w.size(); ++i) {
             ev += w(i) * (0.5 + 1.0 / (std::exp(w(i) / temp) - 1.0));
         }
         ev *= datum::R;
@@ -309,9 +307,9 @@ double chem::const_vol_heat_vib(const Molecule& mol, double temp)
     }
     else {
         Expects(temp > 0.0);
-        arma::vec w = datum::icm_to_K * mol.get_vib().get_freqs();
-        double cv_v = 0.0;
-        for (arma::uword i = 0; i < w.size(); ++i) {
+        srs::dvector w = datum::icm_to_K * mol.get_vib().get_freqs();
+        double cv_v    = 0.0;
+        for (int i = 0; i < w.size(); ++i) {
             double wt = w(i) / temp;
             cv_v += wt * wt * std::exp(wt) / std::pow(std::exp(wt) - 1.0, 2.0);
         }
@@ -340,12 +338,12 @@ double chem::qctcw(const Molecule& mol, double temp)
 
             // Calculate partition function for harmonic oscillator and
             // intermediate case:
-            double qho     = 0.0;
-            double qin     = 0.0;
-            arma::vec pot  = mol.get_tor().get_pot_coeff();
-            arma::vec freq = mol.get_tor().get_freqs();
+            double qho        = 0.0;
+            double qin        = 0.0;
+            srs::dvector pot  = mol.get_tor().get_pot_coeff();
+            srs::dvector freq = mol.get_tor().get_freqs();
             Expects(pot.size() == freq.size());
-            for (arma::uword i = 0; i < pot.size(); ++i) {
+            for (int i = 0; i < pot.size(); ++i) {
                 double ui = pot(i) * datum::icm_to_K;
                 double wi = freq(i) * datum::icm_to_K;
                 qho += std::exp(-(ui + 0.5 * wi) / temp)

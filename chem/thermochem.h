@@ -17,10 +17,10 @@
 #ifndef CHEM_THERMOCHEM_H
 #define CHEM_THERMOCHEM_H
 
-#include <chem/datum.h>
 #include <chem/molecule.h>
-#include <chem/utils.h>
-#include <armadillo>
+#include <srs/array.h>
+#include <srs/datum.h>
+#include <srs/utils.h>
 #include <cmath>
 #include <gsl/gsl>
 #include <iostream>
@@ -30,10 +30,11 @@ namespace chem {
 
 // Perform thermochemistry analysis.
 void thermochemistry(const Molecule& mol,
-                     const arma::vec& temp     = arma::vec{298.15},
-                     const arma::vec& pressure = arma::vec{datum::std_atm},
-                     bool incl_sigma           = true,
-                     std::ostream& to          = std::cout);
+                     const srs::dvector& temp = srs::dvector{298.15},
+                     const srs::dvector& pressure
+                     = srs::dvector{datum::std_atm},
+                     bool incl_sigma  = true,
+                     std::ostream& to = std::cout);
 
 //
 // Translational:

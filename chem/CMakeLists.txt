@@ -19,7 +19,7 @@ set(
     molrot.cpp
     molvib.cpp
     #mopac.cpp
-    #thermochem.cpp
+    thermochem.cpp
     thermodata.cpp
     torsion.cpp
     #tst.cpp
