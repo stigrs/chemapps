@@ -17,8 +17,8 @@
 #ifndef CHEM_THERMODATA_H
 #define CHEM_THERMODATA_H
 
-#include <chem/datum.h>
-#include <armadillo>
+#include <srs/array.h>
+#include <srs/datum.h>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -36,19 +36,19 @@ public:
     Thermodata();
     Thermodata(std::istream& from, const std::string& key = "ThermoData");
 
-    arma::vec get_pressure() const { return pressure; }
-    arma::vec get_temperature() const { return temperature; }
+    srs::dvector get_pressure() const { return pressure; }
+    srs::dvector get_temperature() const { return temperature; }
     bool incl_rot_symmetry() const { return incl_sigma; }
     std::string get_vibr_zeroref() const { return zeroref; }
 
-    void set_pressure(const arma::vec& p) { pressure = p; }
-    void set_temperature(const arma::vec& t) { temperature = t; }
+    void set_pressure(const srs::dvector& p) { pressure = p; }
+    void set_temperature(const srs::dvector& t) { temperature = t; }
     void set_incl_rot_symmetry(bool flag) { incl_sigma = flag; }
     void set_vibr_zeroref(const std::string& ref) { zeroref = ref; }
 
 private:
-    arma::vec pressure;
-    arma::vec temperature;
+    srs::dvector pressure;
+    srs::dvector temperature;
     int incl_sigma;       // include rotational symmetry number?
     std::string zeroref;  // zero reference point for vibrations (BOT or V=0)
 };

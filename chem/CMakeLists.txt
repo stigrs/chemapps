@@ -20,7 +20,7 @@ set(
     molvib.cpp
     #mopac.cpp
     #thermochem.cpp
-    #thermodata.cpp
+    thermodata.cpp
     torsion.cpp
     #tst.cpp
     #tunnel.cpp

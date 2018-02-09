@@ -58,7 +58,7 @@ set(PROGRAMS
     #test_mopac
     test_ptable
     #test_thermochem
-    #test_thermodata
+    test_thermodata
     test_torsion
     #test_tst
     #test_tunnel

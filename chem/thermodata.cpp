@@ -14,25 +14,24 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <chem/input.h>
 #include <chem/thermodata.h>
-#include <chem/utils.h>
+#include <srs/utils.h>
 #include <map>
 
 Thermodata::Thermodata(std::istream& from, const std::string& key)
 {
     // Read input data:
 
-    arma::vec p_def = {datum::std_atm};
-    arma::vec t_def = {298.15};
+    srs::dvector p_def = {datum::std_atm};
+    srs::dvector t_def = {298.15};
 
-    std::map<std::string, Input> input_data;
-    input_data["pressure"]    = Input(pressure, p_def);
-    input_data["temperature"] = Input(temperature, t_def);
-    input_data["incl_sigma"]  = Input(incl_sigma, 1);
-    input_data["zeroref"]     = Input(zeroref, "BOT");
+    std::map<std::string, srs::Input> input_data;
+    input_data["pressure"]    = srs::Input(pressure, p_def);
+    input_data["temperature"] = srs::Input(temperature, t_def);
+    input_data["incl_sigma"]  = srs::Input(incl_sigma, 1);
+    input_data["zeroref"]     = srs::Input(zeroref, "BOT");
 
-    bool found = chem::find_section(from, key);
+    bool found = srs::find_section(from, key);
     if (found) {
         std::string token;
         while (from >> token) {
@@ -58,6 +57,5 @@ Thermodata::Thermodata(std::istream& from, const std::string& key)
             throw Thermodata_error(it->first + " not initialized");
         }
     }
-
     // TODO (stigrs@gmail.com) Implement validation
 }

@@ -15,23 +15,23 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <chem/thermodata.h>
-#include <chem/utils.h>
-#include <armadillo>
+#include <srs/array.h>
+#include <srs/utils.h>
 #include <catch/catch.hpp>
 #include <string>
 
 TEST_CASE("test_thermodata")
 {
-    arma::vec t_ans         = {100.0, 200.0, 300.0, 800.0, 1000.0};
+    srs::dvector t_ans      = {100.0, 200.0, 300.0, 800.0, 1000.0};
     std::string zeroref_ans = "V=0";
 
     std::ifstream from;
-    chem::fopen(from, "test_thermodata.inp");
+    srs::fopen(from, "test_thermodata.inp");
 
     Thermodata td(from);
 
     CHECK(td.get_vibr_zeroref() == zeroref_ans);
-    for (arma::uword i = 0; i < t_ans.size(); ++i) {
+    for (int i = 0; i < t_ans.size(); ++i) {
         CHECK(td.get_temperature()(i) == t_ans(i));
     }
 }
