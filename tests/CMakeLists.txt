@@ -30,11 +30,14 @@ target_link_libraries(
 
 function(add_chemapps_test name)
     add_executable(${name} ${name}.cpp)
-    if (MSVC)
+    if (WIN32)
         target_link_libraries (
             ${program} 
             chem 
             srs.lib
+            mkl_intel_c.lib
+            mkl_sequential.lib 
+            mkl_core.lib
             test_catch
         ) 
     else()

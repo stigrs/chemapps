@@ -16,7 +16,6 @@
 
 #include <chem/element.h>
 #include <chem/molecule.h>
-#include <chem/utils.h>
 #include <srs/array.h>
 #include <srs/utils.h>
 #include <catch/catch.hpp>
