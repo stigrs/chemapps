@@ -85,7 +85,7 @@ else()
 endif()
 
 add_subdirectory(chem)
-#add_subdirectory(src)
+add_subdirectory(src)
 
 if(BUILD_TESTS)
     enable_testing()

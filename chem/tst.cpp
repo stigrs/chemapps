@@ -14,24 +14,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4100)  // unreferenced formal parameter
-#endif                           // _MSC_VER
-
-#include <chem/datum.h>
-#include <chem/input.h>
 #include <chem/thermochem.h>
 #include <chem/tst.h>
-#include <chem/utils.h>
-#include <armadillo>
+#include <srs/array.h>
+#include <srs/datum.h>
+#include <srs/utils.h>
 #include <gsl/gsl>
 #include <map>
 #include <vector>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
 
 Tst::Tst(std::istream& from,
          std::ostream& to,
@@ -44,13 +35,13 @@ Tst::Tst(std::istream& from,
     std::string method_str;
     std::string reaction_str;
 
-    std::map<std::string, Input> input_data;
-    input_data["method"]     = Input(method_str, method_def);
-    input_data["reaction"]   = Input(reaction_str, reaction_def);
-    input_data["en_barrier"] = Input(en_barrier);
-    input_data["rxn_sigma"]  = Input(rxn_sigma, 1);
+    std::map<std::string, srs::Input> input_data;
+    input_data["method"]     = srs::Input(method_str, method_def);
+    input_data["reaction"]   = srs::Input(reaction_str, reaction_def);
+    input_data["en_barrier"] = srs::Input(en_barrier);
+    input_data["rxn_sigma"]  = srs::Input(rxn_sigma, 1);
 
-    if (chem::find_section(from, key)) {
+    if (srs::find_section(from, key)) {
         std::string token;
         while (from >> token) {
             if (token == "End") {
@@ -110,8 +101,8 @@ Tst::Tst(std::istream& from,
 
 void Tst::conventional(std::ostream& to) const
 {
-    arma::vec temp     = td->get_temperature();
-    arma::vec pressure = arma::zeros(1);
+    srs::dvector temp     = td->get_temperature();
+    srs::dvector pressure = {0.0};
 
     chem::thermochemistry(*ra, temp, pressure, false, to);
     if (reaction == Bimolecular) {
@@ -119,7 +110,7 @@ void Tst::conventional(std::ostream& to) const
     }
     chem::thermochemistry(*ts, temp, pressure, false, to);
 
-    chem::Format<char> line;
+    srs::Format<char> line;
     line.width(37).fill('=');
 
     to << "Conventional Transition State Theory:\n" << line('=') << "\n\n";
@@ -145,16 +136,16 @@ void Tst::conventional(std::ostream& to) const
         to << line('-') << '\n' << "T/K\t TST\n" << line('-') << '\n';
     }
 
-    chem::Format<double> fix7;
+    srs::Format<double> fix7;
     fix7.fixed().width(7).precision(2);
 
-    chem::Format<double> fix6;
+    srs::Format<double> fix6;
     fix6.fixed().width(6).precision(2);
 
-    chem::Format<double> sci;
+    srs::Format<double> sci;
     sci.scientific().width(10).precision(4);
 
-    for (arma::uword i = 0; i < temp.size(); ++i) {
+    for (int i = 0; i < temp.size(); ++i) {
         double ktst = rate_conventional(temp(i));
         double wig  = kappa->wigner(temp(i));
         if (kappa->get_method() == "Eckart") {

@@ -40,11 +40,33 @@ function(add_chemapps_test name)
             mkl_core.lib
             test_catch
         ) 
+    elseif(APPLE)
+        target_link_libraries(
+            ${program}
+            chem 
+            srs 
+            mkl_intel_lp64
+            mkl_tbb_thread
+            mkl_core
+            tbb 
+            stdc++
+            pthread 
+            m 
+            ldl 
+            test_catch 
+        )
     else()
         target_link_libraries (
             ${program} 
             chem 
             srs
+            mkl_intel_lp64 
+            mkl_gnu_thread 
+            mkl_core 
+            gomp 
+            pthread 
+            m 
+            dl
             test_catch
         )
     endif()
