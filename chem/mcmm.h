@@ -18,15 +18,16 @@
 #define CHEM_MCMM_H
 
 #include <chem/conformer.h>
-#include <chem/math.h>
 #include <chem/molecule.h>
+#include <srs/array.h>
+#include <srs/math.h>
 #include <algorithm>
-#include <armadillo>
 #include <iostream>
 #include <random>
 #include <stdexcept>
 #include <string>
 #include <vector>
+
 
 // Error reporting:
 
@@ -50,7 +51,7 @@ public:
 
     // Get global minimum values.
     double get_global_min_energy();
-    arma::mat get_global_min_xyz();
+    srs::dmatrix get_global_min_xyz();
 
 private:
     // Check if MCMM solver is finished.
@@ -73,7 +74,7 @@ private:
 
     // Function for selecting starting geometry by using the uniform
     // usage scheme.
-    void uniform_usage(arma::mat& xnew);
+    void uniform_usage(srs::dmatrix& xnew);
 
     // Generate a new random conformer.
     void gen_rand_conformer(Molecule& m);
@@ -107,8 +108,8 @@ private:
     unsigned nreject;  // iterator for number of consecutive rejected trials
     unsigned naccept;  // iterator for number of accepted trials
 
-    arma::mat xcurr;    // current geometry
-    arma::mat xglobal;  // geometry of global minimum
+    srs::dmatrix xcurr;    // current geometry
+    srs::dmatrix xglobal;  // geometry of global minimum
 
     double ecurr;                 // current energy
     std::vector<double> eglobal;  // energy of global minimum
@@ -131,7 +132,7 @@ inline double Mcmm<Pot>::get_global_min_energy()
 }
 
 template <class Pot>
-inline arma::mat Mcmm<Pot>::get_global_min_xyz()
+inline srs::dmatrix Mcmm<Pot>::get_global_min_xyz()
 {
     if (!global_min_found) {
         solve();
@@ -148,18 +149,6 @@ inline void Mcmm<Pot>::gen_rand_conformer(Molecule& m)
     std::uniform_real_distribution<> rnd_uni_real(-180.0, 180.0);
     double delta = rnd_uni_real(mt);
     m.get_zmat().rotate_moiety(moiety, delta);
-}
-
-template <class Pot>
-inline bool Mcmm<Pot>::accept_geom_dist(const Molecule& m) const
-{
-    bool geom_ok = true;
-    arma::mat dist_mat;
-    chem::pdist_matrix(dist_mat, m.get_xyz());
-    if (arma::nonzeros(dist_mat).min() < rmin) {  // avoid too close atoms
-        geom_ok = false;
-    }
-    return geom_ok;
 }
 
 template <class Pot>

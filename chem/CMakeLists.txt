@@ -13,7 +13,7 @@ set(
     SRC_FILES
     #collision.cpp
     ptable.cpp
-    #mcmm.cpp
+    mcmm.cpp
     molecule.cpp
     molecule_io.cpp
     molrot.cpp

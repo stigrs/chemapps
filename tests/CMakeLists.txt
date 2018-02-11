@@ -75,7 +75,7 @@ function(add_chemapps_test name)
 endfunction()
 
 set(PROGRAMS 
-    #test_mcmm
+    test_mcmm
     test_molecule
     test_molecule_io
     test_molrot
