@@ -58,7 +58,7 @@ add_compile_options(
 if(WIN32)
     set(Boost_USE_STATIC_LIBS ON)
 endif()
-find_package(Boost 1.65.0 REQUIRED)
+find_package(Boost 1.58.0 COMPONENTS program_options REQUIRED)
 
 # GSL library is required.
 find_path(GSL_INCLUDE_DIR gsl HINTS $ENV{HOME}/include /usr/include /usr/local/include)

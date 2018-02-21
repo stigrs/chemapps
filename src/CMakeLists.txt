@@ -12,7 +12,7 @@ link_directories($ENV{BOOST_LIBRARYDIR})
 
 set(
     PROGRAMS 
-    #mcmm 
+    mcmm 
     molrot 
     thermo
     tst
@@ -35,6 +35,7 @@ foreach(program ${PROGRAMS})
         target_link_libraries (
             ${program} 
             chem 
+            srs
             ${Boost_LIBRARIES}
         )
     endif()

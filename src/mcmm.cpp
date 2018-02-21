@@ -17,12 +17,12 @@
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4100 4505)  // caused by boost/program_options.hpp
-#endif  // _MSC_VER
+#endif                                // _MSC_VER
 
 #include <chem/mcmm.h>
 #include <chem/molecule.h>
 #include <chem/mopac.h>
-#include <chem/utils.h>
+#include <srs/utils.h>
 #include <boost/program_options.hpp>
 #include <exception>
 #include <fstream>
@@ -65,11 +65,11 @@ int main(int argc, char* argv[])
         std::ofstream to;
 
         std::string output_file;
-        output_file = chem::strip_suffix(input_file, ".inp");
+        output_file = srs::strip_suffix(input_file, ".inp");
         output_file = output_file + ".out";
 
-        chem::fopen(from, input_file);
-        chem::fopen(to, output_file.c_str());
+        srs::fopen(from, input_file);
+        srs::fopen(to, output_file.c_str());
 
         Molecule mol(from, to);
         Mcmm<Mopac> mc(from, mol, "Mcmm", true);

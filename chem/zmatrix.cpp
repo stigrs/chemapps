@@ -111,12 +111,12 @@ void Zmatrix::build_zmat()
         }
         if (atom >= 3) {
             srs::ivector iatms(4);
-            iatms(0) = atom;
-            iatms(1) = bond_connect(iatms(0));
-            iatms(2) = angle_connect(iatms(0));
-            iatms(3) = angle_connect(iatms(1));
-            auto tmp = iatms.head(3);
-            auto it  = std::find(tmp.begin(), tmp.end(), iatms(3));
+            iatms(0)         = atom;
+            iatms(1)         = bond_connect(iatms(0));
+            iatms(2)         = angle_connect(iatms(0));
+            iatms(3)         = angle_connect(iatms(1));
+            srs::ivector tmp = iatms.head(3);
+            auto it          = std::find(tmp.begin(), tmp.end(), iatms(3));
             if (it != tmp.end()) {
                 iatms(3) = find_new_connection(iatms, bond_connect.head(atom));
             }
