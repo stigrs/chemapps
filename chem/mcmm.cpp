@@ -220,7 +220,6 @@ bool Mcmm<Pot>::duplicate(const Molecule& m) const
 template <class Pot>
 void Mcmm<Pot>::new_conformer()
 {
-    // Molecule m(mol);
     // Generate a new random conformer by using the uniform usage scheme:
     do {
         srs::dmatrix xnew = mol.get_xyz();
@@ -315,8 +314,7 @@ std::vector<int> Mcmm<Pot>::select_rand_dihedral(const Molecule& m)
 
     std::vector<int> res(0);
     for (std::size_t i = 2; i < connect.size(); ++i) {
-        // Continue here:
-        if (arma::all((connect[i] == dihedral) == 1)) {
+        if (connect[i] == dihedral) {
             res.push_back(i);
         }
     }

@@ -159,7 +159,7 @@ int Zmatrix::find_new_connection(const srs::ivector& iatms,
     for (int idx = 1; idx < connectivity.size(); ++idx) {
         // clang-format off
         if (std::find(iatms.begin(), iatms.end(), idx) == iatms.end()
-            && std::find(iatms.begin(), iatms.end(), connectivity(idx)) == iatms.end()) {
+            && std::find(iatms.begin(), iatms.end(), connectivity(idx)) != iatms.end()) {
             // clang-format on
             connection = gsl::narrow<int>(idx);
         }
