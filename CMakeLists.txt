@@ -21,6 +21,11 @@ else()
 endif()
 option(BUILD_TESTS "Build tests." ON)
 
+# Set default MSVC compiler options to avoid D9025 error.
+if(MSVC)
+    set(CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS")
+endif()
+
 # Set release compiler options.
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wpedantic -Wall -Wshadow -Wextra -Wno-missing-braces -Werror")
@@ -43,29 +48,41 @@ endif()
 
 # Set definitions.
 set(ChemApps_DEFINITIONS_DEBUG -DGSL_THROW_ON_CONTRACT_VIOLATION)
-set(ChemApps_DEFINITIONS_RELEASE -DNDEBUG -DARMA_NO_DEBUG -DGSL_THROW_ON_CONTRACT_VIOLATION)
+set(ChemApps_DEFINITIONS_RELEASE -DNDEBUG -DGSL_THROW_ON_CONTRACT_VIOLATION)
 add_compile_options(
     "$<$<CONFIG:Debug>:${ChemApps_DEFINITIONS_DEBUG}>"
     "$<$<CONFIG:Release>:${ChemApps_DEFINITIONS_RELEASE}>" 
 )
 
-# Armadillo library is required.
-if(MSVC)
-    find_path(ARMADILLO_INCLUDE_DIRS armadillo HINTS $ENV{HOME}/include)
-    add_definitions(-DARMA_USE_BLAS)
-    add_definitions(-DARMA_USE_LAPACK)
-else()
-    find_package(Armadillo 7.950.1 REQUIRED)
-endif()
-
 # Boost library is required.
-if(MSVC)
+if(WIN32)
     set(Boost_USE_STATIC_LIBS ON)
 endif()
-find_package(Boost 1.65.0 COMPONENTS program_options REQUIRED)
+find_package(Boost 1.65.0 REQUIRED)
 
 # GSL library is required.
 find_path(GSL_INCLUDE_DIR gsl HINTS $ENV{HOME}/include /usr/include /usr/local/include)
+
+# Intel MKL is required.
+find_path(MKL_INCLUDE_DIR mkl.h HINTS $ENV{MKL_INCLUDE_DIR} /opt/intel/mkl/include)
+if(WIN32)
+    find_path(MKL_LIB_DIR mkl_core.lib HINTS $ENV{MKL_LIB_DIR})
+else()
+    find_path(MKL_LIB_DIR libmkl_core.a HINTS $ENV{MKL_LIB_DIR} /opt/intel/mkl/lib /opt/intel/mkl/lib/intel64)
+    if(APPLE)
+        find_path(TBB_LIB_DIR libtbb.dylib HINTS /opt/intel/tbb/lib)
+    endif()
+endif()
+ 
+# LIBSRS is required.
+find_path(SRS_INCLUDE_DIR srs HINTS $ENV{HOME}/include /usr/include /usr/local/include)
+if(WIN32)
+    find_path(SRS_LIB_DIR srs.lib HINTS $ENV{HOME}/lib)
+elseif(APPLE)
+    find_path(SRS_LIB_DIR libsrs.dylib HINTS $ENV{HOME}/lib /usr/lib /usr/local/lib)
+else()
+    find_path(SRS_LIB_DIR libsrs.so HINTS $ENV{HOME}/lib /usr/lib /usr/local/lib)
+endif()
 
 add_subdirectory(chem)
 add_subdirectory(src)

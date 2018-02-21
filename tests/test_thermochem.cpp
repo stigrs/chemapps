@@ -14,11 +14,12 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <chem/datum.h>
 #include <chem/molecule.h>
 #include <chem/thermochem.h>
 #include <chem/thermodata.h>
-#include <chem/utils.h>
+#include <srs/array.h>
+#include <srs/datum.h>
+#include <srs/utils.h>
 #include <catch/catch.hpp>
 #include <cmath>
 #include <fstream>
@@ -28,7 +29,7 @@ TEST_CASE("test_thermochem")
     SECTION("CH3OH")
     {
         std::ifstream from;
-        chem::fopen(from, "test_thermochem_ch3oh.inp");
+        srs::fopen(from, "test_thermochem_ch3oh.inp");
         Molecule mol(from);
 
         const double qtr_ans = 0.712383e+7;
@@ -118,16 +119,16 @@ TEST_CASE("test_thermochem")
 
     SECTION("CH2ClCH2Cl")
     {
-        arma::vec qtor_ans{1.070, 1.745, 30.772};  // C&T (2000) erratum
+        srs::dvector qtor_ans{1.070, 1.745, 30.772};  // C&T (2000) erratum
 
         std::ifstream from;
-        chem::fopen(from, "test_thermochem_ch2clch2cl.inp");
+        srs::fopen(from, "test_thermochem_ch2clch2cl.inp");
         Molecule mol(from);
 
         Thermodata td(from);
-        arma::vec temp = td.get_temperature();
+        srs::dvector temp = td.get_temperature();
 
-        for (arma::uword i = 0; i < temp.size(); ++i) {
+        for (int i = 0; i < temp.size(); ++i) {
             double qtor = chem::qtor(mol, temp(i));
             CHECK(std::abs(qtor - qtor_ans(i)) / qtor_ans(i) < 5.0e-2);
         }

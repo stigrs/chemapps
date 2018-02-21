@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,13 +12,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef CHEM_CONFORMER_H
 #define CHEM_CONFORMER_H
 
 #include <chem/element.h>
-#include <armadillo>
+#include <srs/array.h>
 #include <vector>
 
 //
@@ -26,13 +26,13 @@
 //
 struct Conformer {
     Conformer() {}
-    explicit Conformer(double e, const arma::mat& x)
+    explicit Conformer(double e, const srs::dmatrix& x)
         : energy(e), atoms(0), xyz(x)
     {
         iter = 0;
     }
 
-    Conformer(double e, const std::vector<Element>& at, const arma::mat& x)
+    Conformer(double e, const std::vector<Element>& at, const srs::dmatrix& x)
         : energy(e), atoms(at), xyz(x)
     {
         iter = 0;
@@ -52,7 +52,7 @@ struct Conformer {
 
     double energy;               // conformer energy
     std::vector<Element> atoms;  // atoms
-    arma::mat xyz;               // Cartesian coordinates
+    srs::dmatrix xyz;            // Cartesian coordinates
     int iter;                    // iterator to be used for counting
 };
 

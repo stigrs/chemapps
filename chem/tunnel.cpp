@@ -14,21 +14,11 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4100)  // unreferenced formal parameter
-#endif                           // _MSC_VER
-
-#include <chem/input.h>
-#include <chem/math.h>
 #include <chem/tunnel.h>
-#include <chem/utils.h>
-#include <armadillo>
+#include <srs/array.h>
+#include <srs/math.h>
+#include <srs/utils.h>
 #include <map>
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
 
 Tunnel::Tunnel(std::istream& from, const std::string& key)
 {
@@ -36,13 +26,13 @@ Tunnel::Tunnel(std::istream& from, const std::string& key)
     std::string method_def = "none";
     std::string method_str;
 
-    std::map<std::string, Input> input_data;
-    input_data["method"]     = Input(method_str, method_def);
-    input_data["freq_im"]    = Input(freq_im);
-    input_data["en_barrier"] = Input(en_barrier, 0.0);
-    input_data["en_rxn"]     = Input(en_rxn, 0.0);
+    std::map<std::string, srs::Input> input_data;
+    input_data["method"]     = srs::Input(method_str, method_def);
+    input_data["freq_im"]    = srs::Input(freq_im);
+    input_data["en_barrier"] = srs::Input(en_barrier, 0.0);
+    input_data["en_rxn"]     = srs::Input(en_rxn, 0.0);
 
-    if (chem::find_section(from, key)) {
+    if (srs::find_section(from, key)) {
         std::string token;
         while (from >> token) {
             if (token == "End") {
@@ -152,9 +142,9 @@ double Tunnel::eckart(double temp) const
     // Integrate using a 40-point Gauss-Legendre quadrature:
 
     const int n = 40;
-    arma::vec x(n);
-    arma::vec w(n);
-    chem::gaussleg(n, x, w, epsilon_0, epsilon_b);
+    srs::dvector x(n);
+    srs::dvector w(n);
+    srs::gaussleg(n, x, w, epsilon_0, epsilon_b);
 
     double kappa = 0.0;
     for (int i = 0; i < n; ++i) {

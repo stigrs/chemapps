@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include <chem/molecule.h>
-#include <chem/utils.h>
+#include <srs/utils.h>
 #include <catch/catch.hpp>
 #include <cmath>
 #include <fstream>
@@ -25,7 +25,7 @@ TEST_CASE("test_torsion")
     SECTION("CH2ClCH2Cl")
     {
         std::ifstream from;
-        chem::fopen(from, "test_torsion_ch2clch2cl.inp");
+        srs::fopen(from, "test_torsion_ch2clch2cl.inp");
 
         Molecule mol(from);
         double rmi = mol.get_tor().red_moment_of_inertia();
@@ -37,7 +37,7 @@ TEST_CASE("test_torsion")
     SECTION("CH3OH")
     {
         std::ifstream from;
-        chem::fopen(from, "test_torsion_ch3oh.inp");
+        srs::fopen(from, "test_torsion_ch3oh.inp");
 
         Molecule mol(from);
         double rmi = mol.get_tor().red_moment_of_inertia();

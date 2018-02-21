@@ -16,8 +16,9 @@
 
 #include <chem/element.h>
 #include <chem/molecule_io.h>
-#include <chem/utils.h>
-#include <armadillo>
+#include <srs/array.h>
+#include <srs/math.h>
+#include <srs/utils.h>
 #include <catch/catch.hpp>
 #include <fstream>
 #include <string>
@@ -25,7 +26,7 @@
 
 TEST_CASE("test_molecule_io")
 {
-    arma::mat xyz_ans(8, 3);
+    srs::dmatrix xyz_ans(8, 3);
     xyz_ans(0, 0) = 0.0000;
     xyz_ans(0, 1) = 0.0000;
     xyz_ans(0, 2) = 0.7637;
@@ -52,12 +53,12 @@ TEST_CASE("test_molecule_io")
     xyz_ans(7, 2) = -1.1564;
 
     std::string title;
-    arma::mat xyz;
+    srs::dmatrix xyz;
     std::vector<Element> atoms;
 
     std::ifstream from;
-    chem::fopen(from, "test_molecule_io.inp");
+    srs::fopen(from, "test_molecule_io.inp");
     chem::read_xyz_format(from, atoms, xyz, title);
 
-    CHECK(arma::approx_equal(xyz, xyz_ans, "absdiff", 1.0e-12));
+    CHECK(srs::approx_equal(xyz, xyz_ans, 1.0e-12));
 }

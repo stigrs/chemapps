@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,24 +12,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4100)  // unreferenced formal parameter
-#endif                           // _MSC_VER
-
-#include <chem/datum.h>
-#include <chem/input.h>
 #include <chem/molecule_io.h>
 #include <chem/molrot.h>
-#include <chem/utils.h>
+#include <srs/datum.h>
+#include <srs/utils.h>
 #include <cmath>
+#include <gsl/gsl>
 #include <map>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
 
 Molrot::Molrot(const Molrot& rot)
     : atoms(rot.atoms), xyz(rot.xyz), pmom(rot.pmom), paxis(rot.paxis)
@@ -59,7 +51,7 @@ double Molrot::tot_mass() const
     return totmass;
 }
 
-arma::vec3 Molrot::constants()
+srs::dvector Molrot::constants()
 {
     using namespace datum;
 
@@ -69,8 +61,7 @@ arma::vec3 Molrot::constants()
     const double tol    = 1.0e-3;
     const double factor = h_bar / (4.0 * pi * giga * m_u * a_0 * a_0 * 1.0e-20);
 
-    arma::vec3 rotc;
-    rotc.zeros();
+    srs::dvector rotc(3, 0.0);
 
     if (atoms.size() > 1) {
         if (std::abs(pmom(0)) < tol) {
@@ -118,10 +109,10 @@ void Molrot::init(std::istream& from, const std::string& key)
 {
     // Read input data:
 
-    std::map<std::string, Input> input_data;
-    input_data["sigma"] = Input(sigma, 1.0);
+    std::map<std::string, srs::Input> input_data;
+    input_data["sigma"] = srs::Input(sigma, 1.0);
 
-    bool found = chem::find_section(from, key);
+    bool found = srs::find_section(from, key);
     if (found) {
         std::string token;
         while (from >> token) {
@@ -149,14 +140,14 @@ void Molrot::init(std::istream& from, const std::string& key)
     }
 }
 
-arma::vec3 Molrot::center_of_mass() const
+srs::dvector Molrot::center_of_mass() const
 {
-    arma::vec3 com;
+    srs::dvector com(3);
 
-    for (arma::uword j = 0; j < xyz.n_cols; ++j) {
+    for (int j = 0; j < xyz.cols(); ++j) {
         double sum = 0.0;
         for (std::size_t i = 0; i < atoms.size(); ++i) {
-            sum += atoms[i].atomic_mass * (xyz)(i, j);
+            sum += atoms[i].atomic_mass * xyz(i, j);
         }
         com(j) = sum / tot_mass();
     }
@@ -166,18 +157,20 @@ arma::vec3 Molrot::center_of_mass() const
 void Molrot::principal_moments()
 {
     // Work on a local copy of the cartesian coordinates:
-    arma::mat xyz_(xyz);
+    srs::dmatrix xyz_(xyz);
 
     // Convert geometry to bohr:
     xyz_ /= datum::a_0;
 
     // Move geometry to center of mass:
-    arma::vec3 com = center_of_mass();
-    chem::translate(xyz_, -com(0), -com(1), -com(2));
+    srs::dvector com = center_of_mass();
+    srs::translate(xyz_, -com(0), -com(1), -com(2));
 
     // Compute principal moments:
-    paxis.zeros();
-    pmom.zeros();
+    paxis.resize(3, 3);
+    pmom.resize(3);
+    paxis = 0.0;
+    pmom  = 0.0;
 
     if (atoms.size() > 1) {
         for (std::size_t i = 0; i < atoms.size(); ++i) {
@@ -195,14 +188,13 @@ void Molrot::principal_moments()
             paxis(2, 0) = paxis(0, 2);
             paxis(2, 1) = paxis(1, 2);
         }
-        arma::eig_sym(pmom, paxis, paxis);
+        srs::eigs(paxis, pmom);
 
         // Check if principal axes form a proper rotation:
-        if (arma::det(paxis) < 0.0) {
+        if (srs::det(paxis) < 0.0) {
             paxis *= -1.0;
         }
-        chem::Assert((std::abs(arma::det(paxis)) - 1.0) < 1.0e-12,
-                     Molrot_error("bad determinant of paxis"));
+        Ensures(std::abs(srs::det(paxis) - 1.0) < 1.0e-12);
     }
 }
 
@@ -211,7 +203,7 @@ void Molrot::rotate_to_principal_axes()
     if (!atoms.empty()) {
         move_to_com();
         principal_moments();
-        chem::rotate(xyz, paxis.t());
+        srs::rotate(xyz, srs::transpose(paxis));
         principal_moments();
         aligned = true;
     }
@@ -219,8 +211,8 @@ void Molrot::rotate_to_principal_axes()
 
 void Molrot::print_center_of_mass(std::ostream& to) const
 {
-    arma::vec3 com = center_of_mass();
-    chem::Format<double> fix;
+    srs::dvector com = center_of_mass();
+    srs::Format<double> fix;
     fix.fixed().width(8).precision(4);
 
     if (!atoms.empty()) {
@@ -231,29 +223,29 @@ void Molrot::print_center_of_mass(std::ostream& to) const
 
 void Molrot::print_principal_moments(std::ostream& to) const
 {
-    chem::Format<char> line;
+    srs::Format<char> line;
     line.width(54).fill('-');
 
     if (!atoms.empty()) {
         to << "\nPrincipal axes and moments of inertia in atomic units:\n"
            << line('-') << '\n';
 
-        chem::Format<double> fix;
+        srs::Format<double> fix;
         fix.fixed().width(12);
 
         to << "\t\tA\t     B\t\t  C\n"
            << "Eigenvalue: " << fix(pmom(0)) << ' ' << fix(pmom(1)) << ' '
            << fix(pmom(2)) << '\n';
         to << "     X      ";
-        for (std::size_t i = 0; i < pmom.size(); ++i) {
+        for (int i = 0; i < pmom.size(); ++i) {
             to << fix(paxis(0, i)) << ' ';
         }
         to << "\n     Y      ";
-        for (std::size_t i = 0; i < pmom.size(); ++i) {
+        for (int i = 0; i < pmom.size(); ++i) {
             to << fix(paxis(1, i)) << ' ';
         }
         to << "\n     Z      ";
-        for (std::size_t i = 0; i < pmom.size(); ++i) {
+        for (int i = 0; i < pmom.size(); ++i) {
             to << fix(paxis(2, i)) << ' ';
         }
         to << '\n';
@@ -264,13 +256,13 @@ void Molrot::print_constants(std::ostream& to)
 {
     const double gHz2icm = datum::giga / (datum::c_0 * 100.0);
 
-    chem::Format<char> line;
+    srs::Format<char> line;
     line.width(21).fill('-');
 
-    chem::Format<double> fix;
+    srs::Format<double> fix;
     fix.fixed().width(14);
 
-    arma::vec3 r     = constants();
+    srs::dvector r   = constants();
     std::string symm = symmetry();
 
     if (r(0) > 0.0) {
@@ -280,9 +272,9 @@ void Molrot::print_constants(std::ostream& to)
             to << fix(r(0)) << " GHz\n" << fix(r(0) * gHz2icm) << " cm^-1\n\n";
         }
         else {
-            double ra = r[0];
-            double rb = r[1];
-            double rc = r[2];
+            double ra = r(0);
+            double rb = r(1);
+            double rc = r(2);
             to << "\tA\t\tB\t\tC\n"
                << fix(ra) << '\t' << fix(rb) << '\t' << fix(rc) << " GHz\n"
                << fix(ra * gHz2icm) << '\t' << fix(rb * gHz2icm) << '\t'

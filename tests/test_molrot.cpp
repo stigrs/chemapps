@@ -16,23 +16,23 @@
 
 #include <chem/element.h>
 #include <chem/molecule.h>
-#include <chem/utils.h>
-#include <armadillo>
+#include <srs/utils.h>
+#include <srs/array.h>
 #include <catch/catch.hpp>
 #include <cmath>
 #include <fstream>
 
 TEST_CASE("test_molrot")
 {
-    arma::vec3 rotc_ans = {127.63201, 24.89071, 24.02767};
+    srs::dvector rotc_ans = {127.63201, 24.89071, 24.02767};
 
     std::ifstream from;
-    chem::fopen(from, "test_molrot.inp");
+    srs::fopen(from, "test_molrot.inp");
 
     Molecule mol(from);
-    arma::vec3 rotc = mol.get_rot().constants();
+    srs::dvector rotc = mol.get_rot().constants();
 
-    for (arma::uword i = 0; i < rotc.size(); ++i) {
+    for (int i = 0; i < rotc.size(); ++i) {
         CHECK(std::abs(rotc(i) - rotc_ans(i)) < 1.0e-4);
     }
 }

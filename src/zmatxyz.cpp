@@ -17,16 +17,20 @@
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4505)  // caused by boost/program_options.hpp
-#endif  // _MSC_VER
+#endif                           // _MSC_VER
 
 #include <chem/molecule.h>
 #include <chem/molecule_io.h>
-#include <chem/utils.h>
+#include <srs/utils.h>
 #include <boost/program_options.hpp>
 #include <exception>
 #include <fstream>
 #include <iostream>
 #include <string>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
 
 //
 // Program for converting between XYZ and Z matrix file formats.
@@ -65,22 +69,22 @@ int main(int argc, char* argv[])
     try {
         std::ifstream from;
         std::ofstream to;
-        chem::fopen(from, input_file);
+        srs::fopen(from, input_file);
 
         Molecule mol(from, to, "Molecule");
 
         std::string output_file;
-        output_file = chem::strip_suffix(input_file, ".inp");
+        output_file = srs::strip_suffix(input_file, ".inp");
 
         if (vm["xyz"].as<bool>()) {
             mol.get_zmat().load(from);
             output_file = output_file + ".xyz";
-            chem::fopen(to, output_file.c_str());
+            srs::fopen(to, output_file.c_str());
             chem::print_xyz_format(to, mol.get_atoms(), mol.get_xyz(), "");
         }
         else if (vm["zmat"].as<bool>()) {
             output_file = output_file + ".zmat";
-            chem::fopen(to, output_file.c_str());
+            srs::fopen(to, output_file.c_str());
             mol.get_zmat().print(to);
         }
     }

@@ -14,23 +14,14 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4100)  // unreferenced formal parameter
-#endif                           // _MSC_VER
-
-#include <chem/datum.h>
-#include <chem/input.h>
 #include <chem/mopac.h>
-#include <chem/utils.h>
+#include <srs/datum.h>
+#include <srs/utils.h>
 #include <cstdlib>
 #include <fstream>
 #include <map>
 #include <sstream>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
 
 Mopac::Mopac(std::istream& from, const std::string& key)
 {
@@ -40,12 +31,12 @@ Mopac::Mopac(std::istream& from, const std::string& key)
     std::string jobname_def = "mopac";
     int opt_geom_def        = 1;
 
-    std::map<std::string, Input> input_data;
-    input_data["version"]  = Input(version, version_def);
-    input_data["jobname"]  = Input(jobname, jobname_def);
-    input_data["opt_geom"] = Input(opt_geom, opt_geom_def);
+    std::map<std::string, srs::Input> input_data;
+    input_data["version"]  = srs::Input(version, version_def);
+    input_data["jobname"]  = srs::Input(jobname, jobname_def);
+    input_data["opt_geom"] = srs::Input(opt_geom, opt_geom_def);
 
-    if (chem::find_section(from, key)) {
+    if (srs::find_section(from, key)) {
         std::string token;
         while (from >> token) {
             if (token == "End") {
@@ -57,7 +48,7 @@ Mopac::Mopac(std::istream& from, const std::string& key)
                 if (line.empty()) {  // not entirely safe
                     std::getline(from, line);
                 }
-                keywords = chem::trim(line, " ");
+                keywords = srs::trim(line, " ");
             }
             else {
                 auto it = input_data.find(token);
@@ -100,7 +91,7 @@ void Mopac::run(Molecule& mol) const
     mol.set_elec_energy(get_heat_of_formation());
 
     // Update Cartesian coordinates:
-    arma::mat xyz = mol.get_xyz();
+    srs::dmatrix xyz = mol.get_xyz();
     get_xyz(xyz);
     mol.set_xyz(xyz);
 }
@@ -108,19 +99,19 @@ void Mopac::run(Molecule& mol) const
 void Mopac::write_dat(const Molecule& mol) const
 {
     std::ofstream to;
-    chem::fopen(to, jobname + ".dat");
+    srs::fopen(to, jobname + ".dat");
     to << keywords << '\n' << mol.get_title() << "\n\n";
     write_xyz(to, mol);
 }
 
 void Mopac::write_xyz(std::ostream& to, const Molecule& mol) const
 {
-    chem::Format<double> fix;
+    srs::Format<double> fix;
     fix.fixed().width(10).precision(6);
 
     for (std::size_t i = 0; i < mol.get_atoms().size(); ++i) {
         to << mol.get_atoms()[i].atomic_symbol << '\t';
-        for (arma::uword j = 0; j < mol.get_xyz().n_cols; ++j) {
+        for (int j = 0; j < mol.get_xyz().cols(); ++j) {
             to << fix(mol.get_xyz()(i, j)) << " " << opt_geom << " ";
         }
         to << '\n';
@@ -132,7 +123,7 @@ bool Mopac::check_convergence() const
     bool converged = false;
 
     std::ifstream from;
-    chem::fopen(from, jobname + ".out");
+    srs::fopen(from, jobname + ".out");
 
     std::string buf;
     while (std::getline(from, buf)) {
@@ -151,7 +142,7 @@ double Mopac::get_heat_of_formation() const
     bool found  = false;
 
     std::ifstream from;
-    chem::fopen(from, jobname + ".out");
+    srs::fopen(from, jobname + ".out");
 
     std::string buf;
     while (std::getline(from, buf)) {
@@ -182,14 +173,14 @@ double Mopac::get_heat_of_formation() const
     }
 }
 
-void Mopac::get_xyz(arma::mat& xyz) const
+void Mopac::get_xyz(srs::dmatrix& xyz) const
 {
     // Note: xyz must have the correct size on input, no resizing is done.
 
     bool found = false;
 
     std::ifstream from;
-    chem::fopen(from, jobname + ".out");
+    srs::fopen(from, jobname + ".out");
 
     std::string buf;
     while (std::getline(from, buf)) {
@@ -206,7 +197,7 @@ void Mopac::get_xyz(arma::mat& xyz) const
                     double x;
                     double y;
                     double z;
-                    for (arma::uword i = 0; i < xyz.n_rows; ++i) {
+                    for (int i = 0; i < xyz.rows(); ++i) {
                         std::getline(from, buf);
                         std::istringstream iss(buf);
                         iss >> center >> atom >> x >> y >> z;

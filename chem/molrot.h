@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,14 +12,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef CHEM_MOLROT_H
 #define CHEM_MOLROT_H
 
 #include <chem/element.h>
-#include <chem/math.h>
-#include <armadillo>
+#include <srs/array.h>
+#include <srs/math.h>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -40,7 +40,7 @@ class Torsion;
 //
 class Molrot {
 public:
-    Molrot(std::vector<Element>& atoms_, arma::mat& xyz_)
+    Molrot(std::vector<Element>& atoms_, srs::dmatrix& xyz_)
         : atoms(atoms_), xyz(xyz_)
     {
     }
@@ -48,7 +48,7 @@ public:
     Molrot(std::istream& from,
            const std::string& key,
            std::vector<Element>& atoms_,
-           arma::mat& xyz_);
+           srs::dmatrix& xyz_);
 
     Molrot(const Molrot& rot);
 
@@ -59,7 +59,7 @@ public:
     double tot_mass() const;
 
     // Compute rotational constants.
-    arma::vec3 constants();
+    srs::dvector constants();
 
     // Return rotational symmetry number.
     double get_sigma() const { return sigma; }
@@ -77,7 +77,7 @@ protected:
     void move_to_com();
 
     // Compute center of mass coordinates.
-    arma::vec3 center_of_mass() const;
+    srs::dvector center_of_mass() const;
 
     // Compute principal moments of inertia.
     void principal_moments();
@@ -98,10 +98,10 @@ protected:
     void print_constants(std::ostream& to = std::cout);
 
     std::vector<Element>& atoms;
-    arma::mat& xyz;
+    srs::dmatrix& xyz;
 
-    arma::vec3 pmom;
-    arma::mat33 paxis;
+    srs::dvector pmom;
+    srs::dmatrix paxis;
 
     double sigma;
     bool aligned = false;
@@ -110,7 +110,7 @@ protected:
 inline Molrot::Molrot(std::istream& from,
                       const std::string& key,
                       std::vector<Element>& atoms_,
-                      arma::mat& xyz_)
+                      srs::dmatrix& xyz_)
     : atoms(atoms_), xyz(xyz_)
 {
     init(from, key);
@@ -118,8 +118,8 @@ inline Molrot::Molrot(std::istream& from,
 
 inline void Molrot::move_to_com()
 {
-    arma::vec3 com = center_of_mass();
-    chem::translate(xyz, -com(0), -com(1), -com(2));
+    srs::dvector com = center_of_mass();
+    srs::translate(xyz, -com(0), -com(1), -com(2));
 }
 
 #endif  // CHEM_MOLROT_H

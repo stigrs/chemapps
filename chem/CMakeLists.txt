@@ -2,21 +2,17 @@ cmake_minimum_required(VERSION 3.4.3)
 project(ChemLib CXX)
 
 include_directories(${ChemApps_SOURCE_DIR})
-include_directories(${ARMADILLO_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GSL_INCLUDE_DIR})
+include_directories(${MKL_INCLUDE_DIR})
+include_directories(${SRS_INCLUDE_DIR})
 link_directories(${ChemApps_BINARY_DIR})
-if(MSVC)
-    link_directories($ENV{MKLROOT})
-endif()
+link_directories(${SRS_LIB_DIR})
 
 set(
     SRC_FILES
-    collision.cpp
-    datum.cpp
-    input.cpp
+    #collision.cpp
     ptable.cpp
-    math.cpp
     mcmm.cpp
     molecule.cpp
     molecule_io.cpp
@@ -37,12 +33,13 @@ add_library(
 if(MSVC)
     target_link_libraries(
         chem 
-        mkl_intel_c.lib
-        mkl_sequential.lib
-        mkl_core.lib
+        srs.lib
     )
 else()
-    target_link_libraries (chem ${ARMADILLO_LIBRARIES}) 
+    target_link_libraries(
+        chem
+        srs
+    ) 
 endif()
 
 install(

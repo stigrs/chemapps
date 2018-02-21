@@ -14,23 +14,14 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4100)  // unreferenced formal parameter
-#endif                           // _MSC_VER
-
-#include <chem/input.h>
 #include <chem/mcmm.h>
 #include <chem/molecule_io.h>
 #include <chem/mopac.h>
-#include <chem/utils.h>
+#include <srs/utils.h>
 #include <limits>
 #include <map>
 #include <numeric>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
 
 template <class Pot>
 Mcmm<Pot>::Mcmm(std::istream& from,
@@ -43,19 +34,19 @@ Mcmm<Pot>::Mcmm(std::istream& from,
 
     const double emin_def = -std::numeric_limits<double>::max();
 
-    std::map<std::string, Input> input_data;
-    input_data["xtol"]      = Input(xtol, 5.0e-4);
-    input_data["etol"]      = Input(etol, 1.0e-4);
-    input_data["emin"]      = Input(emin, emin_def);
-    input_data["emax"]      = Input(emax, 0.0);
-    input_data["rmin"]      = Input(rmin, 0.7414);  // experimental r(H-H)
-    input_data["temp"]      = Input(temp, 298.15);
-    input_data["maxiter"]   = Input(maxiter, 1000);
-    input_data["maxreject"] = Input(maxreject, 100);
-    input_data["nminima"]   = Input(nminima, 20);
-    input_data["seed"]      = Input(seed, 0);
+    std::map<std::string, srs::Input> input_data;
+    input_data["xtol"]      = srs::Input(xtol, 5.0e-4);
+    input_data["etol"]      = srs::Input(etol, 1.0e-4);
+    input_data["emin"]      = srs::Input(emin, emin_def);
+    input_data["emax"]      = srs::Input(emax, 0.0);
+    input_data["rmin"]      = srs::Input(rmin, 0.7414);  // experimental r(H-H)
+    input_data["temp"]      = srs::Input(temp, 298.15);
+    input_data["maxiter"]   = srs::Input(maxiter, 1000);
+    input_data["maxreject"] = srs::Input(maxreject, 100);
+    input_data["nminima"]   = srs::Input(nminima, 20);
+    input_data["seed"]      = srs::Input(seed, 0);
 
-    bool found = chem::find_section(from, key);
+    bool found = srs::find_section(from, key);
     if (found) {
         std::string token;
         while (from >> token) {
@@ -119,11 +110,11 @@ void Mcmm<Pot>::solve(std::ostream& to)
     }
     if (verbose) {
         double eglobal_min = *std::min_element(eglobal.begin(), eglobal.end());
-        chem::Format<char> line;
+        srs::Format<char> line;
         line.width(41).fill('=');
-        chem::Format<int> ifix;
+        srs::Format<int> ifix;
         ifix.fixed().width(5);
-        chem::Format<double> dfix;
+        srs::Format<double> dfix;
         dfix.fixed().width(8).precision(2);
         to << "Monte Carlo Multiple Minima (MCMM) Solver\n"
            << line('=') << '\n';
@@ -199,12 +190,25 @@ bool Mcmm<Pot>::accept_energy(double enew)
 }
 
 template <class Pot>
+bool Mcmm<Pot>::accept_geom_dist(const Molecule& m) const
+{
+    bool geom_ok = true;
+    srs::dmatrix dist_mat;
+    srs::pdist_matrix(dist_mat, m.get_xyz());
+    for (auto v : dist_mat) {
+        if (v > 0.0 && v < rmin) {  // avoid too close atoms
+            geom_ok = false;
+        }
+    }
+    return geom_ok;
+}
+
+template <class Pot>
 bool Mcmm<Pot>::duplicate(const Molecule& m) const
 {
     bool duplicate = false;
     for (std::size_t i = 0; i < conformers.size(); ++i) {  // check geometry
-        duplicate = arma::approx_equal(
-            conformers[i].xyz, m.get_xyz(), "absdiff", xtol);
+        duplicate = srs::approx_equal(conformers[i].xyz, m.get_xyz(), xtol);
         if (duplicate) {  // check energy
             double ediff = std::abs(conformers[i].energy - m.get_elec_energy());
             duplicate    = ediff < etol;
@@ -216,10 +220,9 @@ bool Mcmm<Pot>::duplicate(const Molecule& m) const
 template <class Pot>
 void Mcmm<Pot>::new_conformer()
 {
-    // Molecule m(mol);
     // Generate a new random conformer by using the uniform usage scheme:
     do {
-        arma::mat xnew = mol.get_xyz();
+        srs::dmatrix xnew = mol.get_xyz();
         uniform_usage(xnew);
         mol.set_xyz(xnew);
         gen_rand_conformer(mol);
@@ -258,7 +261,7 @@ void Mcmm<Pot>::update()
 }
 
 template <class Pot>
-void Mcmm<Pot>::uniform_usage(arma::mat& xnew)
+void Mcmm<Pot>::uniform_usage(srs::dmatrix& xnew)
 {
     xnew = xcurr;
     if (!conformers.empty()) {
@@ -304,14 +307,14 @@ inline void Mcmm<Pot>::sort_conformers()
 template <class Pot>
 std::vector<int> Mcmm<Pot>::select_rand_dihedral(const Molecule& m)
 {
-    std::vector<arma::ivec> connect = m.get_zmat().get_connectivities();
+    std::vector<srs::ivector> connect = m.get_zmat().get_connectivities();
     std::uniform_int_distribution<> rnd_uni_int(2, connect.size() - 1);
-    int index           = rnd_uni_int(mt);
-    arma::ivec dihedral = connect[index];
+    int index             = rnd_uni_int(mt);
+    srs::ivector dihedral = connect[index];
 
     std::vector<int> res(0);
     for (std::size_t i = 2; i < connect.size(); ++i) {
-        if (arma::all((connect[i] == dihedral) == 1)) {
+        if (connect[i] == dihedral) {
             res.push_back(i);
         }
     }

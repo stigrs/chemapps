@@ -14,11 +14,9 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <chem/datum.h>
-#include <chem/element.h>
+#include <srs/datum.h>
 #include <chem/molecule.h>
-#include <chem/utils.h>
-#include <armadillo>
+#include <srs/utils.h>
 #include <catch/catch.hpp>
 #include <cmath>
 #include <fstream>
@@ -28,7 +26,7 @@ TEST_CASE("test_molvib")
     double zpe_ans = 0.052023;
 
     std::ifstream from;
-    chem::fopen(from, "test_molvib.inp");
+    srs::fopen(from, "test_molvib.inp");
 
     Molecule mol(from);
     double zpe = mol.get_vib().zero_point_energy() / datum::au_to_icm;

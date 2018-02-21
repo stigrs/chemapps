@@ -14,28 +14,20 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4100)  // caused by armadillo
-#endif                           // _MSC_VER
-
-#include <chem/datum.h>
 #include <chem/mcmm.h>
 #include <chem/molecule.h>
 #include <chem/mopac.h>
-#include <chem/utils.h>
+#include <srs/datum.h>
+#include <srs/utils.h>
 #include <catch/catch.hpp>
 #include <cmath>
 #include <fstream>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
 
 TEST_CASE("test_mcmm")
 {
     std::ifstream from;
-    chem::fopen(from, "test_mcmm.inp");
+    srs::fopen(from, "test_mcmm.inp");
 
     Molecule mol(from);
     mol.get_zmat().load(from);

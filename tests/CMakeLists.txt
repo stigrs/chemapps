@@ -2,11 +2,11 @@ cmake_minimum_required(VERSION 3.4.3)
 project(ChemTests CXX)
 
 include_directories (${ChemApps_SOURCE_DIR})
-include_directories (${ARMADILLO_INCLUDE_DIRS})
+include_directories (${MKL_INCLUDE_DIR})
+include_directories (${SRS_INCLUDE_DIR})
 link_directories (${ChemApps_BINARY_DIR}/chem)
-if (MSVC)
-    link_directories($ENV{MKLROOT})
-endif()
+link_directories (${MKL_LIB_DIR})
+link_directories (${SRS_LIB_DIR})
 
 # Copy *.inp files to build directory.
 file(GLOB INP_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -30,21 +30,43 @@ target_link_libraries(
 
 function(add_chemapps_test name)
     add_executable(${name} ${name}.cpp)
-    if (MSVC)
+    if (WIN32)
         target_link_libraries (
             ${program} 
             chem 
+            srs.lib
             mkl_intel_c.lib
             mkl_sequential.lib 
-            mkl_core.lib 
+            mkl_core.lib
             test_catch
         ) 
+    elseif(APPLE)
+        target_link_libraries(
+            ${program}
+            chem 
+            srs 
+            mkl_intel_lp64
+            mkl_tbb_thread
+            mkl_core
+            tbb 
+            stdc++
+            pthread 
+            m 
+            ldl 
+            test_catch 
+        )
     else()
         target_link_libraries (
             ${program} 
             chem 
-            ${ARMADILLO_LIBRARIES} 
-            ${Boost_LIBRARIES}
+            srs
+            mkl_intel_lp64 
+            mkl_gnu_thread 
+            mkl_core 
+            gomp 
+            pthread 
+            m 
+            dl
             test_catch
         )
     endif()
@@ -53,21 +75,17 @@ function(add_chemapps_test name)
 endfunction()
 
 set(PROGRAMS 
-    test_datum
-    test_input
-    test_math
     test_mcmm
     test_molecule
     test_molecule_io
     test_molrot
     test_molvib
     test_mopac
-    test_pdist_matrix
     test_ptable
     test_thermochem
     test_thermodata
     test_torsion
-    test_tst
+    #test_tst
     test_tunnel
     test_zmatrix
 )

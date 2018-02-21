@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,13 +12,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef CHEM_TORSION_H
 #define CHEM_TORSION_H
 
 #include <chem/molrot.h>
-#include <armadillo>
+#include <srs/array.h>
+#include <srs/math.h>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -57,8 +58,8 @@ public:
     // Perform torsional mode analysis.
     void analysis(std::ostream& to = std::cout);
 
-    // Get total number of minima.
-    int tot_minima() const;
+    // Get total number of minima (eq 1 in C&T, 2000).
+    int tot_minima() const { return srs::sum(sigma_tor); }
 
     // Calculate effective symmetry number.
     double symmetry_number() const;
@@ -70,10 +71,10 @@ public:
     double eff_moment_of_inertia() const;
 
     // Calculate rotational constant for torsional mode.
-    arma::vec constant();
+    srs::dvector constant() const;
 
-    arma::vec get_pot_coeff() const { return pot_tor; }
-    arma::vec get_freqs() const { return freq_tor; }
+    srs::dvector get_pot_coeff() const { return pot_tor; }
+    srs::dvector get_freqs() const { return freq_tor; }
 
 private:
     // Initialize input data.
@@ -94,23 +95,23 @@ private:
     // Calculate moment of inertia of rotating top.
     void top_moment_of_inertia();
 
-    arma::mat xyz_  = arma::zeros<arma::mat>(0);     // local copy of xyz
-    arma::mat alpha = arma::zeros<arma::mat>(3, 3);  // direction cosines
+    srs::dmatrix xyz_;                                    // local copy of xyz
+    srs::dmatrix alpha = srs::zeros<srs::dmatrix>(3, 3);  // direction cosines
 
-    arma::uvec rot_axis  = arma::zeros<arma::uvec>(2);  // rotational axis
-    arma::uvec rot_top   = arma::zeros<arma::uvec>(0);  // rotating top moiety
-    arma::uvec sigma_tor = arma::zeros<arma::uvec>(0);  // symmetry number
+    srs::ivector rot_axis = srs::zeros<srs::ivector>(2);  // rotational axis
+    srs::ivector rot_top;                                 // rotating top moiety
+    srs::ivector sigma_tor;                               // symmetry number
 
-    arma::vec rmi_tor  = arma::zeros<arma::vec>(0);  // red. moment of inertia
-    arma::vec pot_tor  = arma::zeros<arma::vec>(0);  // potential coefficients
-    arma::vec freq_tor = arma::zeros<arma::vec>(0);  // torsional frequencies
+    srs::dvector rmi_tor;   // red. moment of inertia
+    srs::dvector pot_tor;   // potential coefficients
+    srs::dvector freq_tor;  // torsional frequencies
 
-    arma::rowvec x_axis = arma::zeros<arma::rowvec>(3);  // x axis of rot. top
-    arma::rowvec y_axis = arma::zeros<arma::rowvec>(3);  // y axis of rot. top
-    arma::rowvec z_axis = arma::zeros<arma::rowvec>(3);  // z axis of rot. top
+    srs::dvector x_axis = srs::zeros<srs::dvector>(3);  // x axis of rot. top
+    srs::dvector y_axis = srs::zeros<srs::dvector>(3);  // y axis of rot. top
+    srs::dvector z_axis = srs::zeros<srs::dvector>(3);  // z axis of rot. top
 
-    arma::rowvec top_origo = arma::zeros<arma::rowvec>(3);  // origo
-    arma::rowvec top_com   = arma::zeros<arma::rowvec>(3);  // center of mass
+    srs::dvector top_origo = srs::zeros<srs::dvector>(3);  // origo
+    srs::dvector top_com   = srs::zeros<srs::dvector>(3);  // center of mass
 
     double am;  // moment of inertia of rotating top
     double bm;  // xz product of inertia
@@ -133,7 +134,7 @@ inline Torsion::Torsion(std::istream& from,
 inline double Torsion::symmetry_number() const
 {
     // Eq. 8 in Chuang and Truhlar (2000):
-    return tot_minima() / static_cast<double>(sigma_tor.n_elem);
+    return tot_minima() / static_cast<double>(sigma_tor.size());
 }
 
 #endif  // CHEM_TORSION_H

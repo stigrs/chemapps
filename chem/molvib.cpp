@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,16 +12,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-#include <chem/arma_io.h>
-#include <chem/datum.h>
 #include <chem/molvib.h>
-#include <chem/utils.h>
+#include <srs/datum.h>
+#include <srs/utils.h>
+
 
 Molvib::Molvib(std::istream& from, const std::string& key)
 {
-    bool found = chem::find_section(from, key);
+    bool found = srs::find_section(from, key);
     if (found) {
         std::string token;
         while (from >> token) {
@@ -29,7 +29,7 @@ Molvib::Molvib(std::istream& from, const std::string& key)
                 break;
             }
             else if (token == "vibr") {
-                chem::read_vector(from, freqs);
+                from >> freqs;
             }
         }
     }
@@ -41,16 +41,16 @@ Molvib::Molvib(std::istream& from, const std::string& key)
 
 void Molvib::print(std::ostream& to)
 {
-    chem::Format<char> line;
+    srs::Format<char> line;
     line.width(26).fill('-');
 
-    chem::Format<double> fix;
+    srs::Format<double> fix;
     fix.fixed().width(8).precision(2);
 
     if (freqs.size() > 0) {
         int it = 0;
         to << "\nVibrational modes (cm^-1):\n" << line('-') << '\n';
-        for (arma::uword i = 0; i < freqs.size(); ++i) {
+        for (int i = 0; i < freqs.size(); ++i) {
             to << fix(freqs(i));
             if ((it == 8) && (freqs.size() > 9)) {
                 to << '\n';

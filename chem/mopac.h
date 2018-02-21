@@ -18,7 +18,7 @@
 #define CHEM_MOPAC_H
 
 #include <chem/molecule.h>
-#include <armadillo>
+#include <srs/array.h>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -50,7 +50,7 @@ public:
     double get_heat_of_formation() const;
 
     /// Get optimized Cartesian coordinates.
-    void get_xyz(arma::mat& xyz) const;
+    void get_xyz(srs::dmatrix& xyz) const;
 
 private:
     /// Create Mopac input file.
