@@ -29,6 +29,11 @@
 #include <iostream>
 #include <string>
 
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif  // _MSC_VER
+
+
 //
 // Program providing Monte Carlo Multiple Minima (MCMM) solver.
 //
