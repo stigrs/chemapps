@@ -17,7 +17,5 @@ tmp.*
 # Directories:
 build
 tmp
+.vs
 .vscode
-/.vs
-/CMakeSettings.json
-/CppProperties.json
