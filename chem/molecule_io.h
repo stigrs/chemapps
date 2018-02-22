@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,15 +12,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef CHEM_MOLECULE_IO_H
 #define CHEM_MOLECULE_IO_H
 
 #include <chem/element.h>
+#include <chem/mol_formula.h>
 #include <srs/array.h>
 #include <iostream>
+#include <stdexcept>
 #include <vector>
+
+
+// Error reporting:
+
+struct Mol_IO_error : std::runtime_error {
+    Mol_IO_error(std::string s) : std::runtime_error(s) {}
+};
+
+// Molecular IO methods:
 
 namespace chem {
 
@@ -39,6 +50,9 @@ void read_zmat_format(std::istream& from,
                       srs::ivector& bond_connect,
                       srs::ivector& angle_connect,
                       srs::ivector& dihedral_connect);
+
+// Read molecular formula.
+void read_mol_formula(std::istream& from, std::vector<Mol_formula>& formula);
 
 // Print chemical XYZ file format.
 void print_xyz_format(std::ostream& to,

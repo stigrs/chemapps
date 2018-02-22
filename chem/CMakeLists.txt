@@ -11,7 +11,7 @@ link_directories(${SRS_LIB_DIR})
 
 set(
     SRC_FILES
-    #collision.cpp
+    collision.cpp
     ptable.cpp
     mcmm.cpp
     molecule.cpp

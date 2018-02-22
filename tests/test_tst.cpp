@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,41 +12,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4100)  // unreferenced formal parameter
-#endif                           // _MSC_VER
+////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/tst.h>
-#include <chem/utils.h>
-#include <armadillo>
+#include <srs/array.h>
+#include <srs/utils.h>
 #include <catch/catch.hpp>
 #include <cmath>
 #include <fstream>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
 
 TEST_CASE("test_tst")
 {
     SECTION("ch4cl")
     {
         std::ifstream from;
-        chem::fopen(from, "test_tst_ch4cl.inp");
+        srs::fopen(from, "test_tst_ch4cl.inp");
 
         // These values are from Polyrate 2017:
-        arma::vec ktst_ans  = {1.9919E-15, 4.5171E-14, 1.9234E-12, 6.4847E-11};
-        arma::vec ktstw_ans = {5.8627E-15, 8.4186E-14, 2.3387E-12, 6.7087E-11};
+        srs::dvector ktst_ans
+            = {1.9919E-15, 4.5171E-14, 1.9234E-12, 6.4847E-11};
+        srs::dvector ktstw_ans
+            = {5.8627E-15, 8.4186E-14, 2.3387E-12, 6.7087E-11};
 
         Tst tst(from);
         Thermodata td(from);
 
-        arma::vec temp = td.get_temperature();
+        srs::dvector temp = td.get_temperature();
 
-        for (arma::uword i = 0; i < temp.size(); ++i) {
+        for (int i = 0; i < temp.size(); ++i) {
             double ktst  = tst.rate_coeff(temp(i));
             double ktstw = ktst * tst.tunneling(temp(i));
             CHECK(std::abs(ktst - ktst_ans(i)) / ktst_ans(i) < 1.0e-4);
@@ -57,20 +51,20 @@ TEST_CASE("test_tst")
     SECTION("ch4oh")
     {
         std::ifstream from;
-        chem::fopen(from, "test_tst_ch4oh.inp");
+        srs::fopen(from, "test_tst_ch4oh.inp");
 
         // These values are from Polyrate 2017:
-        arma::vec ktst_ans
+        srs::dvector ktst_ans
             = {3.9039E-18, 5.1396E-16, 1.1748E-13, 1.2988E-11, 8.5959E-11};
-        arma::vec ktstw_ans
+        srs::dvector ktstw_ans
             = {3.2091E-17, 2.1633E-15, 2.1172E-13, 1.4655E-11, 9.0269E-11};
 
         Tst tst(from);
         Thermodata td(from);
 
-        arma::vec temp = td.get_temperature();
+        srs::dvector temp = td.get_temperature();
 
-        for (arma::uword i = 0; i < temp.size(); ++i) {
+        for (int i = 0; i < temp.size(); ++i) {
             double ktst  = tst.rate_coeff(temp(i));
             double ktstw = ktst * tst.tunneling(temp(i));
             CHECK(std::abs(ktst - ktst_ans(i)) / ktst_ans(i) < 5.0e-4);

@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,7 +12,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/molecule_io.h>
 #include <chem/ptable.h>
@@ -146,6 +146,51 @@ void chem::read_zmat_format(std::istream& from,
             dihedrals(i)        = dihedral;
             dihedral_connect(i) = iat3 - 1;
         }
+    }
+}
+
+void chem::read_mol_formula(std::istream& from,
+                            std::vector<Mol_formula>& formula)
+{
+    std::string buf;
+    from >> buf;
+
+    int n = srs::from_string<int>(buf);
+    Expects(n >= 1);
+    formula.resize(n);
+
+    char ch;
+    std::string atom;
+    int stoich;
+
+    from >> ch;
+    if (ch != '[') {
+        throw Mol_IO_error("'[' missing in molecular formula");
+    }
+    for (int i = 0; i < n; ++i) {
+        from >> atom >> stoich >> ch;
+        if (!from) {
+            throw Mol_IO_error("found no data for molecular formula");
+        }
+        if ((ch != ',') && (ch != ';') && (ch != ']')) {
+            throw Mol_IO_error("bad separator in molecular formula: "
+                               + srs::to_string(ch));
+        }
+        if (ch == ']') {
+            from.unget();
+        }
+        if (!ptable::atomic_symbol_is_valid(atom)) {
+            throw Mol_IO_error("bad atomic symbol: " + atom);
+        }
+        if (stoich < 1) {
+            throw Mol_IO_error("bad stoichiometry: " + srs::to_string(stoich));
+        }
+        formula[i].atom   = atom;
+        formula[i].stoich = stoich;
+    }
+    from >> ch;
+    if (ch != ']') {
+        throw Mol_IO_error("']' missing in molecular formula");
     }
 }
 

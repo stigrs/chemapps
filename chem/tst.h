@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,7 +12,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #ifndef CHEM_TST_H
 #define CHEM_TST_H
@@ -25,11 +25,15 @@
 #include <stdexcept>
 #include <string>
 
+//------------------------------------------------------------------------------
+
 // Error reporting:
 
 struct Tst_error : std::runtime_error {
     Tst_error(std::string s) : std::runtime_error(s) {}
 };
+
+//------------------------------------------------------------------------------
 
 //
 // Class providing Transition State Theory (TST).

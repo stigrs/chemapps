@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
 //
@@ -12,12 +12,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
-///////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/collision.h>
-#include <chem/input.h>
+#include <chem/molecule_io.h>
 #include <chem/ptable.h>
-#include <chem/utils.h>
+#include <srs/utils.h>
 #include <gsl/gsl>
 #include <map>
 
@@ -31,28 +31,30 @@ Collision::Collision(std::istream& from, const std::string& key)
     std::string coll_model_str;
     std::string coll_integral_str;
 
-    std::map<std::string, Input> input_data;
-    input_data["coll_model"]    = Input(coll_model_str, "generic");
-    input_data["coll_integral"] = Input(coll_integral_str, "forst");
-    input_data["mass_bath"]     = Input(mass_bath);
-    input_data["mass_mol"]      = Input(mass_mol);
-    input_data["epsilon_bath"]  = Input(epsilon_bath);
-    input_data["epsilon_mol"]   = Input(epsilon_mol);
-    input_data["sigma_bath"]    = Input(sigma_bath);
-    input_data["sigma_mol"]     = Input(sigma_mol);
-    input_data["number_vibr"]   = Input(number_vibr, 0);
-    input_data["vibr_avg"]      = Input(vibr_avg, 0.0);
-    input_data["vibr_high"]     = Input(vibr_high, 0.0);
-    input_data["temperature"]   = Input(temperature);
-    input_data["coll_energy"]   = Input(coll_energy, 0.0);
-    input_data["mol_formula"]   = Input(mol_formula, mol_formula);
-    input_data["h_factor"]      = Input(h_factor, 1.0);
+    std::map<std::string, srs::Input> input_data;
+    input_data["coll_model"]    = srs::Input(coll_model_str, "generic");
+    input_data["coll_integral"] = srs::Input(coll_integral_str, "forst");
+    input_data["mass_bath"]     = srs::Input(mass_bath);
+    input_data["mass_mol"]      = srs::Input(mass_mol);
+    input_data["epsilon_bath"]  = srs::Input(epsilon_bath);
+    input_data["epsilon_mol"]   = srs::Input(epsilon_mol);
+    input_data["sigma_bath"]    = srs::Input(sigma_bath);
+    input_data["sigma_mol"]     = srs::Input(sigma_mol);
+    input_data["number_vibr"]   = srs::Input(number_vibr, 0);
+    input_data["vibr_avg"]      = srs::Input(vibr_avg, 0.0);
+    input_data["vibr_high"]     = srs::Input(vibr_high, 0.0);
+    input_data["temperature"]   = srs::Input(temperature);
+    input_data["coll_energy"]   = srs::Input(coll_energy, 0.0);
+    input_data["h_factor"]      = srs::Input(h_factor, 1.0);
 
-    if (chem::find_section(from, key)) {
+    if (srs::find_section(from, key)) {
         std::string token;
         while (from >> token) {
             if (token == "End") {
                 break;
+            }
+            else if (token == "mol_formula") {
+                chem::read_mol_formula(from, mol_formula);
             }
             else {
                 auto it = input_data.find(token);
@@ -123,16 +125,17 @@ Collision::Collision(std::istream& from, const std::string& key)
 
 double Collision::average_mass() const
 {
-    double mavg = 0.0;
+    double mavg = 0.0;  // average mass of atoms in molecule
 
     int natoms = 0;
-    for (std::size_t i = 0; i < mol_formula.size(); ++i) {
-        natoms += mol_formula[i].stoich;
-        mavg += mol_formula[i].stoich
-                * ptable::get_atomic_mass(mol_formula[i].atom);
+    if (!mol_formula.empty()) {
+        for (std::size_t i = 0; i < mol_formula.size(); ++i) {
+            natoms += mol_formula[i].stoich;
+            mavg += mol_formula[i].stoich
+                    * ptable::get_atomic_mass(mol_formula[i].atom);
+        }
+        mavg /= gsl::narrow_cast<double>(natoms);
     }
-    mavg /= gsl::narrow_cast<double>(natoms);  // avr. mass of atoms in molecule
-
     if (coll_model == brw90a) {  // eq. 35a in Kim and Gilbert (1990)
         mavg = 1.0 / (1.0 / reduced_mass() + 1.0 / mavg);
     }

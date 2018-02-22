@@ -75,6 +75,7 @@ function(add_chemapps_test name)
 endfunction()
 
 set(PROGRAMS 
+    test_collision
     test_mcmm
     test_molecule
     test_molecule_io
@@ -85,7 +86,7 @@ set(PROGRAMS
     test_thermochem
     test_thermodata
     test_torsion
-    #test_tst
+    test_tst
     test_tunnel
     test_zmatrix
 )

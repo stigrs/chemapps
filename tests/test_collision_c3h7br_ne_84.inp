@@ -1,0 +1,14 @@
+Collision
+ coll_model     brw84
+ coll_int       troe
+ mass_bath      20.0
+ mass_mol       121.97
+ epsilon_bath   32.00 
+ epsilon_mol    406.12
+ sigma_bath     2.82
+ sigma_mol      5.78
+ vibr_avg       1399.0
+ number_vibr    27
+ temperature    870.0
+ coll_energy    19000.0
+End
