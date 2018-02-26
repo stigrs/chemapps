@@ -172,7 +172,7 @@ void Collision::biased_random_walk(std::ostream& to) const
     }
 
     line.width(27).fill('-');
-    to << "Biased random walk results:\n" << line('-') << '\n';
+    to << "\nBiased random walk results:\n" << line('-') << '\n';
 
     if (coll_model == brw84) {
         double e2 = std::sqrt(mean_sqr_energy_transfer_coll());

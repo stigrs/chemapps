@@ -169,7 +169,7 @@ inline double Collision::time_coll_brw84() const
 {
     return sigma_complex() * 1.0e-10
            / std::sqrt((8.0 * datum::k * temperature)
-                       / (datum::pi * reduced_mass() * datum::a_0));
+                       / (datum::pi * reduced_mass() * datum::m_u));
 }
 
 inline double Collision::s_param_brw84() const
