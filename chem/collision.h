@@ -70,23 +70,17 @@ public:
     // Calculate reduced collision integral.
     double coll_omega22() const;
 
-    // Collision time using eq. 22 of Gilbert (1984).
-    double time_coll_brw84() const;
-
     // Collision time using eq. 32 of Lim and Gilbert (1990).
-    double time_coll_brw90() const;
-
-    // Biased random walk parameter s using eq. 24 in Gilbert (1984).
-    double s_param_brw84() const;
+    double collision_time() const;
 
     // Biased random walk parameter s using eq. 30 in Lim and Gilbert (1990).
-    double s_param_brw90() const;
+    double s_parameter() const;
 
     // Mean-squared energy transfer per collision (<E^2>).
     double mean_sqr_energy_transfer_coll() const;
 
     // Calculate collision energy transfer in highly excited molecules
-    // using the biased random walk model.
+    // using the biased random walk model B.
     void biased_random_walk(std::ostream& to = std::cout) const;
 
 private:
@@ -106,7 +100,7 @@ private:
     double energy_trans_avg() const;
 
     // A decay parameter (Lim and Gilbert, 1990).
-    double a_decay_param() const;
+    double a_decay_parameter() const;
 
     // Autocorrelation oscillation frequency (Lim and Gilbert, 1990).
     double c_autocorr_osc_freq() const;
@@ -117,10 +111,8 @@ private:
     // Find lightest mass of molecule.
     double mol_mass_lightest() const;
 
-    enum Coll_model_t { generic, brw84, brw90a, brw90b };  // collision models
     enum Coll_omega22_t { troe, forst };  // collision integral equations
 
-    Coll_model_t coll_model;
     Coll_omega22_t coll_integral;
 
     double mass_bath;     // mass of bath gas in amu
@@ -130,11 +122,7 @@ private:
     double sigma_bath;    // LJ collision diam. of bath gas in angstrom
     double sigma_mol;     // LJ collision diam. of molecule in angstrom
     double temperature;   // temperature in kelvin
-    double number_vibr;   // number of vibrational modes of molecule
-    double vibr_avg;      // average vibrational frequency of molecule in cm-1
     double vibr_high;     // highest vibrational frequency of molecule in cm-1
-    double coll_energy;   // collision energy in cm-1
-    double h_factor;
 
     std::vector<double> sigma_loc_val;     // local sigma values
     std::vector<double> epsilon_loc_val;   // local epsilon values
@@ -165,24 +153,11 @@ inline double Collision::lj_coll_rate() const
            * coll_omega22();
 }
 
-inline double Collision::time_coll_brw84() const
-{
-    return sigma_complex() * 1.0e-10
-           / std::sqrt((8.0 * datum::k * temperature)
-                       / (datum::pi * reduced_mass() * datum::m_u));
-}
-
-inline double Collision::s_param_brw84() const
-{
-    return (0.1 * coll_energy / static_cast<double>(number_vibr)) * h_factor
-           * std::sqrt(vibr_avg * datum::c_0 * 100.0 * time_coll_brw84());
-}
-
-inline double Collision::s_param_brw90() const
+inline double Collision::s_parameter() const
 {
     double edot = mean_sqr_int_energy_change();
-    double tc   = time_coll_brw90();
-    double a    = a_decay_param();
+    double tc   = collision_time();
+    double a    = a_decay_parameter();
     double c    = c_autocorr_osc_freq();
 
     return std::sqrt(edot * tc * 2.0 * a / (a * a + c * c));
@@ -190,13 +165,7 @@ inline double Collision::s_param_brw90() const
 
 inline double Collision::mean_sqr_energy_transfer_coll() const
 {
-    double s = 0.0;
-    if (coll_model == brw84) {
-        s = s_param_brw84();
-    }
-    else if ((coll_model == brw90a) || (coll_model == brw90b)) {
-        s = s_param_brw90();
-    }
+    double s = s_parameter();
     return 2.0 * s * s;
 }
 
@@ -215,14 +184,7 @@ inline double Collision::impact_parameter() const
 
 inline double Collision::energy_trans_avg() const
 {
-    double etr = 0.0;
-    if (coll_model == brw90a) {
-        etr = coll_energy / static_cast<double>(number_vibr);
-    }
-    else if (coll_model == brw90b) {
-        etr = 2.0e-3 * datum::k * temperature * datum::N_A / datum::icm_to_kJ;
-    }
-    return etr;
+    return 2.0e-3 * datum::k * temperature * datum::N_A / datum::icm_to_kJ;
 }
 
 inline double Collision::c_autocorr_osc_freq() const

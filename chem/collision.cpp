@@ -28,11 +28,9 @@ Collision::Collision(std::istream& from, const std::string& key)
     set_epsilon_local_values();
 
     // Read input data:
-    std::string coll_model_str;
     std::string coll_integral_str;
 
     std::map<std::string, srs::Input> input_data;
-    input_data["coll_model"]    = srs::Input(coll_model_str, "generic");
     input_data["coll_integral"] = srs::Input(coll_integral_str, "forst");
     input_data["mass_bath"]     = srs::Input(mass_bath);
     input_data["mass_mol"]      = srs::Input(mass_mol);
@@ -40,12 +38,8 @@ Collision::Collision(std::istream& from, const std::string& key)
     input_data["epsilon_mol"]   = srs::Input(epsilon_mol);
     input_data["sigma_bath"]    = srs::Input(sigma_bath);
     input_data["sigma_mol"]     = srs::Input(sigma_mol);
-    input_data["number_vibr"]   = srs::Input(number_vibr, 0);
-    input_data["vibr_avg"]      = srs::Input(vibr_avg, 0.0);
     input_data["vibr_high"]     = srs::Input(vibr_high, 0.0);
     input_data["temperature"]   = srs::Input(temperature);
-    input_data["coll_energy"]   = srs::Input(coll_energy, 0.0);
-    input_data["h_factor"]      = srs::Input(h_factor, 1.0);
 
     if (srs::find_section(from, key)) {
         std::string token;
@@ -76,21 +70,7 @@ Collision::Collision(std::istream& from, const std::string& key)
     }
 
     // Validate input data:
-    if (coll_model_str == "generic") {
-        coll_model = generic;
-    }
-    else if (coll_model_str == "brw84") {
-        coll_model = brw84;
-    }
-    else if (coll_model_str == "brw90a") {
-        coll_model = brw90a;
-    }
-    else if (coll_model_str == "brw90b") {
-        coll_model = brw90b;
-    }
-    else {
-        throw Collision_error("bad coll_model: " + coll_model_str);
-    }
+
     if (coll_integral_str == "troe") {
         coll_integral = troe;
     }
@@ -107,20 +87,6 @@ Collision::Collision(std::istream& from, const std::string& key)
     Expects(sigma_bath > 0.0);
     Expects(sigma_mol > 0.0);
     Expects(temperature > 0.0);
-    if (coll_model != generic) {
-        Expects(number_vibr >= 1);
-    }
-    if (coll_model == brw84) {
-        Expects(vibr_avg > 0.1);
-        Expects((h_factor > 0.0) && (h_factor <= 1.0));
-    }
-    if ((coll_model == brw84) || (coll_model == brw90a)) {
-        Expects(coll_energy > 0.1);
-    }
-    if ((coll_model == brw90a) || (coll_model == brw90b)) {
-        Expects(vibr_high > 0.1);
-        Expects(!mol_formula.empty());
-    }
 }
 
 void Collision::biased_random_walk(std::ostream& to) const
@@ -129,20 +95,6 @@ void Collision::biased_random_walk(std::ostream& to) const
     line.width(35).fill('-');
 
     to << "Lennard-Jones collision parameters:\n" << line('-') << '\n';
-
-    to << "Collision model:\t\t";
-    switch (coll_model) {
-    case brw84:
-        to << "BRW 84\n";
-        break;
-    case brw90a:
-        to << "BRW 90a\n";
-        break;
-    case brw90b:
-        to << "BRW 90b\n";
-        break;
-    }
-
     to << "Collision integral:\t\t";
     switch (coll_integral) {
     case troe:
@@ -163,46 +115,35 @@ void Collision::biased_random_walk(std::ostream& to) const
        << "Mass molecule:\t\t\t" << mass_mol << " amu\n"
        << "Reduced mass complex:\t\t" << reduced_mass() << " amu\n";
 
-    if ((coll_model == brw90a) || (coll_model == brw90b)) {
-        to << "Highest vibrational frequency:\t" << vibr_high << " cm-1\n"
-           << "Average atom/atom mass:\t\t" << average_mass() << " amu\n"
-           << "Local well depth complex:\t" << epsilon_local() << " K\n"
-           << "Local collision diam. complex:\t" << sigma_local()
-           << " angstrom\n";
-    }
+    to << "Highest vibrational frequency:\t" << vibr_high << " cm-1\n"
+       << "Average atom/atom mass:\t\t" << average_mass() << " amu\n"
+       << "Local well depth complex:\t" << epsilon_local() << " K\n"
+       << "Local collision diam. complex:\t" << sigma_local() << " angstrom\n";
 
     line.width(27).fill('-');
     to << "\nBiased random walk results:\n" << line('-') << '\n';
 
-    if (coll_model == brw84) {
-        double e2 = std::sqrt(mean_sqr_energy_transfer_coll());
-        to << "Collision time:\t\t" << time_coll_brw84() << " s\n"
-           << "BRW parameter (s):\t" << s_param_brw84() << " cm-1\n"
-           << "sqrt(<E^2>):\t\t" << e2 << " cm-1\n";
-    }
-    else if ((coll_model == brw90a) || (coll_model == brw90b)) {
-        double om22 = coll_omega22();
-        double d    = dist_interact();
-        double b    = impact_parameter();
-        double etr  = energy_trans_avg();
-        double tc   = time_coll_brw90();
-        double a    = a_decay_param();
-        double c    = c_autocorr_osc_freq();
-        double edot = mean_sqr_int_energy_change();
-        double s    = s_param_brw90();
-        double e2   = std::sqrt(mean_sqr_energy_transfer_coll());
+    double om22 = coll_omega22();
+    double d    = dist_interact();
+    double b    = impact_parameter();
+    double etr  = energy_trans_avg();
+    double tc   = collision_time();
+    double a    = a_decay_parameter();
+    double c    = c_autocorr_osc_freq();
+    double edot = mean_sqr_int_energy_change();
+    double s    = s_parameter();
+    double e2   = std::sqrt(mean_sqr_energy_transfer_coll());
 
-        to << "Collision integral:\t\t" << om22 << '\n'
-           << "Closest interaction distance:\t" << d << " angstrom\n"
-           << "Impact parameter:\t\t" << b << " angstrom\n"
-           << "Average translational energy:\t" << etr << " cm-1\n"
-           << "Collision time:\t\t\t" << tc << " s\n"
-           << "A decay parameter:\t\t" << a << " s-1\n"
-           << "Autocorr. osc. frequency (C):\t" << c << " s-1\n"
-           << "<Edot(i)^2>:\t\t\t" << edot << " cm-2 s-2\n"
-           << "BRW parameter (s):\t\t" << s << " cm-1\n"
-           << "sqrt(<E^2>):\t\t\t" << e2 << " cm-1\n";
-    }
+    to << "Collision integral:\t\t" << om22 << '\n'
+       << "Closest interaction distance:\t" << d << " angstrom\n"
+       << "Impact parameter:\t\t" << b << " angstrom\n"
+       << "Average translational energy:\t" << etr << " cm-1\n"
+       << "Collision time:\t\t\t" << tc << " s\n"
+       << "A decay parameter:\t\t" << a << " s-1\n"
+       << "Autocorr. osc. frequency (C):\t" << c << " s-1\n"
+       << "<Edot(i)^2>:\t\t\t" << edot << " cm-2 s-2\n"
+       << "BRW parameter (s):\t\t" << s << " cm-1\n"
+       << "sqrt(<E^2>):\t\t\t" << e2 << " cm-1\n";
 }
 
 double Collision::average_mass() const
@@ -218,13 +159,8 @@ double Collision::average_mass() const
         }
         mavg /= gsl::narrow_cast<double>(natoms);
     }
-    if (coll_model == brw90a) {  // eq. 35a in Lim and Gilbert (1990)
-        mavg = 1.0 / (1.0 / reduced_mass() + 1.0 / mavg);
-    }
-    else if (coll_model == brw90b) {  // eq. 35b in Lim and Gilbert (1990)
-        mavg = 1.0 / ((1.0 / (mavg * natoms - mavg)) + (1.0 / mavg));
-    }
-    return mavg;
+    // Eq. 35b in Lim and Gilbert (1990)
+    return 1.0 / ((1.0 / (mavg * natoms - mavg)) + (1.0 / mavg));
 }
 
 double Collision::sigma_local() const
@@ -233,17 +169,14 @@ double Collision::sigma_local() const
 
     double sloc = 0.0;
 
-    if ((coll_model == brw90a) || (coll_model == brw90b)) {
-        int natoms = 0;
-        for (std::size_t i = 0; i < mol_formula.size(); ++i) {
-            natoms += mol_formula[i].stoich;
-            sloc += mol_formula[i].stoich
-                    * sigma_loc_val[get_atomic_number(mol_formula[i].atom)];
-        }
-        sloc /= gsl::narrow_cast<double>(natoms);
-        sloc = 0.5 * (sloc + sigma_bath);
+    int natoms = 0;
+    for (std::size_t i = 0; i < mol_formula.size(); ++i) {
+        natoms += mol_formula[i].stoich;
+        sloc += mol_formula[i].stoich
+                * sigma_loc_val[get_atomic_number(mol_formula[i].atom)];
     }
-    return sloc;
+    sloc /= gsl::narrow_cast<double>(natoms);
+    return 0.5 * (sloc + sigma_bath);
 }
 
 double Collision::epsilon_local() const
@@ -252,17 +185,14 @@ double Collision::epsilon_local() const
 
     double eloc = 0.0;
 
-    if ((coll_model == brw90a) || (coll_model == brw90b)) {
-        int natoms = 0;
-        for (std::size_t i = 0; i < mol_formula.size(); ++i) {
-            natoms += mol_formula[i].stoich;
-            eloc += mol_formula[i].stoich
-                    * epsilon_loc_val[get_atomic_number(mol_formula[i].atom)];
-        }
-        eloc /= gsl::narrow_cast<double>(natoms);
-        eloc = std::sqrt(eloc * epsilon_bath);
+    int natoms = 0;
+    for (std::size_t i = 0; i < mol_formula.size(); ++i) {
+        natoms += mol_formula[i].stoich;
+        eloc += mol_formula[i].stoich
+                * epsilon_loc_val[get_atomic_number(mol_formula[i].atom)];
     }
-    return eloc;
+    eloc /= gsl::narrow_cast<double>(natoms);
+    return std::sqrt(eloc * epsilon_bath);
 }
 
 double Collision::coll_omega22() const
@@ -285,7 +215,7 @@ double Collision::coll_omega22() const
     return omega22;
 }
 
-double Collision::time_coll_brw90() const
+double Collision::collision_time() const
 {
     const double ang2m = 1.0e-10;  // angstrom to meters
     const double dr    = 0.0005;   // step size
@@ -346,7 +276,7 @@ void Collision::set_epsilon_local_values()
     epsilon_loc_val[ptable::get_atomic_number("I")]  = 230.0;
 }
 
-double Collision::a_decay_param() const
+double Collision::a_decay_parameter() const
 {
     const double ang2m = 1.0e-10;        // angstrom to meters
     const double dr    = 0.005 * ang2m;  // step size
