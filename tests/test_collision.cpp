@@ -41,4 +41,13 @@ TEST_CASE("test_collision")
         CHECK(coll.epsilon_local() == 0.0);
         CHECK(coll.sigma_local() == 0.0);
     }
+
+    SECTION("azulene_ne")
+    {
+        std::ifstream from;
+        srs::fopen(from, "test_collision_azulene_ne_90a.inp");
+
+        Collision coll(from);
+        coll.biased_random_walk();
+    }
 }

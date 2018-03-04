@@ -39,7 +39,7 @@ struct Collision_error : std::runtime_error {
 // Algorithms:
 //   Forst, W. Unimolecular Reactions; Cambridge University Press, 2003.
 //   Gilbert, R. G., J. Chem. Phys., 1984, vol. 80, pp. 5501-5509.
-//   Kim, K. F.; Gilbert, R. G. J. Chem. Phys., 1990, vol. 92, pp. 1819-1830.
+//   Lim, K. F.; Gilbert, R. G. J. Chem. Phys., 1990, vol. 92, pp. 1819-1830.
 //   Troe, J. J. Chem. Phys., 1977, vol. 66, pp. 4758-4775.
 //
 class Collision {
@@ -49,7 +49,7 @@ public:
     // Calculate reduced mass of system.
     double reduced_mass() const;
 
-    // Average atom/atom mass of molecule (Kim and Gilbert, 1990).
+    // Average atom/atom mass of molecule (Lim and Gilbert, 1990).
     double average_mass() const;
 
     // Calculate Lennard-Jones well depth of system.
@@ -58,10 +58,10 @@ public:
     // Calculate Lennard-Jones collision diameter of system.
     double sigma_complex() const;
 
-    // Local Lennard-Jones well depth of system (Kim and Gilbert, 1990).
+    // Local Lennard-Jones well depth of system (Lim and Gilbert, 1990).
     double epsilon_local() const;
 
-    // Local Lennard-Jones collision diam. of system (Kim and Gilbert, 1990).
+    // Local Lennard-Jones collision diam. of system (Lim and Gilbert, 1990).
     double sigma_local() const;
 
     // Calculate Lennard-Jones collision rate (Forst, 2003).
@@ -73,13 +73,13 @@ public:
     // Collision time using eq. 22 of Gilbert (1984).
     double time_coll_brw84() const;
 
-    // Collision time using eq. 32 of Kim and Gilbert (1990).
+    // Collision time using eq. 32 of Lim and Gilbert (1990).
     double time_coll_brw90() const;
 
     // Biased random walk parameter s using eq. 24 in Gilbert (1984).
     double s_param_brw84() const;
 
-    // Biased random walk parameter s using eq. 30 in Kim and Gilbert (1990).
+    // Biased random walk parameter s using eq. 30 in Lim and Gilbert (1990).
     double s_param_brw90() const;
 
     // Mean-squared energy transfer per collision (<E^2>).
@@ -87,7 +87,7 @@ public:
 
     // Calculate collision energy transfer in highly excited molecules
     // using the biased random walk model.
-    void biased_random_walk(std::ostream& to) const;
+    void biased_random_walk(std::ostream& to = std::cout) const;
 
 private:
     // Populate database with local Lennard-Jones collision diameter values.
@@ -96,22 +96,22 @@ private:
     // Populate database with local Lennard-Jones well depth values.
     void set_epsilon_local_values();
 
-    // Closest interaction distance (d) (Kim and Gilbert, 1990).
+    // Closest interaction distance (d) (Lim and Gilbert, 1990).
     double dist_interact() const;
 
-    // Impact parameter (b) (Kim and Gilbert, 1990).
+    // Impact parameter (b) (Lim and Gilbert, 1990).
     double impact_parameter() const;
 
-    // Average translational energy (Kim and Gilbert, 1990).
+    // Average translational energy (Lim and Gilbert, 1990).
     double energy_trans_avg() const;
 
-    // A decay parameter (Kim and Gilbert, 1990).
+    // A decay parameter (Lim and Gilbert, 1990).
     double a_decay_param() const;
 
-    // Autocorrelation oscillation frequency (Kim and Gilbert, 1990).
+    // Autocorrelation oscillation frequency (Lim and Gilbert, 1990).
     double c_autocorr_osc_freq() const;
 
-    // Mean-squared rate of internal energy change (Kim and Gilbert, 1990).
+    // Mean-squared rate of internal energy change (Lim and Gilbert, 1990).
     double mean_sqr_int_energy_change() const;
 
     // Find lightest mass of molecule.

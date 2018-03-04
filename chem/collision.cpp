@@ -218,10 +218,10 @@ double Collision::average_mass() const
         }
         mavg /= gsl::narrow_cast<double>(natoms);
     }
-    if (coll_model == brw90a) {  // eq. 35a in Kim and Gilbert (1990)
+    if (coll_model == brw90a) {  // eq. 35a in Lim and Gilbert (1990)
         mavg = 1.0 / (1.0 / reduced_mass() + 1.0 / mavg);
     }
-    else if (coll_model == brw90b) {  // eq. 35b in Kim and Gilbert (1990)
+    else if (coll_model == brw90b) {  // eq. 35b in Lim and Gilbert (1990)
         mavg = 1.0 / ((1.0 / (mavg * natoms - mavg)) + (1.0 / mavg));
     }
     return mavg;
@@ -300,7 +300,7 @@ double Collision::time_coll_brw90() const
     double veff = 0.0;
     double tc   = 0.0;
 
-    while (veff < etr) {  // integrate eq. 32 in Kim and Gilbert (1990)
+    while (veff < etr) {  // integrate eq. 32 in Lim and Gilbert (1990)
         double sigr6  = std::pow(sig / r, 6.0);
         double sigr12 = sigr6 * sigr6;
         veff = 4.0 * eps * (sigr12 - sigr6) + etr * std::pow(b / r, 2.0);
@@ -363,7 +363,7 @@ double Collision::a_decay_param() const
     double veff   = 0.0;
     double a      = 0.0;
 
-    while (veff < ebar) {  // evaluate eq. 36 in Kim and Gilbert (1990)
+    while (veff < ebar) {  // evaluate eq. 36 in Lim and Gilbert (1990)
         sigr6  = std::pow(sig / r, 6.0);
         sigr12 = sigr6 * sigr6;
         veff   = 4.0 * eps * (sigr12 - sigr6) + ebar * std::pow(b / r, 2.0);
@@ -377,7 +377,7 @@ double Collision::a_decay_param() const
             r -= dr;
         }
     }
-    // Evaluate eq. 34b in Kim and Gilbert (1990):
+    // Evaluate eq. 34b in Lim and Gilbert (1990):
 
     a = std::abs((4.0 * eps * (-12.0 * sigr12 + 6.0 * sigr6)
                   - 2.0 * ebar * std::pow(b / r, 2.0))
@@ -387,7 +387,7 @@ double Collision::a_decay_param() const
 
 double Collision::mean_sqr_int_energy_change() const
 {
-    // Evaluate eq. 38 in Kim and Gilbert (1990):
+    // Evaluate eq. 38 in Lim and Gilbert (1990):
 
     const double ang2m = 1.0e-10;  // angstrom to meter
 
@@ -404,7 +404,7 @@ double Collision::mean_sqr_int_energy_change() const
     double deltav = 4.0 * eps * (deltax / x)
                     * (-12.0 * std::pow(f, 12.0) + 6.0 * std::pow(f, 6.0));
 
-    // Evaluate eq. 40 in Kim and Gilbert (1990):
+    // Evaluate eq. 40 in Lim and Gilbert (1990):
 
     return std::pow((ebar - std::min(std::abs(deltav), 0.5 * ebar)) * nu, 2.0)
            / (datum::J_to_icm * datum::J_to_icm);
