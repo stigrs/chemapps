@@ -12,6 +12,7 @@ link_directories($ENV{BOOST_LIBRARYDIR})
 
 set(
     PROGRAMS 
+    brw
     mcmm 
     molrot 
     thermo
@@ -24,7 +25,7 @@ foreach(program ${PROGRAMS})
     if (WIN32)
         target_link_libraries (
             ${program} 
-            chem.lib 
+            chem 
             srs.lib
             mkl_intel_c.lib 
             mkl_sequential.lib 
