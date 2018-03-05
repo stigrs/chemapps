@@ -25,13 +25,20 @@ TEST_CASE("test_collision")
 {
     SECTION("C3H7Br-Ne")
     {
+        // Data taken from UNIMOL program of Gilbert.
+
         std::ifstream from;
         srs::fopen(from, "test_collision_c3h7br_ne.inp");
 
         Collision coll(from);
-        coll.biased_random_walk();
         CHECK(srs::approx_equal(coll.sigma_complex(), 4.30, 1.0e-12));
         CHECK(srs::approx_equal(coll.epsilon_complex(), 113.999, 1.0e-3));
+        CHECK(srs::approx_equal(coll.sigma_local(), 2.96, 1.0e-2));
+        CHECK(srs::approx_equal(coll.epsilon_local(), 29.36, 1.0e-2));
         CHECK(srs::approx_equal(coll.reduced_mass(), 17.183, 1.0e-3));
+        CHECK(srs::approx_equal(coll.average_mass(), 10.080, 1.0e-3));
+        CHECK(srs::approx_equal(coll.impact_parameter(), 2.867, 1.0e-3));
+        CHECK(srs::approx_equal(coll.collision_time() * 1.0e+13, 1.45, 1.0e-3));
+        CHECK(srs::approx_equal(coll.s_parameter(), 542.986, 1.0e-1));
     }
 }

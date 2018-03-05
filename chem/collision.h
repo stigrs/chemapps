@@ -73,6 +73,9 @@ public:
     // Collision time using eq. 32 of Lim and Gilbert (1990).
     double collision_time() const;
 
+    // Impact parameter (b) (Lim and Gilbert, 1990).
+    double impact_parameter() const;
+
     // Biased random walk parameter s using eq. 30 in Lim and Gilbert (1990).
     double s_parameter() const;
 
@@ -92,9 +95,6 @@ private:
 
     // Closest interaction distance (d) (Lim and Gilbert, 1990).
     double dist_interact() const;
-
-    // Impact parameter (b) (Lim and Gilbert, 1990).
-    double impact_parameter() const;
 
     // Average translational energy (Lim and Gilbert, 1990).
     double energy_trans_avg() const;
@@ -153,6 +153,11 @@ inline double Collision::lj_coll_rate() const
            * coll_omega22();
 }
 
+inline double Collision::impact_parameter() const
+{
+    return (2.0 / 3.0) * dist_interact();
+}
+
 inline double Collision::s_parameter() const
 {
     double edot = mean_sqr_int_energy_change();
@@ -175,11 +180,6 @@ inline double Collision::dist_interact() const
 {
     double d = sigma_complex() * std::sqrt(coll_omega22());
     return std::max(d, sigma_complex());
-}
-
-inline double Collision::impact_parameter() const
-{
-    return (2.0 / 3.0) * dist_interact();
 }
 
 inline double Collision::energy_trans_avg() const
