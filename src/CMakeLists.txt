@@ -15,6 +15,7 @@ set(
     brw
     cambi
     mcmm 
+    mh2ph
     molrot 
     thermo
     tst
