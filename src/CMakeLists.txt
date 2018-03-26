@@ -13,7 +13,9 @@ link_directories($ENV{BOOST_LIBRARYDIR})
 set(
     PROGRAMS 
     brw
+    cambi
     mcmm 
+    mh2ph
     molrot 
     thermo
     tst
