@@ -33,30 +33,33 @@ struct Mopac_error : std::runtime_error {
 
 //-----------------------------------------------------------------------------
 
-/// Wrapper class for running Mopac calculations.
+// Wrapper class for running Mopac calculations.
 class Mopac {
 public:
     Mopac();
 
     Mopac(std::istream& from, const std::string& key = "Mopac");
 
-    /// Run Mopac calculation.
+    // Initialize Mopac calculation.
+    void init(std::istream& from, const std::string& key = "Mopac");
+
+    // Run Mopac calculation.
     void run(Molecule& mol) const;
 
-    /// Check SCF convergence.
+    // Check SCF convergence.
     bool check_convergence() const;
 
-    /// Get heat of formation in kJ/mol from Mopac output file.
+    // Get heat of formation in kJ/mol from Mopac output file.
     double get_heat_of_formation() const;
 
-    /// Get optimized Cartesian coordinates.
+    // Get optimized Cartesian coordinates.
     void get_xyz(srs::dmatrix& xyz) const;
 
 private:
-    /// Create Mopac input file.
+    // Create Mopac input file.
     void write_dat(const Molecule& mol) const;
 
-    /// Write Cartesian coordinates in Mopac format.
+    // Write Cartesian coordinates in Mopac format.
     void write_xyz(std::ostream& to, const Molecule& mol) const;
 
     std::string version;   // Mopac version
@@ -71,6 +74,11 @@ inline Mopac::Mopac()
     keywords = "PM6-D EF GEO-OK PRECISE";
     jobname  = "mopac";
     opt_geom = 1;  // perform geometry optimization
+}
+
+inline Mopac::Mopac(std::istream& from, const std::string& key)
+{
+    init(from, key);
 }
 
 #endif  // CHEM_MOPAC_H

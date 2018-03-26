@@ -23,7 +23,7 @@
 #include <sstream>
 
 
-Mopac::Mopac(std::istream& from, const std::string& key)
+void Mopac::init(std::istream& from, const std::string& key)
 {
     // Read input data:
 
@@ -57,9 +57,6 @@ Mopac::Mopac(std::istream& from, const std::string& key)
                 }
             }
         }
-    }
-    else {
-        throw Mopac_error("cannot find " + key + " section");
     }
 
     // Check if initialized:

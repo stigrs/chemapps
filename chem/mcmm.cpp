@@ -73,6 +73,10 @@ Mcmm<Pot>::Mcmm(std::istream& from,
         }
     }
 
+    // Initialize potential:
+
+    pot.init(from);
+
     // Initialize iterators:
 
     kiter   = 0;
