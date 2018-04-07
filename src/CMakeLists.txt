@@ -44,8 +44,17 @@ foreach(program ${PROGRAMS})
     endif()
 endforeach()
 
-install(
-    TARGETS ${PROGRAMS}
-    RUNTIME DESTINATION bin
-    CONFIGURATIONS Release
-)
+if (WIN32)
+    install(
+        TARGETS ${PROGRAMS}
+        DESTINATION bin 
+        CONFIGURATIONS Release
+    ) 
+elseif()
+    foreach(program ${PROGRAMS})
+        install(
+            PROGRAMS ${ChemApps_BINARY_DIR}/src/${program} 
+            DESTINATION bin
+        )
+    endforeach()
+endif()
