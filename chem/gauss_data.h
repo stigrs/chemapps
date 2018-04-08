@@ -14,8 +14,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CHEM_GAUSSIAN_H
-#define CHEM_GAUSSIAN_H
+#ifndef CHEM_GAUSS_DATA_H
+#define CHEM_GAUSS_DATA_H
 
 #include <srs/array.h>
 #include <iostream>
@@ -114,11 +114,11 @@ public:
     void get_irc_hess(srs::dvector& hess) const;
 
     // Get ModRedundant coordinate.
-    std::string get_modred_coord() const;
+    std::string get_modredundant_coord() const;
 
 private:
     std::istream& from;
     Gauss_filetype filetype;
 };
 
-#endif  // CHEM_GAUSSIAN_H
+#endif  // CHEM_GAUSS_DATA_H
