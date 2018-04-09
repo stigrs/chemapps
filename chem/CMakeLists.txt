@@ -12,13 +12,14 @@ link_directories(${SRS_LIB_DIR})
 set(
     SRC_FILES
     collision.cpp
-    ptable.cpp
+    gauss_data.cpp
     mcmm.cpp
     molecule.cpp
     molecule_io.cpp
     molrot.cpp
     molvib.cpp
     mopac.cpp
+    ptable.cpp
     thermochem.cpp
     thermodata.cpp
     torsion.cpp

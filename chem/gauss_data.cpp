@@ -14,7 +14,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <chem/gaussian.h>
+#include <chem/gauss_data.h>
+#include <srs/utils.h>
 #include <sstream>
 
 Gauss_version Gauss_data::get_version() const
@@ -147,24 +148,20 @@ void Gauss_data::get_curr_cart_coord(struct Gauss_coord& coord) const
     std::string line;
 
     if (filetype == out) {
-        // not implemented
+        throw Gauss_error("not implemented for Gaussian output files");
     }
     else {  // filetype == fchk
         while (std::getline(from, line)) {
-
             // Get atomic numbers:
-
             std::string::size_type pos = line.find("Atomic numbers");
             if (pos != std::string::npos) {
                 for (int i = 0; i < coord.natoms; ++i) {
                     int atomic_number;
                     from >> atomic_number;
-                    coord.atnum[i] = atomic_number;
+                    coord.atnum(i) = atomic_number;
                 }
             }
-
             // Get current Cartesian coordinates:
-
             pos = line.find("Current cartesian coordinates");
             if (pos != std::string::npos) {
                 for (int i = 0; i < coord.natoms; ++i) {
@@ -183,13 +180,11 @@ void Gauss_data::get_curr_cart_coord(struct Gauss_coord& coord) const
     from.clear();
 }
 
-void Gauss_data::get_freqs(std::vector<double>& freqs) const
+void Gauss_data::get_freqs(srs::dvector& freqs) const
 {
     if (filetype == fchk) {
-        throw Gauss_data_error(
-            "get_pes_scan_data() only implemented for output files");
+        throw Gauss_error("not implemented for Gaussian fchk files");
     }
-
     from.clear();
     from.seekg(0, std::ios_base::beg);  // move to beginning of file
 
@@ -210,14 +205,12 @@ void Gauss_data::get_freqs(std::vector<double>& freqs) const
 }
 
 void Gauss_data::get_pes_scan_data(std::string& scan_coord,
-                                   std::vector<double>& coord,
-                                   std::vector<double>& energy) const
+                                   srs::dvector& coord,
+                                   srs::dvector& energy) const
 {
     if (filetype == fchk) {
-        throw Gauss_data_error(
-            "get_pes_scan_data() only implemented for output files");
+        throw Gauss_error("not implemented for Gaussian fchk files");
     }
-
     from.clear();
     from.seekg(0, std::ios_base::beg);  // move to beginning of file
 
@@ -254,11 +247,11 @@ void Gauss_data::get_pes_scan_data(std::string& scan_coord,
         }
     }
     if (!summary_found) {
-        throw Gauss_data_error(
+        throw Gauss_error(
             "Summary of Optimized Potential Surface Scan not found");
     }
     if (energy.size() != coord.size()) {
-        throw Gauss_data_error("bad number of data read");
+        throw Gauss_error("bad number of data read");
     }
 }
 
@@ -267,10 +260,8 @@ void Gauss_data::get_nmr_data(std::vector<Gauss_NMR>& nmr,
                               const double degen_tol) const
 {
     if (filetype == fchk) {
-        throw Gauss_data_error(
-            "get_nmr_data() only implemented for output files");
+        throw Gauss_error("not implemented for Gaussian fchk files");
     }
-
     from.clear();
     from.seekg(0, std::ios_base::beg);  // move to beginning of file
 
@@ -302,7 +293,6 @@ void Gauss_data::get_nmr_data(std::vector<Gauss_NMR>& nmr,
             }
         }
     }
-
     // Sort shieldings and condense degenerate peaks:
 
     Gauss_NMR nmr_tmp;
@@ -334,7 +324,6 @@ int Gauss_data::get_no_irc_points() const
     std::string line;
     if (filetype == out) {
         const char pattern[] = "-- Optimized point #";
-
         while (std::getline(from, line)) {
             if (line.find(pattern, 0) != std::string::npos) {
                 std::istringstream iss(srs::trim(line, " "));
@@ -365,7 +354,7 @@ int Gauss_data::get_no_irc_points() const
     return npoints;
 }
 
-void Gauss_data::get_irc_data(std::vector<double>& mep) const
+void Gauss_data::get_irc_data(srs::dvector& mep) const
 {
     from.clear();
     from.seekg(0, std::ios_base::beg);  // move to beginning of file
@@ -404,7 +393,7 @@ void Gauss_data::get_irc_data(std::vector<double>& mep) const
             }
         }
         if (count == 0) {
-            throw Gauss_data_error("could not find IRC data in Gaussian file");
+            throw Gauss_error("could not find IRC data in Gaussian file");
         }
     }
     else {  // filetype == fchk
@@ -428,12 +417,12 @@ void Gauss_data::get_irc_data(std::vector<double>& mep) const
             }
         }
         else {
-            throw Gauss_data_error("could not find IRC data in Gaussian file");
+            throw Gauss_error("could not find IRC data in Gaussian file");
         }
     }
 }
 
-void Gauss_data::get_irc_geom(std::vector<double>& geom) const
+void Gauss_data::get_irc_geom(srs::dvector& geom) const
 {
     from.clear();
     from.seekg(0, std::ios_base::beg);  // move to beginning of file
@@ -449,13 +438,11 @@ void Gauss_data::get_irc_geom(std::vector<double>& geom) const
 
         Gauss_version version = get_version();
 
-        /*
-          Temporary store all geometries; save last geometry if an
-          optimized point was found.
-        */
+        // Temporary store all geometries; save last geometry if an
+        // optimized point was found.
 
         int count = 1;
-        std::vector<double> geom_tmp(natoms3);
+        srs::dvector geom_tmp(natoms3);
         while (count < npoints) {
             std::getline(from, line);
             if (line.find(pattern_geom, 0) != std::string::npos) {
@@ -485,14 +472,13 @@ void Gauss_data::get_irc_geom(std::vector<double>& geom) const
             }
             if (line.find(pattern_opt, 0) != std::string::npos) {
                 for (int i = 0; i < natoms3; ++i) {
-                    geom.push_back(geom_tmp[i]);
+                    geom.push_back(geom_tmp(i));
                 }
                 count++;
             }
         }
         if (count == 0) {
-            throw Gauss_data_error(
-                "could not find IRC geometries in Gaussian file");
+            throw Gauss_error("could not find IRC geometries in Gaussian file");
         }
     }
     else {  // filetype == fchk
@@ -516,13 +502,12 @@ void Gauss_data::get_irc_geom(std::vector<double>& geom) const
             }
         }
         else {
-            throw Gauss_data_error(
-                "could not find IRC geometries in Gaussian file");
+            throw Gauss_error("could not find IRC geometries in Gaussian file");
         }
     }
 }
 
-void Gauss_data::get_irc_grad(std::vector<double>& grad) const
+void Gauss_data::get_irc_grad(srs::dvector& grad) const
 {
     from.clear();
     from.seekg(0, std::ios_base::beg);  // move to beginning of file
@@ -537,13 +522,11 @@ void Gauss_data::get_irc_grad(std::vector<double>& grad) const
         const int natoms3 = 3 * natoms;
         const int npoints = get_no_irc_points();
 
-        /*
-          Temporary store all gradients; save last gradient if an
-          optimized point was found.
-        */
+        // Temporary store all gradients; save last gradient if an
+        // optimized point was found.
 
         int count = 1;
-        std::vector<double> grad_tmp(natoms3);
+        srs::dvector grad_tmp(natoms3);
         while (count < npoints) {
             std::getline(from, line);
             if (line.find(pattern_grad, 0) != std::string::npos) {
@@ -567,15 +550,13 @@ void Gauss_data::get_irc_grad(std::vector<double>& grad) const
             }
             if (line.find(pattern_opt, 0) != std::string::npos) {
                 for (int i = 0; i < natoms3; ++i) {
-                    // convert forces to gradients
-                    grad.push_back(-1.0 * grad_tmp[i]);
+                    grad.push_back(-1.0 * grad_tmp(i));  // forces to gradients
                 }
                 count++;
             }
         }
         if (count == 0) {
-            throw Gauss_data_error(
-                "could not find IRC gradients in Gaussian file");
+            throw Gauss_error("could not find IRC gradients in Gaussian file");
         }
     }
     else {  // filetype == fchk
@@ -599,13 +580,12 @@ void Gauss_data::get_irc_grad(std::vector<double>& grad) const
             }
         }
         else {
-            throw Gauss_data_error(
-                "could not find IRC gradients in Gaussian file");
+            throw Gauss_error("could not find IRC gradients in Gaussian file");
         }
     }
 }
 
-void Gauss_data::get_irc_hess(std::vector<double>& hess) const
+void Gauss_data::get_irc_hess(srs::dvector& hess) const
 {
     from.clear();
     from.seekg(0, std::ios_base::beg);  // move to beginning of file
@@ -617,20 +597,17 @@ void Gauss_data::get_irc_hess(std::vector<double>& hess) const
         const int npoints = get_no_irc_points();
         const int natoms  = get_natoms();
         const int natoms3 = 3 * natoms;
+        const int nhess   = natoms3 * (natoms3 + 1) / 2;
 
-        const unsigned int nhess = natoms3 * (natoms3 + 1) / 2;
-
-        /*
-          Temporary store all Hessians; save last Hessians if an
-          optimized point was found.
-        */
+        // Temporary store all Hessians; save last Hessians if an
+        // optimized point was found.
 
         int count = 1;
         double fc;
         std::string line;
         std::string token;
         std::string data;
-        std::vector<double> hess_tmp(nhess);
+        srs::dvector hess_tmp(nhess);
         while (count < npoints) {
             std::getline(from, line);
             if (line.find(pattern_hess, 0) != std::string::npos) {
@@ -647,19 +624,18 @@ void Gauss_data::get_irc_hess(std::vector<double>& hess) const
                 }
             }
             if (line.find(pattern_opt, 0) != std::string::npos) {
-                for (unsigned int i = 0; i < nhess; ++i) {
-                    hess.push_back(hess_tmp[i]);
+                for (int i = 0; i < nhess; ++i) {
+                    hess.push_back(hess_tmp(i));
                 }
                 count++;
             }
         }
         if (count == 0) {
-            throw Gauss_data_error(
-                "could not find IRC Hessians in Gaussian file");
+            throw Gauss_error("could not find IRC Hessians in Gaussian file");
         }
     }
     else {  // filetype == fchk
-        throw Gauss_data_error(
+        throw Gauss_error(
             "IRC Hessians can only be extracted from Gaussian output files");
     }
 }
@@ -667,10 +643,8 @@ void Gauss_data::get_irc_hess(std::vector<double>& hess) const
 std::string Gauss_data::get_modredundant_coord() const
 {
     if (filetype == fchk) {
-        throw Gauss_data_error(
-            "get_modredundant_coord() only implemented for output files");
+        throw Gauss_error("not implemented for Gaussian fchk files");
     }
-
     from.clear();
     from.seekg(0, std::ios_base::beg);  // move to beginning of file
 
@@ -697,5 +671,5 @@ std::string Gauss_data::get_modredundant_coord() const
             }
         }
     }
-    throw Gauss_data_error("ModRedundant coordinate not found");
+    throw Gauss_error("ModRedundant coordinate not found");
 }
