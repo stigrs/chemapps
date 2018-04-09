@@ -47,7 +47,7 @@ endforeach()
 if (WIN32)
     install(
         TARGETS ${PROGRAMS}
-        DESTINATION bin 
+        DESTINATION bin  
         CONFIGURATIONS Release
     ) 
 elseif()
