@@ -17,10 +17,9 @@
 #ifndef CHEM_PTABLE_H
 #define CHEM_PTABLE_H
 
+#include <chem/element.h>
 #include <stdexcept>
 #include <string>
-
-#include <chem/element.h>
 
 //
 // Namespace providing the Periodic Table of Elements.
@@ -39,6 +38,7 @@ struct Bad_atomic_symbol : std::domain_error {
 
 Element get_element(const std::string& symbol);
 std::string get_atomic_symbol(const std::string& symbol);
+std::string get_atomic_symbol(int atomic_number);
 
 int get_max_atomic_number();
 int get_atomic_number(const std::string& symbol);

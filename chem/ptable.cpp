@@ -16,6 +16,7 @@
 
 #include <chem/ptable.h>
 #include <srs/utils.h>
+#include <algorithm>
 #include <array>
 
 namespace ptable {
@@ -2581,6 +2582,17 @@ Element get_element(const std::string& symbol)
         elem.isotope_comp  = isotope_comp[idx];
     }
     return elem;
+}
+
+std::string get_atomic_symbol(int atomic_number)
+{
+    auto idx = std::find(mass_numbers.begin(), mass_numbers.end(), atomic_number);
+    if (idx != mass_numbers.end()) {
+        return isotopes[*idx];
+    }
+    else {
+        return isotopes[0];
+    }
 }
 
 bool atomic_symbol_is_valid(const std::string& symbol)
