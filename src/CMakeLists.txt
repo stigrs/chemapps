@@ -14,6 +14,7 @@ set(
     PROGRAMS 
     brw
     cambi
+    gausscan
     mcmm 
     mh2ph
     molrot 
@@ -44,17 +45,8 @@ foreach(program ${PROGRAMS})
     endif()
 endforeach()
 
-if (WIN32)
-    install(
-        TARGETS ${PROGRAMS}
-        DESTINATION bin  
-        CONFIGURATIONS Release
-    ) 
-elseif()
-    foreach(program ${PROGRAMS})
-        install(
-            PROGRAMS ${ChemApps_BINARY_DIR}/src/${program} 
-            DESTINATION bin
-        )
-    endforeach()
-endif()
+install(
+    TARGETS ${PROGRAMS}
+    DESTINATION bin  
+    CONFIGURATIONS Release
+)
