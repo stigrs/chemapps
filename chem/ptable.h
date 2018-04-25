@@ -65,7 +65,7 @@ inline int ptable::get_atomic_number(const std::string& symbol)
     return elem.atomic_number;
 }
 
-inline int ptable::get_max_atomic_number() { return get_atomic_number("Uuo"); }
+inline int ptable::get_max_atomic_number() { return get_atomic_number("Og"); }
 
 inline int ptable::get_mass_number(const std::string& symbol)
 {

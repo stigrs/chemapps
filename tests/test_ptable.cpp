@@ -30,4 +30,6 @@ TEST_CASE("test_ptable")
         double atomic_mass = ptable::get_element("109Ag").atomic_mass;
         CHECK(atomic_mass == 108.904755);
     }
+
+    SECTION("atomic_number") { CHECK(ptable::get_atomic_symbol(15) == "P"); }
 }

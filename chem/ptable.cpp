@@ -18,8 +18,23 @@
 #include <srs/utils.h>
 #include <algorithm>
 #include <array>
+#include <gsl/gsl>
 
 namespace ptable {
+
+constexpr int num_elements = 119;
+
+const std::array<std::string, num_elements> elements
+    = {"X",  "H",  "He", "Li", "Be", "B",  "C",  "N",  "O",  "F",  "Ne", "Na",
+       "Mg", "Al", "Si", "P",  "S",  "Cl", "Ar", "K",  "Ca", "Sc", "Ti", "V",
+       "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br",
+       "Kr", "Rb", "Sr", "Y",  "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag",
+       "Cd", "In", "Sn", "Sb", "Te", "I",  "Xe", "Cs", "Ba", "La", "Ce", "Pr",
+       "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu",
+       "Hf", "Ta", "W",  "Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi",
+       "Po", "At", "Rn", "Fr", "Ra", "Ac", "Th", "Pa", "U",  "Np", "Pu", "Am",
+       "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr", "Rf", "Db", "Sg", "Bh",
+       "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og"};
 
 constexpr int num_isotopes = 3352;
 
@@ -498,11 +513,11 @@ const std::array<std::string, num_isotopes> isotopes
        "280Ds",  "281Ds",  "Rg",     "273Rg",  "274Rg",  "275Rg",  "276Rg",
        "277Rg",  "278Rg",  "279Rg",  "280Rg",  "281Rg",  "282Rg",  "283Rg",
        "Cn",     "277Cn",  "278Cn",  "279Cn",  "280Cn",  "281Cn",  "282Cn",
-       "283Cn",  "284Cn",  "285Cn",  "Uut",    "279Uut", "280Uut", "281Uut",
-       "282Uut", "283Uut", "284Uut", "285Uut", "286Uut", "287Uut", "Fl",
-       "286Fl",  "287Fl",  "288Fl",  "289Fl",  "Uup",    "288Uup", "289Uup",
-       "290Uup", "291Uup", "Lv",     "290Lv",  "291Lv",  "292Lv",  "293Lv",
-       "Uus",    "292Uus", "293Uus", "294Uus", "Uuo",    "294Uuo"};
+       "283Cn",  "284Cn",  "285Cn",  "Nh",    "279Nh", "280Nh", "281Nh",
+       "282Nh", "283Nh", "284Nh", "285Nh", "286Nh", "287Nh", "Fl",
+       "286Fl",  "287Fl",  "288Fl",  "289Fl",  "Mc",    "288Mc", "289Mc",
+       "290Mc", "291Mc", "Lv",     "290Lv",  "291Lv",  "292Lv",  "293Lv",
+       "Ts",    "292Ts", "293Ts", "294Ts", "Og",    "294Og"};
 
 const std::array<int, num_isotopes> mass_numbers = {
     0,   1,   2,   3,   4,   5,   6,   7,   3,   4,   5,   6,   7,   8,   9,
@@ -2586,13 +2601,8 @@ Element get_element(const std::string& symbol)
 
 std::string get_atomic_symbol(int atomic_number)
 {
-    auto idx = std::find(mass_numbers.begin(), mass_numbers.end(), atomic_number);
-    if (idx != mass_numbers.end()) {
-        return isotopes[*idx];
-    }
-    else {
-        return isotopes[0];
-    }
+    Expects(atomic_number >= 0 && atomic_number < num_elements);
+    return elements[atomic_number];
 }
 
 bool atomic_symbol_is_valid(const std::string& symbol)
