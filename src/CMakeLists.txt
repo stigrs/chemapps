@@ -14,6 +14,7 @@ set(
     PROGRAMS 
     brw
     cambi
+    cartoxyz
     gausscan
     mcmm 
     mh2ph
