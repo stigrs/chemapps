@@ -15,6 +15,7 @@ set(
     brw
     cambi
     cartoxyz
+    fchkgztoxyz
     gausscan
     mcmm 
     mh2ph
