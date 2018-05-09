@@ -14,17 +14,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CHEM_MOL_FORMULA_H
-#define CHEM_MOL_FORMULA_H
+#ifndef CHEM_MOL_TYPE_H
+#define CHEM_MOL_TYPE_H
 
 #include <string>
 
-//
+// Enumeration of molecular structure types.
+enum Mol_type { atom, linear, nonlinear };
+
 // Struct for holding molecular formula.
-//
 struct Mol_formula {
     std::string atom;  // atomic or isotopic symbol
     int stoich;        // stoichiometry
 };
 
-#endif  // CHEM_MOL_FORMULA_H
+#endif  // CHEM_MOL_TYPE_H

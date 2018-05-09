@@ -14,6 +14,7 @@ set(
     PROGRAMS 
     brw
     cambi
+    caprate
     cartoxyz
     fchkgztoxyz
     gausscan

@@ -18,7 +18,7 @@
 #define CHEM_MOLECULE_IO_H
 
 #include <chem/element.h>
-#include <chem/mol_formula.h>
+#include <chem/mol_type.h>
 #include <srs/array.h>
 #include <iostream>
 #include <stdexcept>

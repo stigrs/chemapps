@@ -17,7 +17,7 @@
 #ifndef CHEM_COLLISION_H
 #define CHEM_COLLISION_H
 
-#include <chem/mol_formula.h>
+#include <chem/mol_type.h>
 #include <srs/datum.h>
 #include <algorithm>
 #include <cmath>
