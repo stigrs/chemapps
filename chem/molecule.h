@@ -58,6 +58,12 @@ public:
 
     Molecule(const Molecule& mol);
 
+    // Initialize molecule.
+    void init(std::istream& from,
+              std::ostream& to,
+              const std::string& key,
+              bool verbose);
+
     // Return true if molecule has torsional modes.
     bool has_torsions() const { return tor->tot_minima() > 0; }
 
@@ -84,11 +90,6 @@ public:
     void print_data(std::ostream& to, const std::string& key) const;
 
 private:
-    void init(std::istream& from,
-              std::ostream& to,
-              const std::string& key,
-              bool verbose);
-
     std::string title;      // molecule information
     std::string geom_unit;  // units for geometry
 
