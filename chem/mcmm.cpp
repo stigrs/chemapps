@@ -73,6 +73,33 @@ Mcmm<Pot>::Mcmm(std::istream& from,
         }
     }
 
+    // Validate input:
+
+    if (xtol <= 0.0) {
+        throw Mcmm_error("bad xtol <= 0.0");
+    }
+    if (etol <= 0.0) {
+        throw Mcmm_error("bad etol <= 0.0");
+    }
+    if (rmin <= 0.0) {
+        throw Mcmm_error("bad rmin <= 0.0");
+    }
+    if (temp <= 0.0) {
+        throw Mcmm_error("bad temp <= 0.0");
+    }
+    if (kiter < 10) {  // should this be larger?
+        throw Mcmm_error("bad kiter < 10");
+    }
+    if (maxreject < 1) {
+        throw Mcmm_error("bad maxreject < 1");
+    }
+    if (nminima < 1) {
+        throw Mcmm_error("bad nminima < 1");
+    }
+    if (kiter < nminima) {
+        throw Mcmm_error("bad kiter < nminima");
+    }
+
     // Initialize potential:
 
     pot.init(from);
@@ -162,7 +189,7 @@ bool Mcmm<Pot>::check_exit() const
     std::adjacent_difference(eglobal.begin(), eglobal.end(), ediff.begin());
     if (ediff.size() > 1) {
         double ediff_max = *std::max_element(ediff.begin(), ediff.end());
-        if ((ediff_max < etol) && (kiter >= 10)) {
+        if ((ediff_max < etol) && (kiter >= nminima)) {
             finished = true;
         }
     }
