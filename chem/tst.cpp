@@ -145,7 +145,7 @@ void Tst::conventional(std::ostream& to) const
     srs::Format<double> sci;
     sci.scientific().width(10).precision(4);
 
-    for (int i = 0; i < temp.size(); ++i) {
+    for (srs::size_t i = 0; i < temp.size(); ++i) {
         double ktst = rate_conventional(temp(i));
         double wig  = kappa->wigner(temp(i));
         if (kappa->get_method() == "Eckart") {

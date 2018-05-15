@@ -108,7 +108,7 @@ void Mopac::write_xyz(std::ostream& to, const Molecule& mol) const
 
     for (std::size_t i = 0; i < mol.get_atoms().size(); ++i) {
         to << mol.get_atoms()[i].atomic_symbol << '\t';
-        for (int j = 0; j < mol.get_xyz().cols(); ++j) {
+        for (srs::size_t j = 0; j < mol.get_xyz().cols(); ++j) {
             to << fix(mol.get_xyz()(i, j)) << " " << opt_geom << " ";
         }
         to << '\n';
@@ -194,7 +194,7 @@ void Mopac::get_xyz(srs::dmatrix& xyz) const
                     double x;
                     double y;
                     double z;
-                    for (int i = 0; i < xyz.rows(); ++i) {
+                    for (srs::size_t i = 0; i < xyz.rows(); ++i) {
                         std::getline(from, buf);
                         std::istringstream iss(buf);
                         iss >> center >> atom >> x >> y >> z;

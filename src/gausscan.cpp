@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 
         std::cout << "#\t" << scan_coord << "\t\t"
                   << "Eigenvalues\n";
-        for (int i = 0; i < energy.size(); ++i) {
+        for (srs::size_t i = 0; i < energy.size(); ++i) {
             std::cout << i + 1 << '\t' << fix6(coord[i]) << '\t'
                       << fix6(energy[i]) << '\n';
         }

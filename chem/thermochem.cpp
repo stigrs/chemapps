@@ -181,7 +181,7 @@ double chem::qelec(const Molecule& mol, double temp)
 {
     srs::dvector elec = mol.get_elec_state();
     double qe         = 0.0;
-    for (int i = 0; i < elec.size(); i += 2) {
+    for (srs::size_t i = 0; i < elec.size(); i += 2) {
         qe += elec(i) * std::exp(-elec(i + 1) * datum::icm_to_K / temp);
     }
     return qe;
@@ -245,12 +245,12 @@ double chem::qvib(const Molecule& mol, double temp, const std::string& zeroref)
         srs::dvector w = datum::icm_to_K * mol.get_vib().get_freqs();
         double qv      = 1.0;
         if (zeroref == "V=0") {  // zero at first vibrational level
-            for (int i = 0; i < w.size(); ++i) {
+            for (srs::size_t i = 0; i < w.size(); ++i) {
                 qv /= (1.0 - std::exp(-w(i) / temp));
             }
         }
         else if (zeroref == "BOT") {  // zero at the bottom of the well
-            for (int i = 0; i < w.size(); ++i) {
+            for (srs::size_t i = 0; i < w.size(); ++i) {
                 qv *= std::exp(-w(i) / (2.0 * temp))
                       / (1.0 - std::exp(-w(i) / temp));
             }
@@ -270,7 +270,7 @@ double chem::entropy_vib(const Molecule& mol, double temp)
         Expects(temp > 0.0);
         srs::dvector w = datum::icm_to_K * mol.get_vib().get_freqs();
         double sv      = 0.0;
-        for (int i = 0; i < w.size(); ++i) {
+        for (srs::size_t i = 0; i < w.size(); ++i) {
             double wt = w(i) / temp;
             sv += wt / (std::exp(wt) - 1.0) - std::log(1.0 - std::exp(-wt));
         }
@@ -290,7 +290,7 @@ double chem::thermal_energy_vib(const Molecule& mol, double temp)
         Expects(temp > 0.0);
         srs::dvector w = datum::icm_to_K * mol.get_vib().get_freqs();
         double ev      = 0.0;
-        for (int i = 0; i < w.size(); ++i) {
+        for (srs::size_t i = 0; i < w.size(); ++i) {
             ev += w(i) * (0.5 + 1.0 / (std::exp(w(i) / temp) - 1.0));
         }
         ev *= datum::R;
@@ -309,7 +309,7 @@ double chem::const_vol_heat_vib(const Molecule& mol, double temp)
         Expects(temp > 0.0);
         srs::dvector w = datum::icm_to_K * mol.get_vib().get_freqs();
         double cv_v    = 0.0;
-        for (int i = 0; i < w.size(); ++i) {
+        for (srs::size_t i = 0; i < w.size(); ++i) {
             double wt = w(i) / temp;
             cv_v += wt * wt * std::exp(wt) / std::pow(std::exp(wt) - 1.0, 2.0);
         }
@@ -343,7 +343,7 @@ double chem::qctcw(const Molecule& mol, double temp)
             srs::dvector pot  = mol.get_tor().get_pot_coeff();
             srs::dvector freq = mol.get_tor().get_freqs();
             Expects(pot.size() == freq.size());
-            for (int i = 0; i < pot.size(); ++i) {
+            for (srs::size_t i = 0; i < pot.size(); ++i) {
                 double ui = pot(i) * datum::icm_to_K;
                 double wi = freq(i) * datum::icm_to_K;
                 qho += std::exp(-(ui + 0.5 * wi) / temp)

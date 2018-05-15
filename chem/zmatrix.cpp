@@ -42,7 +42,7 @@ std::vector<srs::ivector> Zmatrix::get_connectivities() const
         connect.push_back(ivec2);
     }
     if (atoms.size() > 2) {
-        for (int i = 3; i < bond_connect.size(); ++i) {
+        for (srs::size_t i = 3; i < bond_connect.size(); ++i) {
             srs::ivector ivec3
                 = {bond_connect(i), angle_connect(i), dihedral_connect(i)};
             connect.push_back(ivec3);
@@ -143,7 +143,7 @@ int Zmatrix::find_nearest_atom(const srs::dvector& dist) const
     double dist_min  = srs::min(dist);
     int nearest_atom = -1;
 
-    for (int i = 0; i < dist.size(); ++i) {
+    for (srs::size_t i = 0; i < dist.size(); ++i) {
         if (srs::approx_equal(dist(i), dist_min, 1.0e-12)) {
             nearest_atom = gsl::narrow<int>(i);
             break;
@@ -156,7 +156,7 @@ int Zmatrix::find_new_connection(const srs::ivector& iatms,
                                  const srs::ivector& connectivity) const
 {
     int connection = 0;
-    for (int idx = 1; idx < connectivity.size(); ++idx) {
+    for (srs::size_t idx = 1; idx < connectivity.size(); ++idx) {
         // clang-format off
         if (std::find(iatms.begin(), iatms.end(), idx) == iatms.end()
             && std::find(iatms.begin(), iatms.end(), connectivity(idx)) != iatms.end()) {

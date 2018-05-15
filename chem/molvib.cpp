@@ -50,7 +50,7 @@ void Molvib::print(std::ostream& to)
     if (freqs.size() > 0) {
         int it = 0;
         to << "\nVibrational modes (cm^-1):\n" << line('-') << '\n';
-        for (int i = 0; i < freqs.size(); ++i) {
+        for (srs::size_t i = 0; i < freqs.size(); ++i) {
             to << fix(freqs(i));
             if ((it == 8) && (freqs.size() > 9)) {
                 to << '\n';

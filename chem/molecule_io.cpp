@@ -206,7 +206,7 @@ void chem::print_xyz_format(std::ostream& to,
     to << title << '\n';
     for (std::size_t i = 0; i < atoms.size(); ++i) {
         to << atoms[i].atomic_symbol << '\t';
-        for (int j = 0; j < xyz.cols(); ++j) {
+        for (srs::size_t j = 0; j < xyz.cols(); ++j) {
             to << fix(xyz(i, j)) << '\t';
         }
         to << '\n';
@@ -264,7 +264,7 @@ void chem::print_elec_states(std::ostream& to, const srs::dvector& elec_state)
        << " #\tEnergy/cm^-1\tDegeneracy\n"
        << line('-') << '\n';
     int it = 1;
-    for (int i = 0; i < elec_state.size(); i += 2) {
+    for (srs::size_t i = 0; i < elec_state.size(); i += 2) {
         to << " " << it << '\t' << fix(elec_state(i + 1)) << "\t\t"
            << elec_state(i) << '\n';
         it += 1;
@@ -289,7 +289,7 @@ void chem::print_geometry(std::ostream& to,
            << line('-') << '\n';
         for (std::size_t i = 0; i < atoms.size(); ++i) {
             to << i + 1 << '\t' << atoms[i].atomic_symbol << '\t';
-            for (int j = 0; j < xyz.cols(); ++j) {
+            for (srs::size_t j = 0; j < xyz.cols(); ++j) {
                 to << fix(xyz(i, j)) << '\t';
             }
             to << '\n';

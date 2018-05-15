@@ -144,7 +144,7 @@ srs::dvector Molrot::center_of_mass() const
 {
     srs::dvector com(3);
 
-    for (int j = 0; j < xyz.cols(); ++j) {
+    for (srs::size_t j = 0; j < xyz.cols(); ++j) {
         double sum = 0.0;
         for (std::size_t i = 0; i < atoms.size(); ++i) {
             sum += atoms[i].atomic_mass * xyz(i, j);
@@ -237,15 +237,15 @@ void Molrot::print_principal_moments(std::ostream& to) const
            << "Eigenvalue: " << fix(pmom(0)) << ' ' << fix(pmom(1)) << ' '
            << fix(pmom(2)) << '\n';
         to << "     X      ";
-        for (int i = 0; i < pmom.size(); ++i) {
+        for (srs::size_t i = 0; i < pmom.size(); ++i) {
             to << fix(paxis(0, i)) << ' ';
         }
         to << "\n     Y      ";
-        for (int i = 0; i < pmom.size(); ++i) {
+        for (srs::size_t i = 0; i < pmom.size(); ++i) {
             to << fix(paxis(1, i)) << ' ';
         }
         to << "\n     Z      ";
-        for (int i = 0; i < pmom.size(); ++i) {
+        for (srs::size_t i = 0; i < pmom.size(); ++i) {
             to << fix(paxis(2, i)) << ' ';
         }
         to << '\n';

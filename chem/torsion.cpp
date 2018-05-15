@@ -75,7 +75,7 @@ void Torsion::analysis(std::ostream& to)
            << "Center  Atomic  Atomic\n"
            << "Number  Symbol  Mass\n"
            << line('-') << '\n';
-        for (int i = 0; i < rot_top.size(); ++i) {
+        for (srs::size_t i = 0; i < rot_top.size(); ++i) {
             to << i + 1 << '\t' << rot.atoms[i].atomic_symbol << '\t'
                << fix(rot.atoms[i].atomic_mass) << '\n';
         }
@@ -115,7 +115,7 @@ void Torsion::analysis(std::ostream& to)
             to << "\nTorsional modes:\n" << line('-') << '\n';
             line.width(32).fill(' ');
             to << line(' ');
-            for (int i = 0; i < sigma_tor.size(); ++i) {
+            for (srs::size_t i = 0; i < sigma_tor.size(); ++i) {
                 to << "  Minimum " << i + 1;
             }
             line.width(32 + 11 * sigma_tor.size()).fill('-');
@@ -158,7 +158,7 @@ double Torsion::eff_moment_of_inertia() const
 {
     double imom_eff = 0.0;
     if (tot_minima() > 0) {
-        for (int i = 0; i < sigma_tor.size(); ++i) {
+        for (srs::size_t i = 0; i < sigma_tor.size(); ++i) {
             imom_eff += sigma_tor(i) * rmi_tor(i);  // eq. 7 in C&T (2000)
         }
         imom_eff /= static_cast<double>(tot_minima());
@@ -172,7 +172,7 @@ srs::dvector Torsion::constant() const
 
     srs::dvector rotc(rmi_tor.size(), 0.0);
     if (!rmi_tor.empty()) {
-        for (int i = 0; i < rotc.size(); ++i) {
+        for (srs::size_t i = 0; i < rotc.size(); ++i) {
             rotc(i)
                 = h_bar
                   / (4.0 * pi * giga * m_u * a_0 * a_0 * 1.0e-20 * rmi_tor(i));
@@ -205,7 +205,7 @@ double Torsion::red_moment_of_inertia()
     // origin of the coordinates of the top onto the principal axes:
 
     srs::dvector rm(3);
-    for (int i = 0; i < rm.size(); ++i) {
+    for (srs::size_t i = 0; i < rm.size(); ++i) {
         rm(i) = srs::dot(top_origo, rot.paxis.row(i));
     }
 
@@ -397,9 +397,9 @@ void Torsion::axis_system()
 void Torsion::center_of_mass()
 {
     std::cout << top_com.size() << std::endl;
-    for (int j = 0; j < xyz_.cols(); ++j) {
+    for (srs::size_t j = 0; j < xyz_.cols(); ++j) {
         double sum = 0.0;
-        for (int i = 0; i < rot_top.size(); ++i) {
+        for (srs::size_t i = 0; i < rot_top.size(); ++i) {
             sum += rot.atoms[i].atomic_mass * xyz_(i, j);
         }
         top_com(j) = sum / rot.tot_mass();
@@ -421,10 +421,10 @@ void Torsion::top_moment_of_inertia()
     // Project coordinates of rotating top onto the (x,y,z) coordinate system:
 
     srs::dmatrix top_xyz(rot_top.size(), 3);
-    for (int i = 0; i < rot_top.size(); ++i) {
+    for (srs::size_t i = 0; i < rot_top.size(); ++i) {
         top_xyz.row(i) = xyz_.row(rot_top(i)) - top_origo;
     }
-    for (int i = 0; i < top_xyz.rows(); ++i) {
+    for (srs::size_t i = 0; i < top_xyz.rows(); ++i) {
         double x      = srs::dot(top_xyz.row(i), x_axis);
         double y      = srs::dot(top_xyz.row(i), y_axis);
         double z      = srs::dot(top_xyz.row(i), z_axis);
