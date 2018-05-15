@@ -61,9 +61,6 @@ Mcmm<Pot>::Mcmm(std::istream& from,
             }
         }
     }
-    else {
-        throw Mcmm_error("cannot find " + key + " section");
-    }
 
     // Check if initialized:
 
