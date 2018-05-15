@@ -14,6 +14,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#pragma warning(push)
+#pragma warning(disable : 4458)  // caused by boost/iostreams/filter/gzip.hpp
+#pragma warning(disable : 4706)  // caused by boost/iostreams/filter/zlib.hpp
+
 #include <chem/gauss_data.h>
 #include <chem/ptable.h>
 #include <srs/datum.h>
@@ -25,6 +29,8 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+
+#pragma warning(pop)
 
 //
 // Extracts current Cartesian coordinates from a Gaussian fchk.gz file
