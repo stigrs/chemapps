@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4.3)
 project(ChemLib CXX)
 
-include_directories(${ChemApps_SOURCE_DIR})
+include_directories(${ChemApps_SOURCE_DIR}/include)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${GSL_INCLUDE_DIR})
 include_directories(${MKL_INCLUDE_DIR})
