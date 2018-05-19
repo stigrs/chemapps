@@ -128,7 +128,10 @@ int main(int argc, char* argv[])
 
 double n_el_eff(int species)
 {
-    double n_tot, n_eff, n_int, n_ext;
+    double n_tot;
+    double n_eff;
+    double n_int;
+    double n_ext;
     std::string type;
     switch (species) {
     case 1:
