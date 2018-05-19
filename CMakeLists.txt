@@ -58,8 +58,7 @@ add_compile_options(
 if(WIN32)
     set(Boost_USE_STATIC_LIBS ON)
 endif()
-#find_package(Boost 1.58.0 COMPONENTS program_options iostreams REQUIRED)
-find_package(Boost 1.58.0 REQUIRED)
+find_package(Boost 1.58.0 COMPONENTS program_options iostreams REQUIRED)
 
 # GSL library is required.
 find_path(GSL_INCLUDE_DIR gsl HINTS $ENV{HOME}/include /usr/include /usr/local/include)
@@ -85,7 +84,22 @@ else()
     find_path(SRS_LIB_DIR libsrs.so HINTS $ENV{HOME}/lib /usr/lib /usr/local/lib)
 endif()
 
-add_subdirectory(chem)
+add_library(chem_h INTERFACE)
+
+target_include_directories(chem_h INTERFACE
+    $<BUILD_INTERFACE:
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${GSL_INCLUDE_DIR}
+        ${SRS_INCLUDE_DIR}
+    >
+)
+
+install(
+    DIRECTORY include/chem
+    DESTINATION include
+)
+
+add_subdirectory(lib)
 add_subdirectory(src)
 
 if(BUILD_TESTS)
