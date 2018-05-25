@@ -42,6 +42,7 @@ void thermochemistry(const Molecule& mol,
 
 // Calculate translational partitition function.
 double qtrans(const Molecule& mol, double temp = 298.15, double pressure = 0.0);
+double qtrans(double mass, double temp = 298.15);
 
 // Calculate translational contribution to entropy.
 double entropy_trans(const Molecule& mol,
@@ -180,6 +181,13 @@ inline double chem::qtrans(const Molecule& mol, double temp, double pressure)
         vol = k * temp / pressure;
     }
     return std::pow((2.0 * pi * mass * k * temp) / (h * h), 1.5) * vol;
+}
+
+inline double chem::qtrans(double mass, double temp)
+{
+    double qtr
+        = std::pow(2.0 * datum::pi * mass * datum::m_u * datum::k * temp, 1.5);
+    return qtr /= std::pow(datum::h, 3.0);
 }
 
 inline double chem::entropy_trans(const Molecule& mol,
