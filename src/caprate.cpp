@@ -105,6 +105,7 @@ void read_input(const std::string& input_file)
               << t_grid << '\n';
 
     frag1.init(from, std::cout, "Fragment1", true);
+    std::cout << '\n';
     frag2.init(from, std::cout, "Fragment2", true);
 }
 
@@ -148,7 +149,7 @@ void read_nej(const std::string& input_file)
 //
 void integrate()
 {
-    std::cout << "Abbreviations:\n"
+    std::cout << "\nAbbreviations:\n"
               << " Q_frag(T) - partition function of fragments (cm**-3).\n"
               << " k_cap(T)  - capture rate coefficient "
               << "(cm**3 molecule**-1 s**-1).\n\n"
@@ -183,7 +184,8 @@ void integrate()
         qfrag = chem::qtrans(red_mass, t_grid[t]) * 1.0e-6;  // cm**-3
         qfrag *= chem::qrot(frag1, t_grid[t], true);
         qfrag *= chem::qrot(frag2, t_grid[t], true);
-        kcap *= estep * jstep / (datum::pi * datum::h_bar * qfrag / datum::k);
+        kcap *= estep * jstep
+                / (2.0 * datum::pi * datum::h_bar * qfrag / datum::E_h);
 
         std::cout << t_grid[t] << '\t' << qfrag << '\t' << kcap << '\n';
     }
