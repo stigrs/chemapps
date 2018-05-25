@@ -32,7 +32,7 @@ Molrot::Molrot(const Molrot& rot)
 
 void Molrot::analysis(std::ostream& to)
 {
-    if (!atoms.empty()) {
+    if (!atoms.empty() && atoms.size() > 1) {
         rotate_to_principal_axes();
         to << "\nGeometry in principal axes coordinate system:\n";
         chem::print_geometry(to, atoms, xyz);
