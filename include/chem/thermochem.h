@@ -185,9 +185,9 @@ inline double chem::qtrans(const Molecule& mol, double temp, double pressure)
 
 inline double chem::qtrans(double mass, double temp)
 {
-    double qtr
-        = std::pow(2.0 * datum::pi * mass * datum::m_u * datum::k * temp, 1.5);
-    return qtr /= std::pow(datum::h, 3.0);
+    Expects(temp >= 0.0);
+    return std::pow(2.0 * datum::pi * mass * datum::m_u * datum::k * temp, 1.5)
+           / std::pow(datum::h, 3.0);
 }
 
 inline double chem::entropy_trans(const Molecule& mol,
