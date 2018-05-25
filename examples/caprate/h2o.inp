@@ -1,8 +1,6 @@
-Title
- H + OH --> H2O
- Rotational dynamics, VRC-TST
- CASPT2/aug-cc-pVTZ
-End
+# H + OH --> H2O
+# Rotational dynamics, VRC-TST
+# CASPT2/aug-cc-pVTZ
 
 EnergyGrid
  min    50
@@ -23,14 +21,19 @@ TemprsGrid
 End
 
 Fragment1
- structure linear
- mass      17.0
- rot_const 3 [ 0.0 18.91 0.0 ]
- sigma     1
+ geometry
+ 2
+ OH radical
+ O  0.0000000  0.0000000  0.1077390
+ H  0.0000000  0.0000000 -0.8619150
+ sigma     
+ 1
 End
 
 Fragment2
- structure atom
- mass      1.00782
+ geometry
+ 1
+ Hydrogen
+ H 0.0 0.0 0.0
 End 
 
