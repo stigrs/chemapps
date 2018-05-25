@@ -118,23 +118,23 @@ void read_nej(const std::string& input_file)
     double ee = 0.0;
     double jj = 0.0;
     double n  = 0.0;
-    for (int j = 0; j < j_grid.size(); ++j) {
-        for (int e = 0; e < e_grid.size(); ++e) {
+    for (srs::size_t j = 0; j < j_grid.size(); ++j) {
+        for (srs::size_t e = 0; e < e_grid.size(); ++e) {
             from >> ee >> jj >> n;
             if (!from) {
                 throw Caprate_error("cannot read " + input_file);
             }
             if (ee != e_grid[e]) {
-                throw Caprate_error(
-                    srs::to_string(e) + "-th energy has bad value: "
-                    + srs::to_string(ee) + ", " + srs::to_string(e_grid[e]));
+                throw Caprate_error(srs::to_string(e) + "-th E has bad value: "
+                                    + srs::to_string(ee) + ", "
+                                    + srs::to_string(e_grid[e]));
             }
             nej(e, j) = n;
         }
         if (jj != j_grid[j]) {
-            throw Caprate_error(
-                srs::to_string(j) + "-th ang. mom. has bad value: "
-                + srs::to_string(jj) + ", " + srs::to_string(j_grid[j]));
+            throw Caprate_error(srs::to_string(j)
+                                + "-th J has bad value: " + srs::to_string(jj)
+                                + ", " + srs::to_string(j_grid[j]));
         }
     }
 }
@@ -156,8 +156,6 @@ void integrate()
               << std::setw(35) << std::setfill('-') << '-' << std::setfill(' ')
               << '\n';
 
-    double red_mass = frag1.mass * frag2.mass / (frag1.mass + frag2.mass);
-
     double estart = e_grid.start() / datum::au_to_icm;
     double emax   = e_grid.size() / datum::au_to_icm;
     double estep  = e_grid.step() / datum::au_to_icm;
@@ -165,23 +163,27 @@ void integrate()
 
     e_grid.set(estart, emax, estep);  // atomic units
 
-    double tt, twoj, qfrag, kcap;
-    for (std::size_t t = 0; t < t_grid.size(); ++t) {
+    double tt;
+    double twoj;
+    double qfrag;
+    double kcap;
+
+    double red_mass = frag1.tot_mass() * frag2.tot_mass()
+                      / (frag1.tot_mass() + frag2.tot_mass());
+
+    for (srs::size_t t = 0; t < t_grid.size(); ++t) {
         kcap = 0.0;
         tt   = t_grid[t] / datum::au_to_K;
-        for (std::size_t e = 0; e < e_grid.size(); ++e) {
-            for (std::size_t j = 0; j < j_grid.size(); ++j) {
+        for (srs::size_t e = 0; e < e_grid.size(); ++e) {
+            for (srs::size_t j = 0; j < j_grid.size(); ++j) {
                 twoj = 2.0 * j_grid[j] + 1.0;
                 kcap += twoj * nej(e, j) * std::exp(-e_grid[e] / tt);
             }
         }
-        qfrag = chem::trans(red_mass, t_grid[t]) * 1.0e-6;  // cm**-3
-        qfrag *= chem::rot(
-            frag1.structure, frag1.rot_const.data(), frag1.sigma, t_grid[t]);
-        qfrag *= chem::rot(
-            frag2.structure, frag2.rot_const.data(), frag2.sigma, t_grid[t]);
-
-        kcap *= estep * jstep / (srs::m_twopi * Phys_const::au2s * qfrag);
+        qfrag = chem::qtrans(red_mass, t_grid[t]) * 1.0e-6;  // cm**-3
+        qfrag *= chem::qrot(frag1, t_grid[t], true);
+        qfrag *= chem::qrot(frag2, t_grid[t], true);
+        kcap *= estep * jstep / (datum::pi * datum::h_bar * qfrag / datum::k);
 
         std::cout << t_grid[t] << '\t' << qfrag << '\t' << kcap << '\n';
     }
