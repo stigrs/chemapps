@@ -105,8 +105,10 @@ void read_input(const std::string& input_file)
               << t_grid << '\n';
 
     frag1.init(from, std::cout, "Fragment1", true);
+    frag1.get_rot().analysis();
     std::cout << '\n';
     frag2.init(from, std::cout, "Fragment2", true);
+    frag2.get_rot().analysis();
 }
 
 void read_nej(const std::string& input_file)
