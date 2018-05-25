@@ -1,0 +1,38 @@
+Title
+ OH + OH --> H2O2
+ Rotational dynamics, VRC-TST, 2TS model
+ CASPT2/aug-cc-pVTZ
+End
+
+EnergyGrid
+  min   50 
+  max   30000 
+  step  50
+End
+
+AngMomGrid
+  min   2 
+  max   200 
+  step  2
+End
+
+TemprsGrid
+  min   100 
+  max   3000 
+  step  50
+End
+
+Fragment1
+  structure linear
+  mass      17.0
+  rot_const 0.0 18.91 0.0
+  sigma     1
+End
+
+Fragment2
+  structure linear
+  mass      17.0
+  rot_const 0.0 18.91 0.0
+  sigma     1
+End
+
