@@ -17,6 +17,7 @@ set(
     caprate
     cartoxyz
     fchkgztoxyz
+    gaussfreq
     gausscan
     mcmm 
     mh2ph
