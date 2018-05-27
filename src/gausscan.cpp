@@ -28,7 +28,7 @@
 int main(int argc, char* argv[])
 {
     if (argc != 2) {
-        std::cerr << "usage: " << argv[0] << " gaussian_output_file\n";
+        std::cerr << "usage: " << argv[0] << " gaussian.log\n";
         return 1;
     }
 
