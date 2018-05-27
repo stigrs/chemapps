@@ -18,6 +18,7 @@ set(
     cartoxyz
     fchkgztoxyz
     gaussfreq
+    gausshess
     gausscan
     mcmm 
     mh2ph
