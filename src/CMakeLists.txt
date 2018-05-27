@@ -19,6 +19,7 @@ set(
     fchkgztoxyz
     gaussfreq
     gausshess
+    gausshess2
     gausscan
     mcmm 
     mh2ph
