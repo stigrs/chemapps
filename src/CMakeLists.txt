@@ -17,6 +17,7 @@ set(
     caprate
     cartoxyz
     fchkgztoxyz
+    gausscp
     gaussfreq
     gausshess
     gausshess2
