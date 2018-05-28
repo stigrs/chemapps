@@ -54,6 +54,7 @@ on the following platforms:
 * GNU/Linux using GCC 5.4.0
 * GNU/Linux using Clang 3.8.0
 * OS X El Capitan (10.12) using Apple LLVM 8.1.0
+* OS X High Sierra (10.13) using Apple LLVM 9.1.0
 * Windows 7 using Visual Studio 2017
 
 ### Obtaining the Source Code
