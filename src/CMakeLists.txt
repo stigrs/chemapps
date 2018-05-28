@@ -17,11 +17,12 @@ set(
     caprate
     cartoxyz
     fchkgztoxyz
+    gausscan
     gausscp
     gaussfreq
     gausshess
     gausshess2
-    gausscan
+    gaussnmr
     gausstopoly
     mcmm 
     mh2ph
