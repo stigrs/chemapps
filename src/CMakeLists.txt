@@ -30,6 +30,7 @@ set(
     mh2ph
     molrot 
     moptonw
+    moptoxyz
     thermo
     tst
     zmatxyz
