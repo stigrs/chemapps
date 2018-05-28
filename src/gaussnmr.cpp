@@ -30,7 +30,6 @@
 #include <string>
 #include <vector>
 
-
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif  // _MSC_VER
@@ -59,8 +58,8 @@ int main(int argc, char* argv[])
     po::notify(vm);
 
     std::string input_file;
-    std::string nmr_method = "GIAO";  // default NMR method
-    double degen_tol       = 0.05;    // default degeneracy tolerance
+    std::string nmr_method = "SCF GIAO";  // default NMR method
+    double degen_tol       = 0.05;        // default degeneracy tolerance
 
     if (vm.find("help") != vm.end()) {
         std::cout << options << '\n';
