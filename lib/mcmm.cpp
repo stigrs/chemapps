@@ -84,8 +84,8 @@ Mcmm<Pot>::Mcmm(std::istream& from,
     if (temp <= 0.0) {
         throw Mcmm_error("bad temp <= 0.0");
     }
-    if (kiter < 10) {  // should this be larger?
-        throw Mcmm_error("bad kiter < 10");
+    if (maxiter < 10) {  // should this be larger?
+        throw Mcmm_error("bad maxiter < 10");
     }
     if (maxreject < 1) {
         throw Mcmm_error("bad maxreject < 1");
@@ -93,8 +93,8 @@ Mcmm<Pot>::Mcmm(std::istream& from,
     if (nminima < 1) {
         throw Mcmm_error("bad nminima < 1");
     }
-    if (kiter < nminima) {
-        throw Mcmm_error("bad kiter < nminima");
+    if (maxiter < nminima) {
+        throw Mcmm_error("bad maxiter < nminima");
     }
 
     // Initialize potential:

@@ -1,6 +1,6 @@
 Mcmm
   maxiter
-    10
+    20
   seed
     1234
 End
