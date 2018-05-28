@@ -26,6 +26,7 @@ set(
     gausstopoly
     gmsget
     gmsgetxyz
+    gmsscan
     mcmm 
     mergeirc
     mh2ph
