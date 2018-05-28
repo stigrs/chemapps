@@ -25,6 +25,7 @@ set(
     gaussnmr
     gausstopoly
     gmsget
+    gmsgetxyz
     mcmm 
     mh2ph
     molrot 
