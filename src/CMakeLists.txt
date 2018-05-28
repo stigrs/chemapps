@@ -27,6 +27,7 @@ set(
     gmsget
     gmsgetxyz
     mcmm 
+    mergeirc
     mh2ph
     molrot 
     moptonw
