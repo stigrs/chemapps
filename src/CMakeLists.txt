@@ -24,6 +24,7 @@ set(
     gausshess2
     gaussnmr
     gausstopoly
+    gmsget
     mcmm 
     mh2ph
     molrot 
