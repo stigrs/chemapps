@@ -14,9 +14,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4458)  // caused by boost/iostreams/filter/gzip.hpp
 #pragma warning(disable : 4706)  // caused by boost/iostreams/filter/zlib.hpp
+#endif                           // _MSC_VER
 
 #include <chem/gauss_data.h>
 #include <chem/ptable.h>
@@ -30,7 +32,9 @@
 #include <sstream>
 #include <string>
 
+#ifdef _MSC_VER
 #pragma warning(pop)
+#endif  // _MSC_VER
 
 //
 // Extracts current Cartesian coordinates from a Gaussian fchk.gz file
