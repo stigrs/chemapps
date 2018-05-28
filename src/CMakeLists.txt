@@ -29,6 +29,7 @@ set(
     mcmm 
     mh2ph
     molrot 
+    moptonw
     thermo
     tst
     zmatxyz
