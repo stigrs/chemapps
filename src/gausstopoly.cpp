@@ -93,8 +93,8 @@ int main(int argc, char* argv[])
         ("energy,e", po::value<double>(), "energy of reactants (0.0)")
         ("corr,c", po::value<double>(), "correction to SMEP (0.0)")
         ("sign,s", po::bool_switch()->default_value(false), "change sign of SMEP values (false)")
-        ("reverse,r", po::bool_switch()->default_value(false), "reverse MEP values (false")
-        ("hess,h", po::bool_switch()->default_value(false), "get Hessians (false");
+        ("reverse,r", po::bool_switch()->default_value(false), "reverse MEP values (false)")
+        ("hess,h", po::bool_switch()->default_value(false), "get Hessians (false)");
     // clang-format on
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, options), vm);
