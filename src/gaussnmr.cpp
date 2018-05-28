@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
 
         std::sort(nmr[i].number.begin(), nmr[i].number.end());
 
-        for (std::size_t j = 0; j < nmr[i].number.size(); ++j) {
+        for (srs::size_t j = 0; j < nmr[i].number.size(); ++j) {
             std::cout << nmr[i].number[j];
             if ((nmr[i].number.size() > 1) && (j < nmr[i].number.size() - 1)) {
                 std::cout << ',';
