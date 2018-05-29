@@ -35,6 +35,7 @@ set(
     moptoxyz
     nejconv
     nejeff
+    nwget
     thermo
     tst
     zmatxyz
