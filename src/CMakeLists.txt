@@ -44,6 +44,7 @@ set(
     tst
     vflxget
     xyztogms
+    xyztomop
     zmatxyz
 )
 
