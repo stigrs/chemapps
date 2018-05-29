@@ -33,6 +33,7 @@ set(
     molrot 
     moptonw
     moptoxyz
+    nejconv
     thermo
     tst
     zmatxyz
