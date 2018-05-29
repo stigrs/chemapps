@@ -43,6 +43,7 @@ set(
     thermo
     tst
     vflxget
+    xyztogms
     zmatxyz
 )
 
