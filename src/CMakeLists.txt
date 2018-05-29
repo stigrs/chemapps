@@ -36,6 +36,7 @@ set(
     nejconv
     nejeff
     nwget
+    nwgetxyz
     thermo
     tst
     zmatxyz
