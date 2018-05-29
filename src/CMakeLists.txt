@@ -39,6 +39,7 @@ set(
     nwgetxyz
     nwzmap
     polyplot
+    sortirc
     thermo
     tst
     zmatxyz
