@@ -60,6 +60,10 @@ void nej_conv(const std::string& filename);
 
 //------------------------------------------------------------------------------
 
+//
+// Program for convolution of N(E,J) of transitional degrees of freedom
+// with vibrational number of states.
+//
 int main(int argc, char* argv[])
 {
     if (argc != 3) {
