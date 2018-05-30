@@ -48,5 +48,4 @@ install(
     TARGETS chem
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
-    CONFIGURATIONS Release
 )

@@ -74,5 +74,4 @@ endforeach()
 install(
     TARGETS ${PROGRAMS}
     DESTINATION bin  
-    CONFIGURATIONS Release
 )
