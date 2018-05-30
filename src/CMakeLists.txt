@@ -42,6 +42,7 @@ set(
     sortirc
     thermo
     tst
+    unitsconv
     vflxget
     xyztogms
     xyztomop
