@@ -222,7 +222,7 @@ void Gauss_data::get_hessians(srs::dvector& hess) const
         if (line.find(pattern, 0) != std::string::npos) {
             std::istringstream iss(line);
             iss >> buffer >> buffer >> buffer >> buffer >> buffer >> n;
-			hess.resize(n);
+            hess.resize(n);
             for (int i = 0; i < n; ++i) {
                 from >> hess(i);
                 if (!from) {
