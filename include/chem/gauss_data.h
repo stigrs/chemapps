@@ -88,6 +88,9 @@ public:
     // Get vibrational frequencies.
     void get_freqs(srs::dvector& freqs) const;
 
+    // Get hessians.
+    void get_hessians(srs::dvector& hess) const;
+
     // Get data from relaxed PES scan.
     void get_pes_scan_data(std::string& scan_coord,
                            srs::dvector& coord,

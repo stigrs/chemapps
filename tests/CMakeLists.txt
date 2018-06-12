@@ -76,6 +76,7 @@ endfunction()
 
 set(PROGRAMS 
     test_collision
+	test_gauss_data
     test_gaussnmr
     test_mcmm
     test_molecule

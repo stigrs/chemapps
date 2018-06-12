@@ -204,6 +204,35 @@ void Gauss_data::get_freqs(srs::dvector& freqs) const
     }
 }
 
+void Gauss_data::get_hessians(srs::dvector& hess) const
+{
+    if (filetype == out) {
+        throw Gauss_error("not implemented for Gaussian output files");
+    }
+    from.clear();
+    from.seekg(0, std::ios_base::beg);  // move to beginning of file
+
+    const std::string pattern = "Cartesian Force Constants";
+
+    std::string line;
+    std::string buffer;
+    int n;
+
+    while (std::getline(from, line)) {
+        if (line.find(pattern, 0) != std::string::npos) {
+            std::istringstream iss(line);
+            iss >> buffer >> buffer >> buffer >> buffer >> buffer >> n;
+			hess.resize(n);
+            for (int i = 0; i < n; ++i) {
+                from >> hess(i);
+                if (!from) {
+                    throw Gauss_error("could not read Hessians from fchk file");
+                }
+            }
+        }
+    }
+}
+
 void Gauss_data::get_pes_scan_data(std::string& scan_coord,
                                    srs::dvector& coord,
                                    srs::dvector& energy) const
@@ -348,7 +377,8 @@ int Gauss_data::get_no_irc_points() const
         npoints /= 2;
     }
     from.clear();
-    from.seekg(orig_pos, std::ios_base::beg);  // move back to original position
+    from.seekg(orig_pos,
+               std::ios_base::beg);  // move back to original position
     from.clear();
 
     return npoints;
@@ -636,7 +666,8 @@ void Gauss_data::get_irc_hess(srs::dvector& hess) const
     }
     else {  // filetype == fchk
         throw Gauss_error(
-            "IRC Hessians can only be extracted from Gaussian output files");
+            "IRC Hessians can only be extracted from Gaussian output "
+            "files");
     }
 }
 
