@@ -45,6 +45,6 @@ TEST_CASE("test_gauss_data")
     Gauss_data gauss(from, fchk);
     gauss.get_hessians(hess);
 
-	CHECK(hess.size() == ans.size());
-    //CHECK(srs::approx_equal(hess, ans, 1.0e-12));
+    CHECK(hess.size() == ans.size());
+    CHECK(srs::approx_equal(hess, ans, 1.0e-12));
 }
