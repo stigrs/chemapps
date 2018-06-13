@@ -18,6 +18,7 @@
 #define CHEM_GAUSS_DATA_H
 
 #include <srs/array.h>
+#include <srs/packed.h>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -89,7 +90,7 @@ public:
     void get_freqs(srs::dvector& freqs) const;
 
     // Get hessians.
-    void get_hessians(srs::dvector& hess) const;
+    void get_hessians(srs::packed_dmatrix& hess) const;
 
     // Get data from relaxed PES scan.
     void get_pes_scan_data(std::string& scan_coord,

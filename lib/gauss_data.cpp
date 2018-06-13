@@ -204,7 +204,7 @@ void Gauss_data::get_freqs(srs::dvector& freqs) const
     }
 }
 
-void Gauss_data::get_hessians(srs::dvector& hess) const
+void Gauss_data::get_hessians(srs::packed_dmatrix& hess) const
 {
     if (filetype == out) {
         throw Gauss_error("not implemented for Gaussian output files");
@@ -218,19 +218,21 @@ void Gauss_data::get_hessians(srs::dvector& hess) const
     std::string buffer;
     int n;
 
+	srs::dvector tmp;
     while (std::getline(from, line)) {
         if (line.find(pattern, 0) != std::string::npos) {
             std::istringstream iss(line);
             iss >> buffer >> buffer >> buffer >> buffer >> buffer >> n;
-            hess.resize(n);
+            tmp.resize(n);
             for (int i = 0; i < n; ++i) {
-                from >> hess(i);
+                from >> tmp(i);
                 if (!from) {
                     throw Gauss_error("could not read Hessians from fchk file");
                 }
             }
         }
     }
+    hess = srs::packed_dmatrix(tmp);
 }
 
 void Gauss_data::get_pes_scan_data(std::string& scan_coord,

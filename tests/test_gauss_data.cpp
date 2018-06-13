@@ -16,6 +16,7 @@
 
 #include <chem/gauss_data.h>
 #include <srs/array.h>
+#include <srs/packed.h>
 #include <srs/math.h>
 #include <srs/utils.h>
 #include <catch/catch.hpp>
@@ -40,11 +41,13 @@ TEST_CASE("test_gauss_data")
            1.87664060E-16,  -3.37433438E-01, -3.17574263E-01, 2.75352650E-17,
            6.04369497E-02,  1.73459917E-02,  -2.17458099E-16, 2.76996488E-01,
            3.00228271E-01};
-    srs::dvector hess;
+    srs::packed_dmatrix hess;
 
     Gauss_data gauss(from, fchk);
     gauss.get_hessians(hess);
 
     CHECK(hess.size() == ans.size());
-    CHECK(srs::approx_equal(hess, ans, 1.0e-12));
+    for (srs::size_t i = 0; i < ans.size(); ++i) {
+        CHECK(srs::approx_equal(hess.data()[i], ans(i), 1.0e-12));
+	}
 }
