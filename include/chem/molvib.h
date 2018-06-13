@@ -33,7 +33,7 @@ struct Molvib_error : std::runtime_error {
 
 //-----------------------------------------------------------------------------
 
-/// Class for handling molecular vibrations.
+// Class for handling molecular vibrations.
 class Molvib {
 public:
     Molvib() {}
@@ -41,17 +41,21 @@ public:
 
     Molvib(const Molvib& vib) { freqs = vib.freqs; }
 
-    /// Get vibrational frequencies.
+    // Get vibrational frequencies.
     const srs::dvector& get_freqs() const { return freqs; }
 
-    /// Calculate zero-point vibrational energy.
+	// Get Hessians.
+	const srs::dvector& get_hessians() const { return hess; }
+
+    // Calculate zero-point vibrational energy.
     double zero_point_energy() const { return 0.5 * srs::sum(freqs); }
 
-    /// Print vibrational frequencies.
+    // Print vibrational frequencies.
     void print(std::ostream& to = std::cout);
 
 private:
     srs::dvector freqs;
+	srs::dvector hess;
 };
 
 #endif  // CHEM_MOLVIB_H

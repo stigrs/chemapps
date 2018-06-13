@@ -31,6 +31,9 @@ Molvib::Molvib(std::istream& from, const std::string& key)
             else if (token == "vibr") {
                 from >> freqs;
             }
+			else if (token == "hess") {
+				from >> hess;
+			}
         }
     }
     else {
