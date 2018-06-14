@@ -16,31 +16,10 @@
 
 #include <chem/molvib.h>
 #include <srs/datum.h>
+#include <srs/math.h>
 #include <srs/utils.h>
+#include <cmath>
 
-
-Molvib::Molvib(std::istream& from, const std::string& key)
-{
-    bool found = srs::find_section(from, key);
-    if (found) {
-        std::string token;
-        while (from >> token) {
-            if (token == "End") {
-                break;
-            }
-            else if (token == "vibr") {
-                from >> freqs;
-            }
-			else if (token == "hess") {
-				from >> hess;
-			}
-        }
-    }
-    else {
-        throw Molvib_error("cannot find " + key + " section");
-    }
-    // TODO (stigrs@gmail.com) Validate input data
-}
 
 void Molvib::print(std::ostream& to)
 {
@@ -64,4 +43,64 @@ void Molvib::print(std::ostream& to)
         to << "\n\nZero-point vibrational energy: " << zpe / datum::au_to_icm
            << " Hartree\n";
     }
+}
+
+srs::packed_dmatrix Molvib::get_mw_hessians() const
+{
+    srs::packed_dmatrix hess_mw(hess);
+    if (!hess_mw.empty()) {
+        for (srs::size_t j = 0; j < hess_mw.cols(); ++j) {
+            for (srs::size_t i = 0; i < j + 1; ++i) {
+                hess_mw(i, j) /= std::sqrt(atoms[i / 3].atomic_mass
+                                           * atoms[j / 3].atomic_mass);
+            }
+        }
+    }
+    return hess_mw;
+}
+
+srs::dvector Molvib::calc_cart_freqs() const
+{
+    using namespace datum;
+
+    const double factor  // conversion from atomic units to cm-1
+        = 0.1 * (N_A * E_h / (4.0 * std::pow(pi * c_0 * a_0 * 1.0e-10, 2.0)));
+
+    srs::packed_dmatrix hess_mw = get_mw_hessians();
+
+    srs::dvector cart_freqs;
+    srs::dmatrix v;
+
+    srs::eigs(hess_mw, v, cart_freqs);
+
+    for (auto& vi : cart_freqs) {
+        auto x = vi * factor;
+        vi     = srs::sign(std::sqrt(std::abs(x)), x);
+    }
+    return cart_freqs;
+}
+
+void Molvib::init(std::istream& from, const std::string& key)
+{
+    bool found = srs::find_section(from, key);
+    if (found) {
+        std::string token;
+        srs::dvector tmp;
+        while (from >> token) {
+            if (token == "End") {
+                break;
+            }
+            else if (token == "vibr") {
+                from >> freqs;
+            }
+            else if (token == "hessians") {
+                from >> tmp;
+                hess = srs::packed_dmatrix(tmp);
+            }
+        }
+    }
+    else {
+        throw Molvib_error("cannot find " + key + " section");
+    }
+    // TODO (stigrs@gmail.com) Validate input data
 }

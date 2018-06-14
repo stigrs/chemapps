@@ -16,21 +16,57 @@
 
 #include <chem/molecule.h>
 #include <srs/datum.h>
+#include <srs/packed.h>
 #include <srs/utils.h>
 #include <catch/catch.hpp>
 #include <cmath>
 #include <fstream>
+#include <iostream>
 
 
 TEST_CASE("test_molvib")
 {
-    double zpe_ans = 0.052023;
-
     std::ifstream from;
     srs::fopen(from, "test_molvib.inp");
 
     Molecule mol(from);
-    double zpe = mol.get_vib().zero_point_energy() / datum::au_to_icm;
 
-    CHECK(std::abs(zpe - zpe_ans) < 1.0e-6);
+    SECTION("zpe")
+    {
+        double zpe_ans = 0.024386;
+        double zpe     = mol.get_vib().zero_point_energy() / datum::au_to_icm;
+        CHECK(std::abs(zpe - zpe_ans) < 1.0e-6);
+    }
+
+    SECTION("hess")
+    {
+        srs::dvector ans = {
+            -1.89865925E-04, -1.76751570E-16, 8.04584647E-01,  -3.41586331E-16,
+            1.98174810E-14,  6.35148526E-01,  9.49329625E-05,  1.81796550E-17,
+            4.34562970E-17,  -8.85968626E-05, -7.48866947E-17, -4.02292324E-01,
+            2.16559539E-01,  3.81354171E-17,  4.39228651E-01,  1.08057743E-16,
+            3.37433438E-01,  -3.17574263E-01, -2.67533069E-17, -2.76996488E-01,
+            3.00228271E-01,  9.49329625E-05,  2.43493199E-16,  2.46627097E-16,
+            -6.33609993E-06, -6.64102566E-18, -2.75427250E-17, -8.85968626E-05,
+            2.39595307E-16,  -4.02292324E-01, -2.16559539E-01, -1.52988164E-17,
+            -3.69363277E-02, -6.04369497E-02, -2.65825471E-16, 4.39228651E-01,
+            1.87664060E-16,  -3.37433438E-01, -3.17574263E-01, 2.75352650E-17,
+            6.04369497E-02,  1.73459917E-02,  -2.17458099E-16, 2.76996488E-01,
+            3.00228271E-01};
+
+        srs::packed_dmatrix hess = mol.get_vib().get_hessians();
+
+        CHECK(hess.size() == ans.size());
+        for (srs::size_t i = 0; i < ans.size(); ++i) {
+            CHECK(srs::approx_equal(hess.data()[i], ans(i), 1.0e-12));
+        }
+    }
+
+    SECTION("calc_cart_freqs")
+    {
+        srs::dvector ans   = {2169.7566, 4141.6012, 4392.7809};
+        srs::dvector freqs = mol.get_vib().calc_cart_freqs();
+        freqs              = freqs.tail(3);
+        CHECK(srs::approx_equal(freqs, ans, 1.0e-4));
+    }
 }

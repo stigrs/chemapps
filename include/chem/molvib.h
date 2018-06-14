@@ -17,11 +17,14 @@
 #ifndef CHEM_MOLVIB_H
 #define CHEM_MOLVIB_H
 
+#include <chem/element.h>
 #include <srs/array.h>
 #include <srs/math.h>
+#include <srs/packed.h>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 //-----------------------------------------------------------------------------
 
@@ -37,15 +40,30 @@ struct Molvib_error : std::runtime_error {
 class Molvib {
 public:
     Molvib() {}
-    Molvib(std::istream& from, const std::string& key);
+    Molvib(std::istream& from,
+           const std::string& key,
+           std::vector<Element>& atoms_)
+        : atoms(atoms_)
+    {
+        init(from, key);
+    }
 
-    Molvib(const Molvib& vib) { freqs = vib.freqs; }
+    Molvib(const Molvib& vib)
+        : atoms(vib.atoms), freqs(vib.freqs), hess(vib.hess)
+    {
+    }
 
     // Get vibrational frequencies.
     const srs::dvector& get_freqs() const { return freqs; }
 
-	// Get Hessians.
-	const srs::dvector& get_hessians() const { return hess; }
+    // Get Hessians.
+    const srs::packed_dmatrix& get_hessians() const { return hess; }
+
+	// Get mass-weighted Hessians.
+    srs::packed_dmatrix get_mw_hessians() const;
+
+	// Calculate Cartesian frequencies from Hessians.
+    srs::dvector calc_cart_freqs() const;
 
     // Calculate zero-point vibrational energy.
     double zero_point_energy() const { return 0.5 * srs::sum(freqs); }
@@ -54,8 +72,12 @@ public:
     void print(std::ostream& to = std::cout);
 
 private:
+    // Initialize.
+    void init(std::istream& from, const std::string& key);
+
+    std::vector<Element> atoms;
     srs::dvector freqs;
-	srs::dvector hess;
+    srs::packed_dmatrix hess;
 };
 
 #endif  // CHEM_MOLVIB_H
