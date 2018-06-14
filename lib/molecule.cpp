@@ -112,7 +112,7 @@ void Molecule::init(std::istream& from,
 
     // Initialize molecular vibrations object:
 
-    vib = std::make_unique<Molvib>(from, key);
+    vib = std::make_unique<Molvib>(from, key, atoms);
 
     // Initialize molecular torsions object:
 
