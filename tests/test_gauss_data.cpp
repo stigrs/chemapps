@@ -16,8 +16,8 @@
 
 #include <chem/gauss_data.h>
 #include <srs/array.h>
-#include <srs/packed.h>
 #include <srs/math.h>
+#include <srs/packed.h>
 #include <srs/utils.h>
 #include <catch/catch.hpp>
 #include <fstream>
@@ -49,5 +49,5 @@ TEST_CASE("test_gauss_data")
     CHECK(hess.size() == ans.size());
     for (srs::size_t i = 0; i < ans.size(); ++i) {
         CHECK(srs::approx_equal(hess.data()[i], ans(i), 1.0e-12));
-	}
+    }
 }
