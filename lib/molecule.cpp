@@ -108,11 +108,11 @@ void Molecule::init(std::istream& from,
 
     // Initialize molecular rotations object:
 
-    rot = std::make_unique<Molrot>(from, key, atoms, xyz);
+    rot = std::make_unique<Molrot>(from, key, atoms, xyz, geom_unit);
 
     // Initialize molecular vibrations object:
 
-    vib = std::make_unique<Molvib>(from, key, atoms);
+    vib = std::make_unique<Molvib>(from, key, *rot);
 
     // Initialize molecular torsions object:
 

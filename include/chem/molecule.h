@@ -44,7 +44,7 @@ public:
     {
         zmat = std::make_unique<Zmatrix>(atoms, xyz);
         rot  = std::make_unique<Molrot>(atoms, xyz);
-        vib  = std::make_unique<Molvib>();
+        vib  = std::make_unique<Molvib>(*rot);
         tor  = std::make_unique<Torsion>(*rot);
     }
 
@@ -69,6 +69,9 @@ public:
 
     // Calculate total molecular mass.
     double tot_mass() const { return rot->tot_mass(); }
+
+	// Get number of atoms.
+	srs::size_t size() const { return static_cast<srs::size_t>(atoms.size()); }
 
     const std::string get_title() const { return title; }
     const std::vector<Element>& get_atoms() const { return atoms; }
