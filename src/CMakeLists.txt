@@ -31,6 +31,7 @@ set(
     mergeirc
     mh2ph
     molrot 
+	molvib
     moptonw
     moptoxyz
     nejconv
