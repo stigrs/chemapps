@@ -33,6 +33,7 @@ struct Molrot_error : std::runtime_error {
 
 // Forward declarations to allow friend declarations:
 
+class Molvib;
 class Torsion;
 
 //
@@ -40,15 +41,22 @@ class Torsion;
 //
 class Molrot {
 public:
-    Molrot(std::vector<Element>& atoms_, srs::dmatrix& xyz_)
-        : atoms(atoms_), xyz(xyz_)
+    Molrot(std::vector<Element>& atoms_,
+           srs::dmatrix& xyz_,
+           const std::string& unit_ = "angstrom")
+        : atoms(atoms_), xyz(xyz_), unit(unit_)
     {
     }
 
     Molrot(std::istream& from,
            const std::string& key,
            std::vector<Element>& atoms_,
-           srs::dmatrix& xyz_);
+           srs::dmatrix& xyz_,
+           const std::string& unit_ = "angstrom")
+        : atoms(atoms_), xyz(xyz_), unit(unit_)
+    {
+        init(from, key);
+    }
 
     Molrot(const Molrot& rot);
 
@@ -67,6 +75,7 @@ public:
     // Return rotational symmetry.
     std::string symmetry();
 
+    friend class Molvib;
     friend class Torsion;
 
 protected:
@@ -104,17 +113,10 @@ protected:
     srs::dmatrix paxis;
 
     double sigma;
+    std::string unit;  // geometry unit
+
     bool aligned = false;
 };
-
-inline Molrot::Molrot(std::istream& from,
-                      const std::string& key,
-                      std::vector<Element>& atoms_,
-                      srs::dmatrix& xyz_)
-    : atoms(atoms_), xyz(xyz_)
-{
-    init(from, key);
-}
 
 inline void Molrot::move_to_com()
 {
