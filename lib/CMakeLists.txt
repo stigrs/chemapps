@@ -26,6 +26,7 @@ set(
     tst.cpp
     tunnel.cpp
     units.cpp
+    whitten_rabino.cpp
     zmatrix.cpp
 )
 add_library(
