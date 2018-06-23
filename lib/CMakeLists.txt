@@ -23,6 +23,7 @@ set(
     thermochem.cpp
     thermodata.cpp
     torsion.cpp
+    troe.cpp
     tst.cpp
     tunnel.cpp
     units.cpp
