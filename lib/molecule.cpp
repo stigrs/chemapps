@@ -23,7 +23,6 @@
 Molecule::Molecule(const Molecule& mol)
 {
     title       = mol.title;
-    geom_unit   = mol.geom_unit;
     atoms       = mol.atoms;
     xyz         = mol.xyz;
     elec_state  = mol.elec_state;
@@ -50,7 +49,7 @@ void Molecule::print_data(std::ostream& to, const std::string& key) const
     to << "Electronic energy: " << fix(elec_energy) << " Hartree\n"
        << "Charge: " << charge << "\n\n"
        << "Input orientation:\n";
-    chem::print_geometry(to, atoms, xyz, geom_unit);
+    chem::print_geometry(to, atoms, xyz);
     chem::print_atomic_masses(to, atoms);
     vib->print(to);
 }
@@ -67,7 +66,6 @@ void Molecule::init(std::istream& from,
     elec_state_def(1) = 0.0;
 
     std::map<std::string, srs::Input> input_data;
-    input_data["geom_unit"]   = srs::Input(geom_unit, "angstrom");
     input_data["charge"]      = srs::Input(charge, 0);
     input_data["elec_state"]  = srs::Input(elec_state, elec_state_def);
     input_data["elec_energy"] = srs::Input(elec_energy, 0.0);
@@ -108,7 +106,7 @@ void Molecule::init(std::istream& from,
 
     // Initialize molecular rotations object:
 
-    rot = std::make_unique<Molrot>(from, key, atoms, xyz, geom_unit);
+    rot = std::make_unique<Molrot>(from, key, atoms, xyz);
 
     // Initialize molecular vibrations object:
 

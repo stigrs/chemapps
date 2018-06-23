@@ -70,8 +70,8 @@ public:
     // Calculate total molecular mass.
     double tot_mass() const { return rot->tot_mass(); }
 
-	// Get number of atoms.
-	srs::size_t size() const { return static_cast<srs::size_t>(atoms.size()); }
+    // Get number of atoms.
+    srs::size_t size() const { return static_cast<srs::size_t>(atoms.size()); }
 
     const std::string get_title() const { return title; }
     const std::vector<Element>& get_atoms() const { return atoms; }
@@ -93,11 +93,10 @@ public:
     void print_data(std::ostream& to, const std::string& key) const;
 
 private:
-    std::string title;      // molecule information
-    std::string geom_unit;  // units for geometry
+    std::string title;  // molecule information
 
     std::vector<Element> atoms;  // atoms in molecule
-    srs::dmatrix xyz;            // cartesian coordinates
+    srs::dmatrix xyz;            // cartesian coordinates in angstroms
     srs::dvector elec_state;     // electronic state
 
     int charge;          // molecular charge
