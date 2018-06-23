@@ -41,19 +41,16 @@ class Torsion;
 //
 class Molrot {
 public:
-    Molrot(std::vector<Element>& atoms_,
-           srs::dmatrix& xyz_,
-           const std::string& unit_ = "angstrom")
-        : atoms(atoms_), xyz(xyz_), unit(unit_)
+    Molrot(std::vector<Element>& atoms_, srs::dmatrix& xyz_)
+        : atoms(atoms_), xyz(xyz_)
     {
     }
 
     Molrot(std::istream& from,
            const std::string& key,
            std::vector<Element>& atoms_,
-           srs::dmatrix& xyz_,
-           const std::string& unit_ = "angstrom")
-        : atoms(atoms_), xyz(xyz_), unit(unit_)
+           srs::dmatrix& xyz_)
+        : atoms(atoms_), xyz(xyz_)
     {
         init(from, key);
     }
@@ -113,8 +110,6 @@ protected:
     srs::dmatrix paxis;
 
     double sigma;
-    std::string unit;  // geometry unit
-
     bool aligned = false;
 };
 

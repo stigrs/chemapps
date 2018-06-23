@@ -24,11 +24,7 @@
 
 
 Molrot::Molrot(const Molrot& rot)
-    : atoms(rot.atoms),
-      xyz(rot.xyz),
-      unit(rot.unit),
-      pmom(rot.pmom),
-      paxis(rot.paxis)
+    : atoms(rot.atoms), xyz(rot.xyz), pmom(rot.pmom), paxis(rot.paxis)
 {
     sigma   = rot.sigma;
     aligned = rot.aligned;
@@ -164,9 +160,7 @@ void Molrot::principal_moments()
     srs::dmatrix xyz_(xyz);
 
     // Convert geometry to bohr:
-    if (unit == "angstrom") {
-        xyz_ /= datum::a_0;
-    }
+    xyz_ /= datum::a_0;
 
     // Move geometry to center of mass:
     srs::dvector com = center_of_mass();
