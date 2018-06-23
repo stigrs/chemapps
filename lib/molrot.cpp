@@ -105,6 +105,23 @@ std::string Molrot::symmetry()
     return symm;
 }
 
+bool Molrot::is_linear()
+{
+    if (!aligned) {
+        rotate_to_principal_axes();
+    }
+    const double tol = 1.0e-3;
+
+    bool bc = std::abs(pmom(1) - pmom(2)) < tol;
+
+    if (pmom(0) < tol && bc) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 void Molrot::init(std::istream& from, const std::string& key)
 {
     // Read input data:
