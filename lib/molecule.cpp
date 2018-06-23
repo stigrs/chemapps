@@ -35,6 +35,19 @@ Molecule::Molecule(const Molecule& mol)
     tor  = std::make_unique<Torsion>(*mol.tor);
 }
 
+Mol_type Molecule::structure() const
+{
+    if (atoms.size() == 1) {
+        return atom;
+    }
+    else if (rot->constants().size() == 1) {
+        return linear;
+    }
+    else {
+        return nonlinear;
+    }
+}
+
 void Molecule::print_data(std::ostream& to, const std::string& key) const
 {
     srs::Format<char> line;

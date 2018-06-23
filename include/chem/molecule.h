@@ -18,6 +18,7 @@
 #define CHEM_MOLECULE_H
 
 #include <chem/element.h>
+#include <chem/mol_type.h>
 #include <chem/molrot.h>
 #include <chem/molvib.h>
 #include <chem/torsion.h>
@@ -29,11 +30,15 @@
 #include <string>
 #include <vector>
 
+//------------------------------------------------------------------------------
+
 // Error reporting:
 
 struct Mol_error : std::runtime_error {
     Mol_error(std::string s) : std::runtime_error(s) {}
 };
+
+//------------------------------------------------------------------------------
 
 //
 // Class for holding molecule data.
@@ -63,6 +68,9 @@ public:
               std::ostream& to,
               const std::string& key,
               bool verbose);
+
+    // Return molecular structure (atom, linear, nonlinear).
+    Mol_type structure() const;
 
     // Return true if molecule has torsional modes.
     bool has_torsions() const { return tor->tot_minima() > 0; }
