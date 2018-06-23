@@ -29,14 +29,13 @@ void Molvib::analysis(std::ostream& to)
 
     to << "\nVibrational analysis:\n" << line('=') << "\n\n";
 
-    // Calculate Cartesian vibrational frequencies:
-
-    print_cart_freq(to);
-
-    // Calculate vibrational frequencies in internal coordinates:
-
-    norm_coord_analysis();
-    print_norm_coord(to);
+    if (hess.empty()) {
+        print(to);
+    }
+    else {
+        print_cart_freq(to);
+        print_norm_modes(to);
+    }
 }
 
 srs::packed_dmatrix Molvib::get_mw_hessians() const
@@ -66,7 +65,21 @@ srs::dvector Molvib::calc_cart_freqs() const
     return freqs_cart;
 }
 
-void Molvib::norm_coord_analysis()
+double Molvib::zero_point_energy() const
+{
+    double zpe = 0.0;
+    for (auto v : freqs) {
+        if (v < 0.0) {  // ignore imaginary frequencies
+            continue;
+        }
+        else {
+            zpe += v;
+        }
+    }
+    return 0.5 * zpe;
+}
+
+void Molvib::norm_mode_analysis()
 {
     // Transform Cartesian force constants to internal coordinates:
 
@@ -173,6 +186,10 @@ void Molvib::init(std::istream& from, const std::string& key)
         throw Molvib_error("cannot find " + key + " section");
     }
     // TODO (stigrs@gmail.com) Validate input data
+
+    if (!hess.empty()) {
+        norm_mode_analysis();
+    }
 }
 
 void Molvib::trans_rot_vec(srs::dcube& dmat, int& n_tr_rot) const
@@ -296,7 +313,7 @@ void Molvib::print_cart_freq(std::ostream& to) const
     to << '\n';
 }
 
-void Molvib::print_norm_coord(std::ostream& to) const
+void Molvib::print_norm_modes(std::ostream& to) const
 {
     srs::Format<char> line;
     line.fill('-').width(24);

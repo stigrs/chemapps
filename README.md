@@ -8,16 +8,17 @@ and chemical kinetics.
 * Conversion of Cartesian coordinates to Z matrix
 * Conversion of Z matrix to Cartesian coordinates
 * Rotational analysis of molecules
-* Calculation of thermochemical properties for molecules [1]
+* Vibrational analysis of molecules [1]
+* Calculation of thermochemical properties for molecules [2]
 * Calculation of reduced moment of inertia for torsional modes by using
-  the curvilinear scheme [2]
+  the curvilinear scheme [3]
 * Calculation of partition function for torsional modes by using the
-  CT-Cw scheme [3]
+  CT-Cw scheme [4]
 * Calculation of reaction rate coefficients using conventional Transition 
   State Theory
-* Calculation of Wigner [4] and Eckart tunneling corrections [5-7]
+* Calculation of Wigner [5] and Eckart tunneling corrections [6-8]
 * Conformer search using an internal coordinate Monte Carlo Multiple 
-  Minima (MCMM) technique with uniform usage scheme [8,9]
+  Minima (MCMM) technique with uniform usage scheme [9,10]
 * Interface to MOPAC 7, MOPAC 5.022mn, and Gaussian
 
 ## Code of Conduct
@@ -98,15 +99,18 @@ errors in MOPAC on different platforms.
 
 ## Notes and References
 
-1.  The thermochemical values are computed in accordance with the methods
+1.  Vibrational analysis of molecules is computed in accordance with the 
+    methods implemented in Gaussian (see the Vibrational Analysis Whitepaper 
+    available at http://www.gaussian.com)
+2.  The thermochemical values are computed in accordance with the methods
     implemented in Gaussian (see the Thermochemistry Whitepaper available
     at http://www.gaussian.com)
-2.  Pitzer, K. S. J. Chem. Phys. 1946, vol. 14, p. 239.
-3.  Chuang, Y. Y.; Truhlar, D. G. J. Chem. Phys. 2000, vol. 112, p. 1221.
-4.  Wigner, E. Z. Physik. Chem. (Leipzig), 1932, vol. B19, p. 203.;
-5.  Eckart, E. Phys. Rev., 1962, vol. 35, p. 1303.
-6.  Brown, R. L. J. Research NIST, 1981, vol. 86, p. 357.
-7.  Johnston, H. S.; Heicklen, J. J. Phys. Chem., 1962, vol. 66, p. 532.
-8.  Li, Z.; Scheraga, H. A. Proc. Natl. Acad. Sci., 1987, vol. 84, p. 6611.
-9.  Chang, G.; Guida, W. C.; Still, C. J. Am. Chem. Soc., 1989, vol. 111,
+3.  Pitzer, K. S. J. Chem. Phys. 1946, vol. 14, p. 239.
+4.  Chuang, Y. Y.; Truhlar, D. G. J. Chem. Phys. 2000, vol. 112, p. 1221.
+5.  Wigner, E. Z. Physik. Chem. (Leipzig), 1932, vol. B19, p. 203.;
+6.  Eckart, E. Phys. Rev., 1962, vol. 35, p. 1303.
+7.  Brown, R. L. J. Research NIST, 1981, vol. 86, p. 357.
+8.  Johnston, H. S.; Heicklen, J. J. Phys. Chem., 1962, vol. 66, p. 532.
+9.  Li, Z.; Scheraga, H. A. Proc. Natl. Acad. Sci., 1987, vol. 84, p. 6611.
+10. Chang, G.; Guida, W. C.; Still, C. J. Am. Chem. Soc., 1989, vol. 111,
     p. 4379.

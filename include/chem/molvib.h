@@ -45,18 +45,33 @@ public:
         init(from, key);
     }
 
-    Molvib(const Molvib& vib) : freqs(vib.freqs), hess(vib.hess), rot(vib.rot)
+    Molvib(const Molvib& vib)
+        : hess(vib.hess),
+          freqs(vib.freqs),
+          mu_freqs(vib.mu_freqs),
+          k_fc(vib.k_fc),
+          l_cart(vib.l_cart),
+          rot(vib.rot)
     {
     }
 
     // Perform vibrational analysis.
     void analysis(std::ostream& to = std::cout);
 
+    // Get Hessians.
+    const srs::packed_dmatrix& get_hessians() const { return hess; }
+
     // Get vibrational frequencies.
     const srs::dvector& get_freqs() const { return freqs; }
 
-    // Get Hessians.
-    const srs::packed_dmatrix& get_hessians() const { return hess; }
+    // Get reduced masses.
+    const srs::dvector& get_red_mass() const { return mu_freqs; }
+
+    // Get force constants.
+    const srs::dvector& get_force_constant() const { return k_fc; }
+
+    // Get normal coordinates.
+    const srs::dcube& get_norm_coords() const { return l_cart; }
 
     // Get mass-weighted Hessians.
     srs::packed_dmatrix get_mw_hessians() const;
@@ -68,10 +83,10 @@ public:
     srs::dvector calc_cart_freqs() const;
 
     // Calculate zero-point vibrational energy.
-    double zero_point_energy() const { return 0.5 * srs::sum(freqs); }
+    double zero_point_energy() const;
 
-    // Perform normal coordinate analysis.
-    void norm_coord_analysis();
+    // Perform normal mode analysis.
+    void norm_mode_analysis();
 
     // Print vibrational frequencies.
     void print(std::ostream& to = std::cout);
@@ -92,8 +107,8 @@ private:
     // Print Cartesian vibrational frequencies.
     void print_cart_freq(std::ostream& to) const;
 
-	// Print normal coordinates.
-	void print_norm_coord(std::ostream& to) const;
+    // Print normal modes.
+    void print_norm_modes(std::ostream& to) const;
 
     // Shuffle n_vib orthogogal vectors to the beginning of D matrix.
     void shuffle(srs::dcube& dmat, srs::size_t n_tr_rot) const;
@@ -101,13 +116,11 @@ private:
     // Convert frequencies from atomic units to cm^-1.
     void freqs_unit_conv(srs::dvector& vib) const;
 
-    std::vector<Element> atoms;
     srs::packed_dmatrix hess;  // packed Hessian matrix
-
-    srs::dvector freqs;     // vibrational frequencies
-    srs::dvector mu_freqs;  // reduced masses for vibrational modes
-    srs::dvector k_fc;      // force constants for vibrational modes
-    srs::dcube l_cart;      // Cartesian displacements
+    srs::dvector freqs;        // vibrational frequencies
+    srs::dvector mu_freqs;     // reduced masses for vibrational modes
+    srs::dvector k_fc;         // force constants for vibrational modes
+    srs::dcube l_cart;         // Cartesian displacements
 
     Molrot& rot;
 };

@@ -26,47 +26,117 @@
 
 TEST_CASE("test_molvib")
 {
-    std::ifstream from;
-    srs::fopen(from, "test_molvib.inp");
-
-    Molecule mol(from);
-
-    SECTION("zpe")
+    SECTION("H2O")
     {
+        std::ifstream from;
+        srs::fopen(from, "test_molvib_h2o.inp");
+
+        Molecule mol(from);
+
         double zpe_ans = 0.024386;
         double zpe     = mol.get_vib().zero_point_energy() / datum::au_to_icm;
         CHECK(std::abs(zpe - zpe_ans) < 1.0e-6);
+
+        srs::dvector nu_ans = {2169.7566, 4141.6012, 4392.7809};
+        srs::dvector mu_ans = {1.0785, 1.0491, 1.0774};
+        srs::dvector k_ans  = {2.9915, 10.6023, 12.2488};
+
+        srs::dvector nu = mol.get_vib().get_freqs();
+        srs::dvector mu = mol.get_vib().get_red_mass();
+        srs::dvector k  = mol.get_vib().get_force_constant();
+
+        CHECK(srs::approx_equal(nu, nu_ans, 1.0e-4));
+        CHECK(srs::approx_equal(mu, mu_ans, 1.0e-4));
+        CHECK(srs::approx_equal(k, k_ans, 1.0e-4));
     }
 
-    SECTION("hess")
+    SECTION("CO2")
     {
-        srs::dvector ans = {
-            -1.89865925E-04, -1.76751570E-16, 8.04584647E-01,  -3.41586331E-16,
-            1.98174810E-14,  6.35148526E-01,  9.49329625E-05,  1.81796550E-17,
-            4.34562970E-17,  -8.85968626E-05, -7.48866947E-17, -4.02292324E-01,
-            2.16559539E-01,  3.81354171E-17,  4.39228651E-01,  1.08057743E-16,
-            3.37433438E-01,  -3.17574263E-01, -2.67533069E-17, -2.76996488E-01,
-            3.00228271E-01,  9.49329625E-05,  2.43493199E-16,  2.46627097E-16,
-            -6.33609993E-06, -6.64102566E-18, -2.75427250E-17, -8.85968626E-05,
-            2.39595307E-16,  -4.02292324E-01, -2.16559539E-01, -1.52988164E-17,
-            -3.69363277E-02, -6.04369497E-02, -2.65825471E-16, 4.39228651E-01,
-            1.87664060E-16,  -3.37433438E-01, -3.17574263E-01, 2.75352650E-17,
-            6.04369497E-02,  1.73459917E-02,  -2.17458099E-16, 2.76996488E-01,
-            3.00228271E-01};
+        std::ifstream from;
+        srs::fopen(from, "test_molvib_co2.inp");
 
-        srs::packed_dmatrix hess = mol.get_vib().get_hessians();
+        Molecule mol(from);
 
-        CHECK(hess.size() == ans.size());
-        for (srs::size_t i = 0; i < ans.size(); ++i) {
-            CHECK(srs::approx_equal(hess.data()[i], ans(i), 1.0e-12));
-        }
+        double zpe_ans = 0.011626;
+        double zpe     = mol.get_vib().zero_point_energy() / datum::au_to_icm;
+        CHECK(std::abs(zpe - zpe_ans) < 1.0e-6);
+
+        srs::dvector nu_ans = {566.2442, 566.2442, 1435.2233, 2535.7089};
+        srs::dvector mu_ans = {12.8774, 12.8774, 15.9949, 12.8774};
+        srs::dvector k_ans  = {2.4327, 2.4327, 19.4120, 48.7838};
+
+        srs::dvector nu = mol.get_vib().get_freqs();
+        srs::dvector mu = mol.get_vib().get_red_mass();
+        srs::dvector k  = mol.get_vib().get_force_constant();
+
+        CHECK(srs::approx_equal(nu, nu_ans, 1.0e-4));
+        CHECK(srs::approx_equal(mu, mu_ans, 1.0e-4));
+        CHECK(srs::approx_equal(k, k_ans, 1.0e-4));
     }
 
-    SECTION("calc_cart_freqs")
+    SECTION("CH4OH")
     {
-        srs::dvector ans   = {2169.7566, 4141.6012, 4392.7809};
-        srs::dvector freqs = mol.get_vib().calc_cart_freqs();
-        freqs              = freqs.tail(3);
-        CHECK(srs::approx_equal(freqs, ans, 1.0e-4));
+        std::ifstream from;
+        srs::fopen(from, "test_molvib_ch4oh.inp");
+
+        Molecule mol(from);
+
+        double zpe_ans = 0.051319;
+        double zpe     = mol.get_vib().zero_point_energy() / datum::au_to_icm;
+        CHECK(std::abs(zpe - zpe_ans) < 1.0e-6);
+
+        srs::dvector nu_ans = {-1752.6530,
+                               62.301,
+                               326.8547,
+                               332.5309,
+                               775.5512,
+                               909.5669,
+                               1212.3977,
+                               1275.3228,
+                               1340.0812,
+                               1451.6446,
+                               1476.6141,
+                               3103.4053,
+                               3244.1604,
+                               3247.8661,
+                               3767.9277};
+        srs::dvector mu_ans = {1.1201,
+                               1.0445,
+                               1.0905,
+                               1.0684,
+                               2.1719,
+                               1.5377,
+                               1.1215,
+                               1.0879,
+                               1.1208,
+                               1.0421,
+                               1.0216,
+                               1.0242,
+                               1.1068,
+                               1.1074,
+                               1.0669};
+        srs::dvector k_ans  = {2.0272,
+                              0.0024,
+                              0.0686,
+                              0.0696,
+                              0.7697,
+                              0.7495,
+                              0.9713,
+                              1.0425,
+                              1.1859,
+                              1.2939,
+                              1.3124,
+                              5.8116,
+                              6.8635,
+                              6.8826,
+                              8.9245};
+
+        srs::dvector nu = mol.get_vib().get_freqs();
+        srs::dvector mu = mol.get_vib().get_red_mass();
+        srs::dvector k  = mol.get_vib().get_force_constant();
+
+        CHECK(srs::approx_equal(nu, nu_ans, 1.0e-4));
+        CHECK(srs::approx_equal(mu, mu_ans, 1.0e-4));
+        CHECK(srs::approx_equal(k, k_ans, 1.0e-4));
     }
 }
