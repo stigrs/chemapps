@@ -157,7 +157,7 @@ void Molvib::print(std::ostream& to)
         }
         double zpe = zero_point_energy();
         to << "\n\nZero-point vibrational energy: " << zpe / datum::au_to_icm
-           << " Hartree\n";
+           << " Hartree\n\n";
     }
 }
 

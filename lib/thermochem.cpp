@@ -49,8 +49,7 @@ void chem::thermochemistry(const Molecule& mol,
     if (mol.has_torsions()) {
         mol.get_tor().analysis(to);
     }
-    mol.get_vib().print(to);
-    to << '\n';
+    mol.get_vib().analysis(to);
 
     double zpe          = mol.get_vib().zero_point_energy() / datum::au_to_icm;
     const double factor = 1.0 / (datum::E_h * datum::N_A);
@@ -242,17 +241,27 @@ double chem::qvib(const Molecule& mol, double temp, const std::string& zeroref)
     }
     else {
         Expects(temp > 0.0);
-        srs::dvector w = datum::icm_to_K * mol.get_vib().get_freqs();
-        double qv      = 1.0;
+        auto w    = datum::icm_to_K * mol.get_vib().get_freqs();
+        double qv = 1.0;
         if (zeroref == "V=0") {  // zero at first vibrational level
-            for (srs::size_t i = 0; i < w.size(); ++i) {
-                qv /= (1.0 - std::exp(-w(i) / temp));
+            for (auto wi : w) {
+                if (wi < 0.0) {  // ignore imaginary frequencies
+                    continue;
+                }
+                else {
+                    qv /= (1.0 - std::exp(-wi / temp));
+                }
             }
         }
         else if (zeroref == "BOT") {  // zero at the bottom of the well
-            for (srs::size_t i = 0; i < w.size(); ++i) {
-                qv *= std::exp(-w(i) / (2.0 * temp))
-                      / (1.0 - std::exp(-w(i) / temp));
+            for (auto wi : w) {
+                if (wi < 0.0) {
+                    continue;
+                }
+                else {
+                    qv *= std::exp(-wi / (2.0 * temp))
+                          / (1.0 - std::exp(-wi / temp));
+                }
             }
         }
         return qv;
@@ -268,11 +277,16 @@ double chem::entropy_vib(const Molecule& mol, double temp)
     }
     else {
         Expects(temp > 0.0);
-        srs::dvector w = datum::icm_to_K * mol.get_vib().get_freqs();
-        double sv      = 0.0;
-        for (srs::size_t i = 0; i < w.size(); ++i) {
-            double wt = w(i) / temp;
-            sv += wt / (std::exp(wt) - 1.0) - std::log(1.0 - std::exp(-wt));
+        auto w    = datum::icm_to_K * mol.get_vib().get_freqs();
+        double sv = 0.0;
+        for (auto wi : w) {
+            if (wi < 0.0) {  // ignore imaginary frequencies
+                continue;
+            }
+            else {
+                double wt = wi / temp;
+                sv += wt / (std::exp(wt) - 1.0) - std::log(1.0 - std::exp(-wt));
+            }
         }
         sv *= datum::R;
         return sv;
@@ -288,10 +302,15 @@ double chem::thermal_energy_vib(const Molecule& mol, double temp)
     }
     else {
         Expects(temp > 0.0);
-        srs::dvector w = datum::icm_to_K * mol.get_vib().get_freqs();
-        double ev      = 0.0;
-        for (srs::size_t i = 0; i < w.size(); ++i) {
-            ev += w(i) * (0.5 + 1.0 / (std::exp(w(i) / temp) - 1.0));
+        auto w    = datum::icm_to_K * mol.get_vib().get_freqs();
+        double ev = 0.0;
+        for (auto wi : w) {
+            if (wi < 0.0) {
+                continue;
+            }
+            else {
+                ev += wi * (0.5 + 1.0 / (std::exp(wi / temp) - 1.0));
+            }
         }
         ev *= datum::R;
         return ev;
@@ -307,11 +326,17 @@ double chem::const_vol_heat_vib(const Molecule& mol, double temp)
     }
     else {
         Expects(temp > 0.0);
-        srs::dvector w = datum::icm_to_K * mol.get_vib().get_freqs();
-        double cv_v    = 0.0;
-        for (srs::size_t i = 0; i < w.size(); ++i) {
-            double wt = w(i) / temp;
-            cv_v += wt * wt * std::exp(wt) / std::pow(std::exp(wt) - 1.0, 2.0);
+        auto w      = datum::icm_to_K * mol.get_vib().get_freqs();
+        double cv_v = 0.0;
+        for (auto wi : w) {
+            if (wi < 0.0) {  // ignore imaginary frequencies
+                continue;
+            }
+            else {
+                double wt = wi / temp;
+                cv_v += wt * wt * std::exp(wt)
+                        / std::pow(std::exp(wt) - 1.0, 2.0);
+            }
         }
         cv_v *= datum::R;
         return cv_v;

@@ -46,9 +46,6 @@ Thermodata::Thermodata(std::istream& from, const std::string& key)
             }
         }
     }
-    else {
-        throw Thermodata_error("cannot find " + key + " section");
-    }
 
     // Check if initialized:
 
