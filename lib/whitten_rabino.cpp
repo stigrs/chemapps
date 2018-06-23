@@ -14,6 +14,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <chem/mol_type.h>
 #include <chem/whitten_rabino.h>
 #include <srs/datum.h>
 #include <boost/math/special_functions/factorials.hpp>
@@ -42,7 +43,7 @@ double wr::a_corr(const Molecule& mol, double e_barrier)
         }
     }
     double factor = 3.0;  // structure factor for nonlinear
-    if (mol.get_rot().is_linear()) {
+    if (mol.structure() == linear) {
         factor = 2.0;
     }
     double s = static_cast<double>(mol.get_vib().get_freqs().size());
