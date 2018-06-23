@@ -72,6 +72,9 @@ public:
     // Return rotational symmetry.
     std::string symmetry();
 
+    // Check if molecule is linear.
+    bool is_linear();
+
     friend class Molvib;
     friend class Torsion;
 
