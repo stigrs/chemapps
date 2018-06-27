@@ -18,6 +18,7 @@
 #define CHEM_TROE_H
 
 #include <chem/molecule.h>
+#include <chem/mol_type.h>
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
@@ -51,6 +52,12 @@ class Troe {
 public:
     Troe(std::istream& from, Molecule& mol_);
 
+    // Calculate energy dependence factor.
+    //
+    // Eq. 9.10 in Troe, J. J. Chem. Phys., 1977, vol. 66, pp. 4758--4775.
+    //
+    double f_energy(const double temp) const;
+
     // Calculate anharmonicity factor for m Morse oscillators with
     // dissociation energies equal to the barrier height of reaction.
     //
@@ -58,12 +65,36 @@ public:
     //
     double f_anharm() const;
 
+    // Calculate rotational factor.
+    //
+    // Eq. 7.23 (linear molecule, Case II potential), Eq. 7.24 (nonlinear
+    // molecule, Case I potential), Eq. 7.26 (linear molecule, Case II
+    // potential), and Eq. 7.27 (nonlinear molecule, Case I potential) in
+    // Troe, J. J. Chem. Phys., 1977, vol. 66, pp. 4758--4775.
+    //
+    double f_rotation(const double temp) const;
+
+    // Calculate free internal rotation factor.
+    //
+    // Eq. 9.15 in Troe, J. J. Chem. Phys., 1977, vol. 66, pp. 4758--4775.
+    //
+    //double f_free_rotor(const double temp) const;
+
+    // Calculate hindered internal rotation factor.
+    //
+    // Eq. 9.16 in Troe, J. J. Chem. Phys., 1977, vol. 66, pp. 4758--4775.
+    // Hindered internal rotation with E0/V0 <= 3 cannot be treated yet.
+    //
+    //double f_hind_rotor(const double temp) const;
+
 private:
     Molecule& mol;
-    Pot_type pot_type;  // potential type
-    double e_barrier;
+    Pot_type pot_type;  // potential type (type 1 or type 2)
+    double e_barrier;   // energy barrier for the reaction
     double imom_ratio;  // moment of inertia ratio
     int n_morse_osc;    // number of Morse oscillators
+
+	double zpe; // zero-point vibrational energy
 };
 
 inline double Troe::f_anharm() const

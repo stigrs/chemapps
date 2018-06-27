@@ -15,7 +15,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/troe.h>
+#include <chem/whitten_rabino.h>
+#include <srs/datum.h>
 #include <srs/utils.h>
+#include <boost/math/special_functions/factorials.hpp>
+#include <boost/math/special_functions/gamma.hpp>
 #include <map>
 
 Troe::Troe(std::istream& from, Molecule& mol_) : mol(mol_)
@@ -74,4 +78,65 @@ Troe::Troe(std::istream& from, Molecule& mol_) : mol(mol_)
     if (n_morse_osc < 0) {
         throw Troe_error("bad number of Morse oscillators");
     }
+
+    zpe = mol.get_vib().zero_point_energy();
+}
+
+double Troe::f_energy(const double temp) const
+{
+    using namespace boost::math;
+
+    double en = e_barrier + wr::a_corr(mol, e_barrier) * zpe;
+
+    en = datum::R * 1.0e-3 * temp / (en * datum::icm_to_kJ);
+
+    auto s     = mol.get_vib().get_freqs().size();
+    double f_e = 0.0;
+
+    for (srs::size_t i = 0; i < s; ++i) {
+        f_e += factorial<double>(s - 1) * std::pow(en, i)
+               / factorial<double>(s - 1 - i);
+    }
+    return f_e;
+}
+
+double Troe::f_rotation(const double temp) const
+{
+    using namespace boost::math;
+    const double kT = datum::R * 1.0e-3 * temp / datum::icm_to_kJ;
+
+    double e0_azpe = e_barrier + wr::a_corr(mol, e_barrier) * zpe;
+    double e0_kT   = e_barrier / kT;
+    double f_rot   = 1.0;
+    unsigned s     = mol.get_vib().get_freqs().size();
+
+    switch (pot_type) {
+    case type1:  // no barrier
+        if (mol.structure() == linear) {
+            e0_azpe /= s * kT;
+            e0_kT = 2.15 * std::pow(e0_kT, 1. / 3.);
+            f_rot = e0_azpe * (e0_kT / (e0_kT - 1.0 + e0_azpe));
+        }
+        else {  // nonlinear
+            e0_kT = std::pow(e0_kT, 1. / 3.);
+            f_rot = (factorial<double>(s - 1) / tgamma<double>(s + 0.5 + 1.0))
+                    * std::pow(e0_azpe / kT, 1.5)
+                    * (2.15 * e0_kT
+                       / (2.15 * e0_kT - 1.0 + e0_azpe / ((s + 0.5) * kT)));
+        }
+        break;
+    case type2:  // barrier
+        if (mol.structure() == linear) {
+            e0_azpe /= s * kT;
+            f_rot = e0_azpe * imom_ratio / (imom_ratio - 1.0 - e0_azpe);
+        }
+        else {  // nonlinear
+            f_rot = (factorial<double>(s - 1) / tgamma<double>(s + 0.5 + 1.0))
+                    * std::pow(e0_azpe / kT, 1.5)
+                    * (imom_ratio
+                       / (imom_ratio - 1.0 + e0_azpe / ((s + 0.5) * kT)));
+        }
+        break;
+    }
+    return f_rot;
 }
