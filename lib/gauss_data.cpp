@@ -15,6 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/gauss_data.h>
+#include <chem/ptable.h>
 #include <srs/utils.h>
 #include <sstream>
 
@@ -66,6 +67,34 @@ Gauss_version Gauss_data::get_version() const
     return version;
 }
 
+bool Gauss_data::check_termination() const
+{
+    std::streampos orig_pos = from.tellg();
+
+    from.clear();
+    from.seekg(0, std::ios_base::beg);  // move to beginning of file
+    from.clear();
+
+    bool ok = true;
+    if (filetype == out) {
+        std::string line;
+        while (std::getline(from, line)) {
+            if (line.find("Error termination") != std::string::npos) {
+                ok = false;
+                break;
+            }
+        }
+    }
+    else {
+        throw Gauss_error("not implemented for fchk files");
+    }
+    from.clear();
+    from.seekg(orig_pos, std::ios_base::beg);  // move to original position
+    from.clear();
+
+    return ok;
+}
+
 int Gauss_data::get_natoms() const
 {
     std::streampos orig_pos = from.tellg();
@@ -77,7 +106,7 @@ int Gauss_data::get_natoms() const
     int natoms = 0;
 
     if (filetype == out) {
-        const char pattern_start[] = "Z-Matrix";
+        const char pattern_start[] = "Input";
         const char pattern_end[]   = "Distance";
 
         std::string line;
@@ -131,7 +160,45 @@ int Gauss_data::get_natoms() const
     return natoms;
 }
 
-void Gauss_data::get_curr_cart_coord(struct Gauss_coord& coord) const
+srs::dvector Gauss_data::get_scf_zpe_energy() const
+{
+    std::streampos orig_pos = from.tellg();
+
+    from.clear();
+    from.seekg(0, std::ios_base::beg);  // move to beginning of file
+    from.clear();
+
+    std::string buffer;
+    double zpe_energy = 0.0;
+    double tot_energy = 0.0;
+    if (filetype == out) {
+        while (std::getline(from, buffer)) {
+            if (buffer.find("Zero-point correction=") != std::string::npos) {
+                std::istringstream iss(buffer);
+                iss >> buffer >> buffer >> zpe_energy;
+            }
+            if (buffer.find("Sum of electronic and zero-point Energies=")
+                != std::string::npos) {
+                std::istringstream iss(buffer);
+                for (int i = 0; i < 6; ++i) {
+                    iss >> buffer;  // ignore
+                }
+                iss >> tot_energy;
+            }
+        }
+    }
+    else {  // fchk file
+        throw Gauss_error("not implemented for fchk files");
+    }
+    from.clear();
+    from.seekg(orig_pos, std::ios_base::beg);  // move to original position
+    from.clear();
+
+    srs::dvector result = {tot_energy - zpe_energy, zpe_energy};
+    return result;
+}
+
+void Gauss_data::get_opt_cart_coord(struct Gauss_coord& coord) const
 {
     std::streampos orig_pos = from.tellg();
 
@@ -148,7 +215,36 @@ void Gauss_data::get_curr_cart_coord(struct Gauss_coord& coord) const
     std::string line;
 
     if (filetype == out) {
-        throw Gauss_error("not implemented for Gaussian output files");
+        bool conv = false;
+        while (std::getline(from, line)) {
+            if (line.find("Stationary point found.") != std::string::npos) {
+                conv = true;
+                while (std::getline(from, line)) {
+                    if (line.find("Standard orientation:")
+                        != std::string::npos) {
+                        for (int i = 0; i < 4; ++i) {
+                            std::getline(from, line);  // ignore four lines
+                        }
+                        int center;
+                        int atnum;
+                        int attype;
+                        double x;
+                        double y;
+                        double z;
+                        for (int i = 0; i < coord.natoms; ++i) {
+                            from >> center >> atnum >> attype >> x >> y >> z;
+                            coord.atnum(i) = atnum;
+                            coord.xyz(i, 0) = x;
+                            coord.xyz(i, 1) = y;
+                            coord.xyz(i, 2) = z;
+                        }
+                    }
+                }
+            }
+        }
+        if (!conv) {
+            throw Gauss_error("stationary point not found");
+        }
     }
     else {  // filetype == fchk
         while (std::getline(from, line)) {
@@ -218,7 +314,7 @@ void Gauss_data::get_hessians(srs::packed_dmatrix& hess) const
     std::string buffer;
     int n;
 
-	srs::dvector tmp;
+    srs::dvector tmp;
     while (std::getline(from, line)) {
         if (line.find(pattern, 0) != std::string::npos) {
             std::istringstream iss(line);
@@ -379,8 +475,7 @@ int Gauss_data::get_no_irc_points() const
         npoints /= 2;
     }
     from.clear();
-    from.seekg(orig_pos,
-               std::ios_base::beg);  // move back to original position
+    from.seekg(orig_pos, std::ios_base::beg);  // move back to original position
     from.clear();
 
     return npoints;
@@ -705,4 +800,19 @@ std::string Gauss_data::get_modredundant_coord() const
         }
     }
     throw Gauss_error("ModRedundant coordinate not found");
+}
+
+void Gauss_data::print_opt_geom(std::ostream& to) const
+{
+    Gauss_coord coord;
+    get_opt_cart_coord(coord);
+
+    srs::Format<double> fix;
+    fix.fixed().width(12).precision(6);
+    for (int i = 0; i < coord.natoms; ++i) {
+        to << ptable::get_atomic_symbol(coord.atnum(i)) << "  "
+           << fix(coord.xyz(i, 0)) << "  " << fix(coord.xyz(i, 1)) << "  "
+           << fix(coord.xyz(i, 2)) << '\n';
+    }
+    std::cout << '\n';
 }

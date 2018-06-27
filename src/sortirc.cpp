@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
 
         // Correct SMEP data and write to output:
 
-        Gauss_data gauss(from, fchk);
+        Gauss_data gauss(from, filetype);
 
         srs::dvector mep;
         gauss.get_irc_data(mep);

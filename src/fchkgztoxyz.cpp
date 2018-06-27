@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
         Gauss_data gauss(from, fchk);
         Gauss_coord coord;
 
-        gauss.get_curr_cart_coord(coord);
+        gauss.get_opt_cart_coord(coord);
 
         // Write Cartesian coordinates to standard output in XYZ format:
 

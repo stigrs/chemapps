@@ -23,6 +23,7 @@ set(
     gausshess
     gausshess2
     gaussnmr
+    gaussopt
     gausstopoly
     gmsget
     gmsgetxyz
