@@ -80,11 +80,17 @@ public:
     // Get Gaussian version number (only for output files).
     Gauss_version get_version() const;
 
+    // Check termination.
+    bool check_termination() const;
+
     // Get number of atoms.
     int get_natoms() const;
 
-    // Get current Cartesian coordinates.
-    void get_curr_cart_coord(struct Gauss_coord& coord) const;
+    // Get electronic and zero-point energies.
+    srs::dvector get_scf_zpe_energy() const;
+
+    // Get optimized Cartesian coordinates.
+    void get_opt_cart_coord(struct Gauss_coord& coord) const;
 
     // Get vibrational frequencies.
     void get_freqs(srs::dvector& freqs) const;
@@ -119,6 +125,9 @@ public:
 
     // Get ModRedundant coordinate.
     std::string get_modredundant_coord() const;
+
+    // Print optimized geometry.
+    void print_opt_geom(std::ostream& to = std::cout) const;
 
 private:
     std::istream& from;
