@@ -20,15 +20,8 @@
 #include <srs/array.h>
 #include <srs/packed.h>
 #include <iostream>
-#include <stdexcept>
 #include <string>
 #include <vector>
-
-//------------------------------------------------------------------------------
-
-struct Gauss_error : std::runtime_error {
-    Gauss_error(std::string s) : std::runtime_error(s) {}
-};
 
 //------------------------------------------------------------------------------
 

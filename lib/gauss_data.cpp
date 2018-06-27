@@ -15,6 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/gauss_data.h>
+#include <chem/gauss_error.h>
 #include <chem/ptable.h>
 #include <srs/utils.h>
 #include <sstream>
@@ -233,7 +234,7 @@ void Gauss_data::get_opt_cart_coord(struct Gauss_coord& coord) const
                         double z;
                         for (int i = 0; i < coord.natoms; ++i) {
                             from >> center >> atnum >> attype >> x >> y >> z;
-                            coord.atnum(i) = atnum;
+                            coord.atnum(i)  = atnum;
                             coord.xyz(i, 0) = x;
                             coord.xyz(i, 1) = y;
                             coord.xyz(i, 2) = z;
