@@ -36,6 +36,19 @@ public:
 
     // Run Gaussian calculation.
     void run(Molecule& mol) const;
+
+private:
+    Gauss_data data;       // object to hold calculated data
+	std::string version;   // Gaussian version
+    std::string keywords;  // list of Gaussian keywords
+    std::string jobname;   // Gaussian job name
+    int nprocshared;       // number of processors
+    bool nosave;           // flag to specify if chk file should be saved
 };
+
+inline Gaussian::Gaussian(std::istream& from, const std::string& key)
+{
+    init(from, key);
+}
 
 #endif  // CHEM_GAUSSIAN_H
