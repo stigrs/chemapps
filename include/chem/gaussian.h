@@ -27,8 +27,6 @@
 //
 class Gaussian {
 public:
-    Gaussian();
-
     Gaussian(std::istream& from, const std::string& key = "Gaussian");
 
     // Initialize Gaussian calculation.
@@ -38,8 +36,11 @@ public:
     void run(Molecule& mol) const;
 
 private:
+	// Create Gaussian input file.
+	void write_com(const Molecule& mol) const;
+
     Gauss_data data;       // object to hold calculated data
-	std::string version;   // Gaussian version
+    std::string version;   // Gaussian version
     std::string keywords;  // list of Gaussian keywords
     std::string jobname;   // Gaussian job name
     int nprocshared;       // number of processors
@@ -47,6 +48,7 @@ private:
 };
 
 inline Gaussian::Gaussian(std::istream& from, const std::string& key)
+    : data(from, out)
 {
     init(from, key);
 }
