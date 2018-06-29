@@ -45,7 +45,7 @@ The user of this software needs to obtain separate licenses for [MOPAC](http://o
 
 * [CMake](https://cmake.org) 3.4.3
 * [LIBSRS](https://github.com/stigrs/libsrs.git)
-* [Boost](http://www.boost.org/) 1.58.0
+* [Boost](http://www.boost.org/) 1.65.0
 * [GSL](https://github.com/Microsoft/GSL)
 
 ### Supported Platforms
@@ -54,9 +54,11 @@ The test suite that exercises ChemApps has been built and passes successfully
 on the following platforms:
 * GNU/Linux using GCC 5.4.0
 * GNU/Linux using Clang 3.8.0
+* GNU/Linux using Intel C++ 18.0.3 20180410 
 * OS X El Capitan (10.12) using Apple LLVM 8.1.0
 * OS X High Sierra (10.13) using Apple LLVM 9.1.0
 * Windows 7 using Visual Studio 2017
+* Windows 10 using Visual Studio 2017
 
 ### Obtaining the Source Code
 
