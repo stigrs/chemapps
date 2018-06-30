@@ -36,7 +36,7 @@ Mcmm<Pot>::Mcmm(std::istream& from,
     const double emin_def = -std::numeric_limits<double>::max();
 
     std::map<std::string, srs::Input> input_data;
-    input_data["xtol"]      = srs::Input(xtol, 5.0e-4);
+    input_data["xtol"]      = srs::Input(xtol, 5.0e-3);
     input_data["etol"]      = srs::Input(etol, 1.0e-4);
     input_data["emin"]      = srs::Input(emin, emin_def);
     input_data["emax"]      = srs::Input(emax, 0.0);

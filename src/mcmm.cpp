@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
         srs::fopen(to, output_file.c_str());
 
         Molecule mol(from, to);
-        if (pot == "gaussian") {
+        if (pot == "Gaussian") {
             Mcmm<Gaussian> mc(from, mol, "Mcmm", true);
             mc.solve(to);
         }
