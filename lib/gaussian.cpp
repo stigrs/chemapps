@@ -14,9 +14,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <chem/gauss_data.h>
 #include <chem/gauss_error.h>
 #include <chem/gaussian.h>
 #include <srs/utils.h>
+#include <cstdlib>
 #include <fstream>
 #include <gsl/gsl>
 #include <map>
@@ -77,6 +79,36 @@ void Gaussian::run(Molecule& mol) const
 {
     // Create Gaussian input file:
     write_com(mol);
+
+    // Run Gaussian:
+    std::string cmd = version + " " + jobname;
+    if (std::system(cmd.c_str()) != 0) {
+        throw Gauss_error("running " + version + " failed");
+    }
+
+    // Get Gaussian output data:
+    std::ifstream logfile;
+    srs::fopen(logfile, jobname + ".log");
+
+    Gauss_data data(logfile, out);
+
+    // Check termination:
+    if (!data.check_termination()) {
+        throw Gauss_error("Gaussian did not terminate normally");
+    }
+
+    // Check geometry convergence:
+    if (!data.check_opt_conv()) {
+        throw Gauss_error("stationary point not found");
+    }
+
+    // Update molecular energy:
+    mol.set_elec_energy(data.get_scf_zpe_energy()[0]);
+
+    // Update Cartesian coordinates:
+    Gauss_coord coord;
+    data.get_opt_cart_coord(coord);
+    mol.set_xyz(coord.xyz);
 }
 
 //------------------------------------------------------------------------------

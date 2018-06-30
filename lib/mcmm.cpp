@@ -14,6 +14,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <chem/gaussian.h>
 #include <chem/mcmm.h>
 #include <chem/molecule_io.h>
 #include <chem/mopac.h>
@@ -349,4 +350,5 @@ std::vector<int> Mcmm<Pot>::select_rand_dihedral(const Molecule& m)
     return res;
 }
 
+template class Mcmm<Gaussian>;
 template class Mcmm<Mopac>;

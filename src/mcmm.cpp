@@ -19,6 +19,7 @@
 #pragma warning(disable : 4100 4505)  // caused by boost/program_options.hpp
 #endif                                // _MSC_VER
 
+#include <chem/gaussian.h>
 #include <chem/mcmm.h>
 #include <chem/molecule.h>
 #include <chem/mopac.h>
@@ -45,17 +46,22 @@ int main(int argc, char* argv[])
     // clang-format off
     options.add_options()
         ("help,h", "display help message")
-        ("file,f", po::value<std::string>(), "input file");
+        ("file,f", po::value<std::string>(), "input file") 
+		("pot,p", po::value<std::string>(), "potential (Gaussian or Mopac)");
     // clang-format on
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, options), vm);
     po::notify(vm);
 
     std::string input_file;
+    std::string pot = "mopac";
 
     if (vm.find("help") != vm.end()) {
         std::cout << options << '\n';
         return 0;
+    }
+    if (vm.find("pot") != vm.end()) {
+        pot = vm["pot"].as<std::string>();
     }
     if (vm.find("file") != vm.end()) {
         input_file = vm["file"].as<std::string>();
@@ -77,8 +83,14 @@ int main(int argc, char* argv[])
         srs::fopen(to, output_file.c_str());
 
         Molecule mol(from, to);
-        Mcmm<Mopac> mc(from, mol, "Mcmm", true);
-        mc.solve(to);
+        if (pot == "gaussian") {
+            Mcmm<Gaussian> mc(from, mol, "Mcmm", true);
+            mc.solve(to);
+        }
+        else {
+            Mcmm<Mopac> mc(from, mol, "Mcmm", true);
+            mc.solve(to);
+        }
     }
     catch (std::exception& e) {
         std::cerr << "what: " << e.what() << '\n';

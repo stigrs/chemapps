@@ -17,7 +17,6 @@
 #ifndef CHEM_GAUSSIAN_H
 #define CHEM_GAUSSIAN_H
 
-#include <chem/gauss_data.h>
 #include <chem/molecule.h>
 #include <iostream>
 #include <string>
@@ -27,6 +26,8 @@
 //
 class Gaussian {
 public:
+    Gaussian();
+
     Gaussian(std::istream& from, const std::string& key = "Gaussian");
 
     // Initialize Gaussian calculation.
@@ -36,10 +37,9 @@ public:
     void run(Molecule& mol) const;
 
 private:
-	// Create Gaussian input file.
-	void write_com(const Molecule& mol) const;
+    // Create Gaussian input file.
+    void write_com(const Molecule& mol) const;
 
-    Gauss_data data;       // object to hold calculated data
     std::string version;   // Gaussian version
     std::string keywords;  // list of Gaussian keywords
     std::string jobname;   // Gaussian job name
@@ -47,8 +47,16 @@ private:
     bool nosave;           // flag to specify if chk file should be saved
 };
 
+inline Gaussian::Gaussian()
+{
+    version     = "rung09";
+    keywords    = "opt freq hf/sto-3g";
+    jobname     = "gauss";
+    nprocshared = 1;
+    nosave      = true;
+}
+
 inline Gaussian::Gaussian(std::istream& from, const std::string& key)
-    : data(from, out)
 {
     init(from, key);
 }
