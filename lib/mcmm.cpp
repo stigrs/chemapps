@@ -237,7 +237,8 @@ bool Mcmm<Pot>::duplicate(const Molecule& m) const
 {
     bool duplicate = false;
     for (std::size_t i = 0; i < conformers.size(); ++i) {  // check geometry
-        duplicate = srs::approx_equal(conformers[i].xyz, m.get_xyz(), xtol);
+        //duplicate = srs::approx_equal(conformers[i].xyz, m.get_xyz(), xtol);
+		duplicate = srs::rmsd(conformers[i].xyz, m.get_xyz()) <= xtol;
         if (duplicate) {  // check energy
             double ediff = std::abs(conformers[i].energy - m.get_elec_energy());
             duplicate    = ediff < etol;
