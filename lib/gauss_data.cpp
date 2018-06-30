@@ -96,6 +96,34 @@ bool Gauss_data::check_termination() const
     return ok;
 }
 
+bool Gauss_data::check_opt_conv() const
+{
+    std::streampos orig_pos = from.tellg();
+
+    from.clear();
+    from.seekg(0, std::ios_base::beg);  // move to beginning of file
+    from.clear();
+
+    std::string line;
+    bool conv = false;
+    if (filetype == out) {
+        while (std::getline(from, line)) {
+            if (line.find("Stationary point found.") != std::string::npos) {
+                conv = true;
+                break;
+            }
+        }
+    }
+    else {  // filetype == fchk
+        throw Gauss_error("not implemented for fchk files");
+    }
+    from.clear();
+    from.seekg(orig_pos, std::ios_base::beg);  // move to original position
+    from.clear();
+
+    return conv;
+}
+
 int Gauss_data::get_natoms() const
 {
     std::streampos orig_pos = from.tellg();

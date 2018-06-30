@@ -76,6 +76,9 @@ public:
     // Check termination.
     bool check_termination() const;
 
+	// Check geometry convergence.
+	bool check_opt_conv() const;
+
     // Get number of atoms.
     int get_natoms() const;
 
