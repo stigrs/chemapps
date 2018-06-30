@@ -151,7 +151,7 @@ void Mcmm<Pot>::solve(std::ostream& to)
            << "Iterations:\t" << ifix(kiter) << " out of " << maxiter << '\n'
            << "Rejections:\t" << ifix(nreject) << " out of " << maxreject
            << "\n\n";
-        dfix.fixed().width(10).precision(4);
+        dfix.fixed().width(12).precision(6);
         line.width(15).fill('-');
         to << "Global minimum:\n"
            << line('-') << '\n'
@@ -237,8 +237,7 @@ bool Mcmm<Pot>::duplicate(const Molecule& m) const
 {
     bool duplicate = false;
     for (std::size_t i = 0; i < conformers.size(); ++i) {  // check geometry
-        //duplicate = srs::approx_equal(conformers[i].xyz, m.get_xyz(), xtol);
-		duplicate = srs::rmsd(conformers[i].xyz, m.get_xyz()) <= xtol;
+        duplicate = srs::rmsd(conformers[i].xyz, m.get_xyz()) <= xtol;
         if (duplicate) {  // check energy
             double ediff = std::abs(conformers[i].energy - m.get_elec_energy());
             duplicate    = ediff < etol;
