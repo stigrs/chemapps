@@ -19,6 +19,7 @@
 #include <srs/utils.h>
 #include <cstdlib>
 #include <fstream>
+#include <limits>
 #include <map>
 #include <sstream>
 
@@ -70,27 +71,28 @@ void Mopac::init(std::istream& from, const std::string& key)
 
 void Mopac::run(Molecule& mol) const
 {
-    // Create Mopac input file:
-    write_dat(mol);
+    write_dat(mol);  // create Mopac input file
 
-    // Run Mopac:
+    bool ok         = true;
     std::string cmd = version + " " + jobname + ".dat";
     if (std::system(cmd.c_str()) != 0) {
-        throw Mopac_error("running " + version + " failed");
+        ok = false;  // running Mopac failed
     }
 
-    // Check convergence:
     if (!check_convergence()) {
-        throw Mopac_error(jobname + " failed to converge");
+        ok = false;  // optimization failed
     }
+    if (ok) {
+        mol.set_elec_energy(get_heat_of_formation());  // update energy
 
-    // Update molecular energy:
-    mol.set_elec_energy(get_heat_of_formation());
-
-    // Update Cartesian coordinates:
-    srs::dmatrix xyz = mol.get_xyz();
-    get_xyz(xyz);
-    mol.set_xyz(xyz);
+        srs::dmatrix xyz = mol.get_xyz();
+        get_xyz(xyz);
+        mol.set_xyz(xyz);  // update Cartesian coordinates
+    }
+    else {  // calculation failed to converge; set energy to infinity
+        constexpr double emax = std::numeric_limits<double>::max();
+        mol.set_elec_energy(emax);
+    }
 }
 
 void Mopac::write_dat(const Molecule& mol) const
