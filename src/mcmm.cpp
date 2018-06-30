@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     po::notify(vm);
 
     std::string input_file;
-    std::string pot = "mopac";
+    std::string pot = "Mopac";
 
     if (vm.find("help") != vm.end()) {
         std::cout << options << '\n';
@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
         srs::fopen(to, output_file.c_str());
 
         Molecule mol(from, to);
-        if (pot == "Gaussian") {
+        if (pot == "Gaussian" || pot == "gaussian") {
             Mcmm<Gaussian> mc(from, mol, "Mcmm", true);
             mc.solve(to);
         }
