@@ -80,10 +80,12 @@ void Gaussian::run(Molecule& mol) const
     // Create Gaussian input file:
     write_com(mol);
 
+    bool ok = true;
     // Run Gaussian:
     std::string cmd = version + " " + jobname;
     if (std::system(cmd.c_str()) != 0) {
-        throw Gauss_error("running " + version + " failed");
+        ok = false;
+        // throw Gauss_error("running " + version + " failed");
     }
 
     // Get Gaussian output data:
@@ -94,21 +96,25 @@ void Gaussian::run(Molecule& mol) const
 
     // Check termination:
     if (!data.check_termination()) {
-        throw Gauss_error("Gaussian did not terminate normally");
+        ok = false;
+        // throw Gauss_error("Gaussian did not terminate normally");
     }
 
     // Check geometry convergence:
     if (!data.check_opt_conv()) {
-        throw Gauss_error("stationary point not found");
+        ok = false;
+        // throw Gauss_error("stationary point not found");
     }
 
-    // Update molecular energy:
-    mol.set_elec_energy(data.get_scf_zpe_energy()[0]);
+    if (ok) {
+        // Update molecular energy:
+        mol.set_elec_energy(data.get_scf_zpe_energy()[0]);
 
-    // Update Cartesian coordinates:
-    Gauss_coord coord;
-    data.get_opt_cart_coord(coord);
-    mol.set_xyz(coord.xyz);
+        // Update Cartesian coordinates:
+        Gauss_coord coord;
+        data.get_opt_cart_coord(coord);
+        mol.set_xyz(coord.xyz);
+    }
 }
 
 //------------------------------------------------------------------------------
