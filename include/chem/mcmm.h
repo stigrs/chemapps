@@ -99,8 +99,10 @@ private:
     double temp;  // temperature
 
     unsigned maxiter;    // maximum number of iterations (k)
+	unsigned miniter;    // minimum number of iterations (k)
     unsigned maxreject;  // maximum number of consecutive rejected trials
     unsigned nminima;    // number of local minima stored
+	unsigned ntrials;    // number of trials for generating a conformer
 
     int seed;  // random number generator seed
 

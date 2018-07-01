@@ -43,8 +43,10 @@ Mcmm<Pot>::Mcmm(std::istream& from,
     input_data["rmin"]      = srs::Input(rmin, 0.7414);  // experimental r(H-H)
     input_data["temp"]      = srs::Input(temp, 298.15);
     input_data["maxiter"]   = srs::Input(maxiter, 1000);
+    input_data["miniter"]   = srs::Input(miniter, 100);
     input_data["maxreject"] = srs::Input(maxreject, 100);
     input_data["nminima"]   = srs::Input(nminima, 20);
+    input_data["ntrials"]   = srs::Input(ntrials, 50);
     input_data["seed"]      = srs::Input(seed, 0);
 
     bool found = srs::find_section(from, key);
@@ -85,17 +87,17 @@ Mcmm<Pot>::Mcmm(std::istream& from,
     if (temp <= 0.0) {
         throw Mcmm_error("bad temp <= 0.0");
     }
-    if (maxiter < 10) {  // should this be larger?
-        throw Mcmm_error("bad maxiter < 10");
+    if (maxiter < nminima) {
+        throw Mcmm_error("bad maxiter < nminima");
+    }
+    if (maxiter < miniter) {  
+        throw Mcmm_error("bad maxiter < miniter");
     }
     if (maxreject < 1) {
         throw Mcmm_error("bad maxreject < 1");
     }
     if (nminima < 1) {
         throw Mcmm_error("bad nminima < 1");
-    }
-    if (maxiter < nminima) {
-        throw Mcmm_error("bad maxiter < nminima");
     }
 
     // Initialize potential:
@@ -187,7 +189,7 @@ bool Mcmm<Pot>::check_exit() const
     std::adjacent_difference(eglobal.begin(), eglobal.end(), ediff.begin());
     if (ediff.size() > 1) {
         double ediff_max = *std::max_element(ediff.begin(), ediff.end());
-        if ((ediff_max < etol) && (kiter >= nminima)) {
+        if ((ediff_max < etol) && (kiter >= miniter)) {
             finished = true;
         }
     }
@@ -250,12 +252,15 @@ template <class Pot>
 void Mcmm<Pot>::new_conformer()
 {
     // Generate a new random conformer by using the uniform usage scheme:
-    do {
+    for (unsigned i = 0; i < ntrials; ++i) {
         srs::dmatrix xnew = mol.get_xyz();
         uniform_usage(xnew);
         mol.set_xyz(xnew);
         gen_rand_conformer(mol);
-    } while (!accept_geom_dist(mol));  // check geometry constraints
+        if (accept_geom_dist(mol)) {  // check geometry constraints
+            break;
+        }
+    }
 
     // Perform geometry optimization:
     pot.run(mol);
