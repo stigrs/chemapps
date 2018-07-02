@@ -43,9 +43,9 @@ Mcmm<Pot>::Mcmm(std::istream& from,
     input_data["emax"]      = srs::Input(emax, 0.0);
     input_data["rmin"]      = srs::Input(rmin, 0.5);
     input_data["temp"]      = srs::Input(temp, 298.15);
-    input_data["maxiter"]   = srs::Input(maxiter, 1000);
-    input_data["miniter"]   = srs::Input(miniter, 100);
-    input_data["maxreject"] = srs::Input(maxreject, 100);
+    input_data["maxiter"]   = srs::Input(maxiter, 5000);
+    input_data["miniter"]   = srs::Input(miniter, 500);
+    input_data["maxreject"] = srs::Input(maxreject, 200);
     input_data["nminima"]   = srs::Input(nminima, 20);
     input_data["seed"]      = srs::Input(seed, 0);
 
@@ -294,7 +294,7 @@ void Mcmm<Pot>::update()
     if (verbose) {  // log state of MCMM solver
         double eglobal_min = *std::min_element(eglobal.begin(), eglobal.end());
         std::cout << "kiter = " << kiter << "; ecurr = " << ecurr
-                  << "; eglobal = " << eglobal_min << '\n';
+                  << "; eglobal = " << eglobal_min << std::endl;
     }
 }
 
