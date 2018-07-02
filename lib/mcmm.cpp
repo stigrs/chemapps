@@ -19,6 +19,7 @@
 #include <chem/molecule_io.h>
 #include <chem/mopac.h>
 #include <srs/utils.h>
+#include <cmath>
 #include <limits>
 #include <map>
 #include <numeric>
@@ -37,10 +38,10 @@ Mcmm<Pot>::Mcmm(std::istream& from,
 
     std::map<std::string, srs::Input> input_data;
     input_data["xtol"]      = srs::Input(xtol, 5.0e-3);
-    input_data["etol"]      = srs::Input(etol, 1.0e-4);
+    input_data["etol"]      = srs::Input(etol, 1.0e-3);  // suitable for Mopac
     input_data["emin"]      = srs::Input(emin, emin_def);
     input_data["emax"]      = srs::Input(emax, 0.0);
-    input_data["rmin"]      = srs::Input(rmin, 0.7414);  // experimental r(H-H)
+    input_data["rmin"]      = srs::Input(rmin, 0.5);
     input_data["temp"]      = srs::Input(temp, 298.15);
     input_data["maxiter"]   = srs::Input(maxiter, 1000);
     input_data["miniter"]   = srs::Input(miniter, 100);
@@ -184,11 +185,12 @@ bool Mcmm<Pot>::check_exit() const
     if (nreject >= maxreject) {
         finished = true;
     }
-    std::vector<double> ediff(eglobal.size());
-    std::adjacent_difference(eglobal.begin(), eglobal.end(), ediff.begin());
-    if (ediff.size() > 1) {
+    if (eglobal.size() > 1) {
+        std::vector<double> ediff(eglobal.size());
+        std::adjacent_difference(
+            eglobal.end(), eglobal.end() - 1, ediff.begin());
         double ediff_max = *std::max_element(ediff.begin(), ediff.end());
-        if ((ediff_max < etol) && (kiter >= miniter)) {
+        if ((std::abs(ediff_max) < etol) && (kiter >= miniter)) {
             finished = true;
         }
     }
