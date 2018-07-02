@@ -46,7 +46,6 @@ Mcmm<Pot>::Mcmm(std::istream& from,
     input_data["miniter"]   = srs::Input(miniter, 100);
     input_data["maxreject"] = srs::Input(maxreject, 100);
     input_data["nminima"]   = srs::Input(nminima, 20);
-    input_data["ntrials"]   = srs::Input(ntrials, 50);
     input_data["seed"]      = srs::Input(seed, 0);
 
     bool found = srs::find_section(from, key);
@@ -90,7 +89,7 @@ Mcmm<Pot>::Mcmm(std::istream& from,
     if (maxiter < nminima) {
         throw Mcmm_error("bad maxiter < nminima");
     }
-    if (maxiter < miniter) {  
+    if (maxiter < miniter) {
         throw Mcmm_error("bad maxiter < miniter");
     }
     if (maxreject < 1) {
@@ -251,6 +250,7 @@ bool Mcmm<Pot>::duplicate(const Molecule& m) const
 template <class Pot>
 void Mcmm<Pot>::new_conformer()
 {
+    const unsigned ntrials = 20;
     // Generate a new random conformer by using the uniform usage scheme:
     for (unsigned i = 0; i < ntrials; ++i) {
         srs::dmatrix xnew = mol.get_xyz();
