@@ -29,6 +29,7 @@ set(
     gmsgetxyz
     gmsscan
     mcmm 
+    mcmmtocom
     mergeirc
     mh2ph
     molrot 
