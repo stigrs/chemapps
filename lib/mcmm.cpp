@@ -292,6 +292,11 @@ void Mcmm<Pot>::update()
         eglobal.push_back(ecurr);
         xglobal = xcurr;
     }
+    if (verbose) {  // log state of MCMM solver
+        double eglobal_min = *std::min_element(eglobal.begin(), eglobal.end());
+        std::cout << "kiter = " << kiter << "; ecurr = " << ecurr
+                  << "; eglobal = " << eglobal_min << '\n';
+    }
 }
 
 template <class Pot>
