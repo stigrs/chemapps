@@ -186,11 +186,8 @@ bool Mcmm<Pot>::check_exit() const
         finished = true;
     }
     if (eglobal.size() > 1) {
-        std::vector<double> ediff(eglobal.size());
-        std::adjacent_difference(
-            eglobal.end(), eglobal.end() - 1, ediff.begin());
-        double ediff_max = *std::max_element(ediff.begin(), ediff.end());
-        if ((std::abs(ediff_max) < etol) && (kiter >= miniter)) {
+		double ediff = eglobal.end()[-1] - eglobal.end()[-2];
+        if ((std::abs(ediff) < etol) && (kiter >= miniter)) {
             finished = true;
         }
     }
