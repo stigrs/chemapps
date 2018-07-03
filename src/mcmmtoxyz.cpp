@@ -33,7 +33,7 @@
 
 
 //
-// Program for generating Gaussian input files from MCMM solver output.
+// Program for generating XYZ files from MCMM solver output.
 //
 int main(int argc, char* argv[])
 {
@@ -44,10 +44,7 @@ int main(int argc, char* argv[])
     options.add_options()
         ("help,h", "display help message")
         ("file,f", po::value<std::string>(), "input file") 
-		("proc,N", po::value<int>(), "number of processors") 
-		("charge,c", po::value<int>(), "charge of molecule") 
-		("spin,s", po::value<int>(), "spin multiplicity of molecule") 
-        ("key,k", po::value<std::string>(), "Gaussian keywords") 
+		("atoms,N", po::value<int>(), "number of atoms") 
         ("title,t", po::value<std::string>(), "title line");
     // clang-format on
     po::variables_map vm;
@@ -55,11 +52,8 @@ int main(int argc, char* argv[])
     po::notify(vm);
 
     std::string input_file;
-    std::string keywords = "opt freq hf/sto-3g";
-    std::string title    = "Title";
-    int nproc            = 1;
-    int charge           = 0;
-    int spin             = 1;
+    std::string title = "Title";
+    int natoms        = 0;
 
     if (vm.find("help") != vm.end()) {
         std::cout << options << '\n';
@@ -68,17 +62,12 @@ int main(int argc, char* argv[])
     if (vm.find("title") != vm.end()) {
         title = vm["title"].as<std::string>();
     }
-    if (vm.find("key") != vm.end()) {
-        keywords = vm["key"].as<std::string>();
+    if (vm.find("atoms") != vm.end()) {
+        natoms = vm["atoms"].as<int>();
     }
-    if (vm.find("proc") != vm.end()) {
-        nproc = vm["proc"].as<int>();
-    }
-    if (vm.find("charge") != vm.end()) {
-        charge = vm["charge"].as<int>();
-    }
-    if (vm.find("spin") != vm.end()) {
-        spin = vm["spin"].as<int>();
+    else {
+        std::cerr << options << '\n';
+        return 1;
     }
     if (vm.find("file") != vm.end()) {
         input_file = vm["file"].as<std::string>();
@@ -102,14 +91,10 @@ int main(int argc, char* argv[])
                 std::ofstream to;
                 std::string base = srs::strip_suffix(input_file, ".out");
                 base += "_c" + srs::to_string(nc);
-                std::string com = base + ".com";
+                std::string com = base + ".xyz";
                 srs::fopen(to, com.c_str());
 
-                to << "%nprocshared=" << nproc << '\n'
-                   << "%chk=" << base << ".chk\n"
-                   << "# " << keywords << "\n\n"
-                   << title << "\n\n"
-                   << charge << " " << spin << '\n';
+                to << natoms << '\n' << title << '\n';
 
                 for (int it = 0; it < 5; ++it) {
                     std::getline(from, line);  // ignore

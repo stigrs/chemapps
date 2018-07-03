@@ -30,6 +30,7 @@ set(
     gmsscan
     mcmm 
     mcmmtocom
+    mcmmtoxyz
     mergeirc
     mh2ph
     molrot 
