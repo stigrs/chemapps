@@ -37,7 +37,7 @@ Mcmm<Pot>::Mcmm(std::istream& from,
     const double emin_def = -std::numeric_limits<double>::max();
 
     std::map<std::string, srs::Input> input_data;
-    input_data["xtol"]      = srs::Input(xtol, 5.0e-3);
+    input_data["xtol"]      = srs::Input(xtol, 1.0e-2);
     input_data["etol"]      = srs::Input(etol, 1.0e-3);  // suitable for Mopac
     input_data["emin"]      = srs::Input(emin, emin_def);
     input_data["emax"]      = srs::Input(emax, 0.0);
@@ -186,7 +186,7 @@ bool Mcmm<Pot>::check_exit() const
         finished = true;
     }
     if (eglobal.size() > 1) {
-		double ediff = eglobal.end()[-1] - eglobal.end()[-2];
+        double ediff = eglobal.end()[-1] - eglobal.end()[-2];
         if ((std::abs(ediff) < etol) && (kiter >= miniter)) {
             finished = true;
         }
@@ -293,8 +293,10 @@ void Mcmm<Pot>::update()
     }
     if (verbose) {  // log state of MCMM solver
         double eglobal_min = *std::min_element(eglobal.begin(), eglobal.end());
+        double ediff       = std::abs(eglobal.end()[-1] - eglobal.end()[-2]);
         std::cout << "kiter = " << kiter << "; ecurr = " << ecurr
-                  << "; eglobal = " << eglobal_min << std::endl;
+                  << "; eglobal = " << eglobal_min << "; conv = " << ediff
+                  << std::endl;
     }
 }
 
