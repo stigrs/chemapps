@@ -47,6 +47,7 @@ set(
     tst
     unitsconv
     vflxget
+	xyztocom
     xyztogms
     xyztomop
     zmatxyz
