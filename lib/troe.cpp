@@ -30,6 +30,7 @@ Troe::Troe(std::istream& from, Molecule& mol_) : mol(mol_)
     input_data["pot_type"]    = srs::Input(pot_type_tmp, 1);
     input_data["e_barrier"]   = srs::Input(e_barrier);
     input_data["imom_ratio"]  = srs::Input(imom_ratio, 1.0);
+    input_data["n_free_rot"]  = srs::Input(n_free_rot, 0);
     input_data["n_morse_osc"] = srs::Input(n_morse_osc, 0);
 
     if (srs::find_section(from, "Troe")) {
@@ -139,4 +140,23 @@ double Troe::f_rotation(const double temp) const
         break;
     }
     return f_rot;
+}
+
+double Troe::f_free_rotor(const double temp) const
+{
+    using namespace boost::math;
+    double f_free_rot = 1.0;
+
+    if (n_free_rot > 0) {
+        double kT = datum::R * 1.0e-3 * temp / datum::icm_to_kJ;
+
+        double e0_azpe = (e_barrier + wr::a_corr(mol, e_barrier) * zpe) / kT;
+
+        auto s = mol.get_vib().get_freqs().size();
+        auto r = n_free_rot;
+
+        f_free_rot = (factorial<double>(s - 1) / tgamma<double>(s + 0.5 * r))
+                     * std::pow(e0_azpe, 0.5 * r);
+    }
+    return f_free_rot;
 }
