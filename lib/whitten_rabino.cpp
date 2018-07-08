@@ -31,17 +31,19 @@ double wr::a_corr(const Molecule& mol, double e_barrier)
     else {
         w = 1.0 / (5.0 * en + 2.73 * std::sqrt(en) + 3.51);
     }
-    double sum_v  = 0.0;
+    double sum2_v  = 0.0;
     double sum_v2 = 0.0;
     for (auto vi : mol.get_vib().get_freqs()) {
         if (vi < 0.0) {  // ignore imaginary frequencies
             continue;
         }
         else {
-            sum_v += vi;
+            sum2_v += vi;
             sum_v2 += vi * vi;
         }
     }
+	sum2_v *= sum2_v;
+
     double factor = 3.0;  // structure factor for nonlinear
     if (mol.structure() == linear) {
         factor = 2.0;
@@ -50,7 +52,7 @@ double wr::a_corr(const Molecule& mol, double e_barrier)
     double r = static_cast<double>(mol.get_tor().get_pot_coeff().size());
 
     double beta
-        = (s - 1.0) * ((s + 0.5 * r + 0.5 * factor) / s) * sum_v2 / sum_v;
+        = (s - 1.0) * ((s + 0.5 * r + 0.5 * factor) / s) * sum_v2 / sum2_v;
 
     return 1.0 - beta * w;
 }
