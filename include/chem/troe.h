@@ -85,7 +85,7 @@ public:
     // Eq. 9.16 in Troe, J. J. Chem. Phys., 1977, vol. 66, pp. 4758--4775.
     // Hindered internal rotation with E0/V0 <= 3 cannot be treated yet.
     //
-    // double f_hind_rotor(const double temp) const;
+    double f_hind_rotor(const double temp) const;
 
 private:
     Molecule& mol;

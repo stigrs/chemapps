@@ -88,6 +88,7 @@ set(PROGRAMS
     test_thermochem
     test_thermodata
     test_torsion
+	test_troe
     test_tst
     test_tunnel
     test_units

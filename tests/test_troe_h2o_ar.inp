@@ -1,0 +1,12 @@
+Troe
+ pot_type
+  1
+ e_barrier
+  41279.1
+ n_morse_osc
+  3
+End
+Molecule
+ vibr
+ 3 [ 3657.05 1594.59 3755.79 ] 
+End
