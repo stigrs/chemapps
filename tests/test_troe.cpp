@@ -15,6 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/molecule.h>
+#include <chem/thermochem.h>
 #include <chem/troe.h>
 #include <chem/whitten_rabino.h>
 #include <srs/array.h>
@@ -46,5 +47,43 @@ TEST_CASE("test_troe")
         double e0 = 118.023 * datum::cal_to_J / datum::icm_to_kJ;
         double a  = wr::a_corr(mol, e0);
         CHECK(srs::approx_equal(a, 0.989, 1.0e-2));
+
+        double rho = wr::vibr_density_states(mol, e0);
+        rho *= datum::cal_to_J;
+        CHECK(srs::approx_equal(rho, 16.7, 5.0e-2));
+
+        double temp = 300.0;
+
+        double f_e = troe.f_energy(temp);
+        CHECK(srs::approx_equal(f_e, 1.01, 1.0e-3));
+
+        double f_rot = troe.f_rotation(temp);
+        CHECK(srs::approx_equal(f_rot, 95.0, 0.8));
+
+        double f_free = troe.f_free_rotor(temp);
+        CHECK(srs::approx_equal(f_free, 1.0, 1.0e-12));
+
+        double f_hind = troe.f_hind_rotor(temp);
+        CHECK(srs::approx_equal(f_hind, 1.0, 1.0e-12));
+
+        double qvib = chem::qvib(mol, temp, "V=0");
+        CHECK(srs::approx_equal(qvib, 1.0, 5.0e-4));
+
+        temp = 2000.0;
+
+        f_e = troe.f_energy(temp);
+        CHECK(srs::approx_equal(f_e, 1.06, 5.0e-3));
+
+        f_rot = troe.f_rotation(temp);
+        CHECK(srs::approx_equal(f_rot, 14.0, 0.8));
+
+        f_free = troe.f_free_rotor(temp);
+        CHECK(srs::approx_equal(f_free, 1.0, 1.0e-12));
+
+        f_hind = troe.f_hind_rotor(temp);
+        CHECK(srs::approx_equal(f_hind, 1.0, 1.0e-12));
+
+        qvib = chem::qvib(mol, temp, "V=0");
+        CHECK(srs::approx_equal(qvib, 1.69, 5.0e-3));
     }
 }
