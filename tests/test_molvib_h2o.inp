@@ -7,8 +7,6 @@ Molecule
     0
   sigma
     1
-  geom_unit 
-    angstrom
   geometry
     3
     Water  
