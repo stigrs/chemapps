@@ -15,6 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/collision.h>
+#include <chem/thermodata.h>
 #include <srs/utils.h>
 #include <boost/program_options.hpp>
 #include <exception>
@@ -71,8 +72,13 @@ int main(int argc, char* argv[])
         srs::fopen(from, input_file);
         srs::fopen(to, output_file.c_str());
 
+        Thermodata tpdata(from);
+        auto temp = tpdata.get_temperature();
+
         Collision model(from);
-        model.biased_random_walk(to);
+        for (auto& t : temp) {
+            model.biased_random_walk(t, to);
+        }
     }
     catch (std::exception& e) {
         std::cerr << "what: " << e.what() << '\n';
