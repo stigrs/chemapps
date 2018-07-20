@@ -16,3 +16,19 @@ Molecule
  vibr
  3 [ 3657.05 1594.59 3755.79 ] 
 End
+Collision
+ coll_integral
+  troe
+ mass_bath
+  39.948
+ mass_mol
+  18.016
+ epsilon_bath
+  143.20
+ epsilon_mol
+  527.15
+ sigma_bath
+  3.35
+ sigma_mol
+  2.83
+ temperature
