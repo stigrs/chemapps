@@ -46,16 +46,16 @@ class Collision {
 public:
     Collision(std::istream& from, const std::string& key = "Collision");
 
-    // Calculate reduced mass of system.
+    // Reduced mass of system.
     double reduced_mass() const;
 
     // Average atom/atom mass of molecule (Lim and Gilbert, 1990).
     double average_mass() const;
 
-    // Calculate Lennard-Jones well depth of system.
+    // Lennard-Jones well depth of system.
     double epsilon_complex() const;
 
-    // Calculate Lennard-Jones collision diameter of system.
+    // Lennard-Jones collision diameter of system.
     double sigma_complex() const;
 
     // Local Lennard-Jones well depth of system (Lim and Gilbert, 1990).
@@ -64,10 +64,13 @@ public:
     // Local Lennard-Jones collision diam. of system (Lim and Gilbert, 1990).
     double sigma_local() const;
 
-    // Calculate Lennard-Jones collision rate (Forst, 2003).
+    // Lennard-Jones collision frequency (Troe, 1977).
+    double lj_coll_freq(double temp) const;
+
+    // Lennard-Jones collision rate (Forst, 2003).
     double lj_coll_rate(double temp) const;
 
-    // Calculate reduced collision integral.
+    // Reduced collision integral.
     double coll_omega22(double temp) const;
 
     // Collision time using eq. 32 of Lim and Gilbert (1990).
@@ -82,7 +85,7 @@ public:
     // Mean-squared energy transfer per collision (<E^2>).
     double mean_sqr_energy_transfer_coll(double temp) const;
 
-    // Calculate collision energy transfer in highly excited molecules
+    // Collision energy transfer in highly excited molecules
     // using the biased random walk model B.
     void biased_random_walk(double temp, std::ostream& to = std::cout) const;
 
@@ -141,6 +144,15 @@ inline double Collision::epsilon_complex() const
 inline double Collision::sigma_complex() const
 {
     return 0.5 * (sigma_bath + sigma_mol);
+}
+
+inline double Collision::lj_coll_freq(double temp) const
+{
+    double sig = sigma_complex();
+    double mu  = reduced_mass();
+
+    return 4.87e+14 * std::sqrt(temp / 1000.0) * std::sqrt(20.0 / mu)
+           * std::pow(sig / 5.0, 2.0) * coll_omega22(temp);
 }
 
 inline double Collision::lj_coll_rate(double temp) const

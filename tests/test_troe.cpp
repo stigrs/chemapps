@@ -14,6 +14,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <chem/collision.h>
 #include <chem/molecule.h>
 #include <chem/thermochem.h>
 #include <chem/troe.h>
@@ -23,6 +24,7 @@
 #include <srs/math.h>
 #include <srs/utils.h>
 #include <catch/catch.hpp>
+#include <cmath>
 #include <fstream>
 
 
@@ -40,6 +42,7 @@ TEST_CASE("test_troe")
         CHECK(srs::approx_equal(freqs, freqs_ans, 1.0e-12));
 
         Troe troe(from, mol);
+        Collision coll(from);
 
         double f_anh = troe.f_anharm();
         CHECK(srs::approx_equal(f_anh, 2.37, 1.0e-3));
@@ -53,6 +56,8 @@ TEST_CASE("test_troe")
         CHECK(srs::approx_equal(rho, 16.7, 5.0e-2));
 
         double temp = 300.0;
+
+        double kT = datum::R * 1.0e-3 * temp;
 
         double f_e = troe.f_energy(temp);
         CHECK(srs::approx_equal(f_e, 1.01, 1.0e-3));
@@ -69,7 +74,17 @@ TEST_CASE("test_troe")
         double qvib = chem::qvib(mol, temp, "V=0");
         CHECK(srs::approx_equal(qvib, 1.0, 5.0e-4));
 
+        double z_lj = coll.lj_coll_freq(temp);
+        CHECK(srs::approx_equal(z_lj, 1.80e+14, 1.0e-2, "reldiff"));
+
+        rho /= datum::cal_to_J;
+        double k0
+            = z_lj * (rho * kT / qvib) * f_anh * f_e * f_rot * f_hind * f_free;
+        CHECK(srs::approx_equal(k0, 4.1e+17, 1.0e-1, "reldiff"));
+
         temp = 2000.0;
+
+        kT = datum::R * 1.0e-3 * temp;
 
         f_e = troe.f_energy(temp);
         CHECK(srs::approx_equal(f_e, 1.06, 5.0e-3));
@@ -85,5 +100,11 @@ TEST_CASE("test_troe")
 
         qvib = chem::qvib(mol, temp, "V=0");
         CHECK(srs::approx_equal(qvib, 1.69, 5.0e-3));
+
+        z_lj = coll.lj_coll_freq(temp);
+        CHECK(srs::approx_equal(z_lj, 2.92e+14, 1.0e-3, "reldiff"));
+
+        k0 = z_lj * (rho * kT / qvib) * f_anh * f_e * f_rot * f_hind * f_free;
+        CHECK(srs::approx_equal(k0, 4.2e+17, 1.0e-1, "reldiff"));
     }
 }
