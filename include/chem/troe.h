@@ -87,6 +87,9 @@ public:
     //
     double f_hind_rotor(const double temp) const;
 
+    // Get reaction barrier.
+    double get_energy_barrier() const { return e_barrier; }
+
 private:
     Molecule& mol;
     Pot_type pot_type;  // potential type (type 1 or type 2)

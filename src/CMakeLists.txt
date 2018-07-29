@@ -44,6 +44,7 @@ set(
     polyplot
     sortirc
     thermo
+    troe
     tst
     unitsconv
     vflxget
