@@ -25,6 +25,7 @@
 #include <boost/program_options.hpp>
 #include <exception>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
@@ -92,11 +93,63 @@ int main(int argc, char* argv[])
         double wra = wr::a_corr(mol, e0);
 
         std::cout << "Zero-point vibrational energy:    " << zpe << " cm^-1\n"
+			      << "Energy barrier towards reaction:  " << e0 << " cm^-1\n"
                   << "Vibrational density of states:    " << rho
                   << " (kJ/mol)^-1\n"
                   << "Whitten-Rabinovitch A correction: " << wra << "\n\n";
 
+        line.width(75).fill('-');
+
+        // clang-format off
+        std::cout << std::setiosflags(std::ios_base::left) << line('-') << '\n'
+                  << std::setw(8)  << "T/K" 
+			      << std::setw(11) << "k0^SC/[M]"
+                  << std::setw(10) << "Z_LJ/[M]" 
+			      << std::setw(8)  << "Q_vib"
+                  << std::setw(8)  << "F_anh" 
+			      << std::setw(8)  << "F_e"
+                  << std::setw(8)  << "F_rot" 
+			      << std::setw(8)  << "F_free"
+                  << std::setw(8)  << "F_hind" 
+			      << '\n' << line('-') << '\n'
+                  << std::resetiosflags(std::ios_base::left);
+        // clang-format on
+
+        srs::Format<double> gen65;
+        srs::Format<double> sci82;
+        srs::Format<double> sci92;
+
+        gen65.width(6).precision(5);
+        sci82.scientific().width(8).precision(2);
+        sci92.scientific().width(9).precision(2);
+
         auto temp = tpdata.get_temperature();
+
+        for (auto t : temp) {
+            double kT     = datum::R * 1.0e-3 * t;
+            double z_lj   = coll.lj_coll_freq(t);
+            double q_vib  = chem::qvib(mol, t, "V=0");
+            double f_anh  = troe.f_anharm();
+            double f_e    = troe.f_energy(t);
+            double f_rot  = troe.f_rotation(t);
+            double f_free = troe.f_free_rotor(t);
+            double f_hind = troe.f_hind_rotor(t);
+
+            double k0 = z_lj * (rho * kT / q_vib) * f_anh * f_e * f_rot * f_free
+                        * f_hind * std::exp(-e0 * datum::icm_to_kJ / kT);
+
+            // clang-format off
+            std::cout << gen65(t)      << "  " 
+				      << sci92(k0)     << "  " 
+				      << sci82(z_lj)   << "  " 
+				      << gen65(q_vib)  << "  " 
+				      << gen65(f_anh)  << "  "
+                      << gen65(f_e)    << "  " 
+				      << gen65(f_rot)  << "  "
+                      << gen65(f_free) << "  " 
+				      << gen65(f_hind) << '\n';
+            // clang-format on
+        }
     }
     catch (std::exception& e) {
         std::cerr << "what: " << e.what() << '\n';
