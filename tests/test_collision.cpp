@@ -37,8 +37,9 @@ TEST_CASE("test_collision")
         CHECK(srs::approx_equal(coll.epsilon_local(), 29.36, 1.0e-2));
         CHECK(srs::approx_equal(coll.reduced_mass(), 17.183, 1.0e-3));
         CHECK(srs::approx_equal(coll.average_mass(), 10.080, 1.0e-3));
-        CHECK(srs::approx_equal(coll.impact_parameter(), 2.867, 1.0e-3));
-        CHECK(srs::approx_equal(coll.collision_time() * 1.0e+13, 1.45, 1.0e-3));
-        CHECK(srs::approx_equal(coll.s_parameter(), 542.986, 1.0e-1));
+        CHECK(srs::approx_equal(coll.impact_parameter(870.0), 2.867, 1.0e-3));
+        CHECK(srs::approx_equal(
+            coll.collision_time(870.0) * 1.0e+13, 1.45, 1.0e-3));
+        CHECK(srs::approx_equal(coll.s_parameter(870.0), 542.986, 1.0e-1));
     }
 }

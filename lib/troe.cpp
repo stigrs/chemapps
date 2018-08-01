@@ -160,3 +160,43 @@ double Troe::f_free_rotor(const double temp) const
     }
     return f_free_rot;
 }
+
+double Troe::f_hind_rotor(const double temp) const
+{
+    using namespace boost::math;
+    double f_hind_rot = 1.0;
+
+    if (mol.get_tor().get_pot_coeff().size() > 0) {
+        const double kT = datum::k * temp;
+        const double f  = datum::icm_to_kJ * 1.0e+3 / datum::N_A;
+        const double h  = datum::h;
+        const double hb = datum::h_bar;
+        const double c  = datum::c_0;
+
+        double v0 = srs::max(mol.get_tor().get_pot_coeff());
+        if ((e_barrier / v0) <= 3.0) {
+            throw Troe_error(
+                "Troe::f_hind_rotor(): E0/V0 <= 3, not implemented yet");
+        }
+        double a    = wr::a_corr(mol, e_barrier);
+        double s    = mol.get_vib().get_freqs().size();
+        double n    = mol.get_tor().symmetry_number();
+        double b    = srs::max(mol.get_tor().constant()) * 100.0;
+        double v0f  = v0 * f;
+        double e0   = e_barrier * f;
+        double zpef = zpe * f;
+
+        double denom = std::pow((1.0 - exp(-kT / v0f)), 1.2)
+                       + exp(-1.2 * kT / v0f)
+                             / (std::sqrt(kT / (2.0 * b * c * hb))
+                                * (1.0
+                                   - std::exp(-std::sqrt(n * n * h * c * b * v0f
+                                                         / (kT * kT)))));
+
+        f_hind_rot = (tgamma<double>(s) / tgamma<double>(s - 0.5 + 1.0));
+        f_hind_rot *= std::sqrt((e0 + a * zpef) / kT);
+        f_hind_rot *= 1.0 - std::exp(-e0 / (s * v0f));
+        f_hind_rot /= denom;
+    }
+    return f_hind_rot;
+}

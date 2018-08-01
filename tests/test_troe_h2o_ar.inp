@@ -1,0 +1,34 @@
+Troe
+ pot_type
+  1
+ e_barrier
+  41279.1
+ n_morse_osc
+  3
+End
+Molecule
+ geometry
+  3
+  Water  
+  O    0.000000    0.000000    0.127131
+  H    0.000000    0.758016   -0.508525
+  H    0.000000   -0.758016   -0.508525
+ vibr
+ 3 [ 3657.05 1594.59 3755.79 ] 
+End
+Collision
+ coll_integral
+  troe
+ mass_bath
+  39.948
+ mass_mol
+  18.016
+ epsilon_bath
+  143.20
+ epsilon_mol
+  527.15
+ sigma_bath
+  3.35
+ sigma_mol
+  2.83
+End

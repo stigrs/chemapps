@@ -8,7 +8,6 @@ Collision
  sigma_mol      5.78
  number_vibr    27
  vibr_high      3000.0
- temperature    870.0
  coll_energy    19000.0
  mol_formula    3 [ C 3; H 7; Br 1 ]
 End

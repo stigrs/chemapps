@@ -39,7 +39,6 @@ Collision::Collision(std::istream& from, const std::string& key)
     input_data["sigma_bath"]    = srs::Input(sigma_bath);
     input_data["sigma_mol"]     = srs::Input(sigma_mol);
     input_data["vibr_high"]     = srs::Input(vibr_high, 0.0);
-    input_data["temperature"]   = srs::Input(temperature);
 
     if (srs::find_section(from, key)) {
         std::string token;
@@ -86,10 +85,9 @@ Collision::Collision(std::istream& from, const std::string& key)
     Expects(epsilon_mol > 0.0);
     Expects(sigma_bath > 0.0);
     Expects(sigma_mol > 0.0);
-    Expects(temperature > 0.0);
 }
 
-void Collision::biased_random_walk(std::ostream& to) const
+void Collision::biased_random_walk(double temp, std::ostream& to) const
 {
     srs::Format<char> line;
     line.width(35).fill('-');
@@ -123,16 +121,16 @@ void Collision::biased_random_walk(std::ostream& to) const
     line.width(27).fill('-');
     to << "\nBiased random walk results:\n" << line('-') << '\n';
 
-    double om22 = coll_omega22();
-    double d    = dist_interact();
-    double b    = impact_parameter();
-    double etr  = energy_trans_avg();
-    double tc   = collision_time();
-    double a    = a_decay_parameter();
+    double om22 = coll_omega22(temp);
+    double d    = dist_interact(temp);
+    double b    = impact_parameter(temp);
+    double etr  = energy_trans_avg(temp);
+    double tc   = collision_time(temp);
+    double a    = a_decay_parameter(temp);
     double c    = c_autocorr_osc_freq();
-    double edot = mean_sqr_int_energy_change();
-    double s    = s_parameter();
-    double e2   = std::sqrt(mean_sqr_energy_transfer_coll());
+    double edot = mean_sqr_int_energy_change(temp);
+    double s    = s_parameter(temp);
+    double e2   = std::sqrt(mean_sqr_energy_transfer_coll(temp));
 
     to << "Collision integral:\t\t" << om22 << '\n'
        << "Closest interaction distance:\t" << d << " angstrom\n"
@@ -195,9 +193,9 @@ double Collision::epsilon_local() const
     return std::sqrt(eloc * epsilon_bath);
 }
 
-double Collision::coll_omega22() const
+double Collision::coll_omega22(double temp) const
 {
-    double red_temp = temperature / epsilon_complex();
+    double red_temp = temp / epsilon_complex();
 
     double omega22 = 0.0;
     switch (coll_integral) {
@@ -215,14 +213,14 @@ double Collision::coll_omega22() const
     return omega22;
 }
 
-double Collision::collision_time() const
+double Collision::collision_time(double temp) const
 {
     const double ang2m = 1.0e-10;  // angstrom to meters
     const double dr    = 0.0005;   // step size
 
-    const double d   = dist_interact();
-    const double b   = impact_parameter();
-    const double etr = energy_trans_avg() * datum::icm_to_K;
+    const double d   = dist_interact(temp);
+    const double b   = impact_parameter(temp);
+    const double etr = energy_trans_avg(temp) * datum::icm_to_K;
     const double eps = epsilon_complex();
     const double sig = sigma_complex();
 
@@ -276,15 +274,15 @@ void Collision::set_epsilon_local_values()
     epsilon_loc_val[ptable::get_atomic_number("I")]  = 230.0;
 }
 
-double Collision::a_decay_parameter() const
+double Collision::a_decay_parameter(double temp) const
 {
     const double ang2m = 1.0e-10;        // angstrom to meters
     const double dr    = 0.005 * ang2m;  // step size
 
-    const double ebar = energy_trans_avg() * datum::icm_to_K * datum::k;
+    const double ebar = energy_trans_avg(temp) * datum::icm_to_K * datum::k;
     const double eps  = epsilon_local() * datum::k;
     const double sig  = sigma_local() * ang2m;
-    const double d    = std::max(sig, sig * coll_omega22());
+    const double d    = std::max(sig, sig * coll_omega22(temp));
     const double b    = (2.0 / 3.0) * d;
 
     double r      = d;
@@ -315,13 +313,13 @@ double Collision::a_decay_parameter() const
     return a /= std::sqrt(0.5 * ebar * average_mass() * datum::m_u);
 }
 
-double Collision::mean_sqr_int_energy_change() const
+double Collision::mean_sqr_int_energy_change(double temp) const
 {
     // Evaluate eq. 38 in Lim and Gilbert (1990):
 
     const double ang2m = 1.0e-10;  // angstrom to meter
 
-    const double ebar   = energy_trans_avg() * datum::icm_to_K * datum::k;
+    const double ebar   = energy_trans_avg(temp) * datum::icm_to_K * datum::k;
     const double eps    = epsilon_local() * datum::k;
     const double sig    = sigma_local() * ang2m;
     const double mlight = mol_mass_lightest() * datum::m_u;

@@ -46,16 +46,16 @@ class Collision {
 public:
     Collision(std::istream& from, const std::string& key = "Collision");
 
-    // Calculate reduced mass of system.
+    // Reduced mass of system.
     double reduced_mass() const;
 
     // Average atom/atom mass of molecule (Lim and Gilbert, 1990).
     double average_mass() const;
 
-    // Calculate Lennard-Jones well depth of system.
+    // Lennard-Jones well depth of system.
     double epsilon_complex() const;
 
-    // Calculate Lennard-Jones collision diameter of system.
+    // Lennard-Jones collision diameter of system.
     double sigma_complex() const;
 
     // Local Lennard-Jones well depth of system (Lim and Gilbert, 1990).
@@ -64,27 +64,30 @@ public:
     // Local Lennard-Jones collision diam. of system (Lim and Gilbert, 1990).
     double sigma_local() const;
 
-    // Calculate Lennard-Jones collision rate (Forst, 2003).
-    double lj_coll_rate() const;
+    // Lennard-Jones collision frequency (Troe, 1977).
+    double lj_coll_freq(double temp) const;
 
-    // Calculate reduced collision integral.
-    double coll_omega22() const;
+    // Lennard-Jones collision rate (Forst, 2003).
+    double lj_coll_rate(double temp) const;
+
+    // Reduced collision integral.
+    double coll_omega22(double temp) const;
 
     // Collision time using eq. 32 of Lim and Gilbert (1990).
-    double collision_time() const;
+    double collision_time(double temp) const;
 
     // Impact parameter (b) (Lim and Gilbert, 1990).
-    double impact_parameter() const;
+    double impact_parameter(double temp) const;
 
     // Biased random walk parameter s using eq. 30 in Lim and Gilbert (1990).
-    double s_parameter() const;
+    double s_parameter(double temp) const;
 
     // Mean-squared energy transfer per collision (<E^2>).
-    double mean_sqr_energy_transfer_coll() const;
+    double mean_sqr_energy_transfer_coll(double temp) const;
 
-    // Calculate collision energy transfer in highly excited molecules
+    // Collision energy transfer in highly excited molecules
     // using the biased random walk model B.
-    void biased_random_walk(std::ostream& to = std::cout) const;
+    void biased_random_walk(double temp, std::ostream& to = std::cout) const;
 
 private:
     // Populate database with local Lennard-Jones collision diameter values.
@@ -94,19 +97,19 @@ private:
     void set_epsilon_local_values();
 
     // Closest interaction distance (d) (Lim and Gilbert, 1990).
-    double dist_interact() const;
+    double dist_interact(double temp) const;
 
     // Average translational energy (Lim and Gilbert, 1990).
-    double energy_trans_avg() const;
+    double energy_trans_avg(double temp) const;
 
     // A decay parameter (Lim and Gilbert, 1990).
-    double a_decay_parameter() const;
+    double a_decay_parameter(double temp) const;
 
     // Autocorrelation oscillation frequency (Lim and Gilbert, 1990).
     double c_autocorr_osc_freq() const;
 
     // Mean-squared rate of internal energy change (Lim and Gilbert, 1990).
-    double mean_sqr_int_energy_change() const;
+    double mean_sqr_int_energy_change(double temp) const;
 
     // Find lightest mass of molecule.
     double mol_mass_lightest() const;
@@ -121,7 +124,6 @@ private:
     double epsilon_mol;   // LJ well depth of molecule in kelvin
     double sigma_bath;    // LJ collision diam. of bath gas in angstrom
     double sigma_mol;     // LJ collision diam. of molecule in angstrom
-    double temperature;   // temperature in kelvin
     double vibr_high;     // highest vibrational frequency of molecule in cm-1
 
     std::vector<double> sigma_loc_val;     // local sigma values
@@ -144,47 +146,55 @@ inline double Collision::sigma_complex() const
     return 0.5 * (sigma_bath + sigma_mol);
 }
 
-inline double Collision::lj_coll_rate() const
+inline double Collision::lj_coll_freq(double temp) const
 {
     double sig = sigma_complex();
     double mu  = reduced_mass();
 
-    return 4.5713e-12 * sig * sig * std::sqrt(temperature / mu)
-           * coll_omega22();
+    return 4.87e+14 * std::sqrt(temp / 1000.0) * std::sqrt(20.0 / mu)
+           * std::pow(sig / 5.0, 2.0) * coll_omega22(temp);
 }
 
-inline double Collision::impact_parameter() const
+inline double Collision::lj_coll_rate(double temp) const
 {
-    return (2.0 / 3.0) * dist_interact();
+    double sig = sigma_complex();
+    double mu  = reduced_mass();
+
+    return 4.5713e-12 * sig * sig * std::sqrt(temp / mu) * coll_omega22(temp);
 }
 
-inline double Collision::s_parameter() const
+inline double Collision::impact_parameter(double temp) const
 {
-    double edot = mean_sqr_int_energy_change();
-    double tc   = collision_time();
-    double a    = a_decay_parameter();
+    return (2.0 / 3.0) * dist_interact(temp);
+}
+
+inline double Collision::s_parameter(double temp) const
+{
+    double edot = mean_sqr_int_energy_change(temp);
+    double tc   = collision_time(temp);
+    double a    = a_decay_parameter(temp);
     double c    = c_autocorr_osc_freq();
 
     return std::sqrt(edot * tc * 2.0 * a / (a * a + c * c));
 }
 
-inline double Collision::mean_sqr_energy_transfer_coll() const
+inline double Collision::mean_sqr_energy_transfer_coll(double temp) const
 {
-    double s = s_parameter();
+    double s = s_parameter(temp);
     return 2.0 * s * s;
 }
 
 //------------------------------------------------------------------------------
 
-inline double Collision::dist_interact() const
+inline double Collision::dist_interact(double temp) const
 {
-    double d = sigma_complex() * std::sqrt(coll_omega22());
+    double d = sigma_complex() * std::sqrt(coll_omega22(temp));
     return std::max(d, sigma_complex());
 }
 
-inline double Collision::energy_trans_avg() const
+inline double Collision::energy_trans_avg(double temp) const
 {
-    return 2.0e-3 * datum::k * temperature * datum::N_A / datum::icm_to_kJ;
+    return 2.0e-3 * datum::k * temp * datum::N_A / datum::icm_to_kJ;
 }
 
 inline double Collision::c_autocorr_osc_freq() const
