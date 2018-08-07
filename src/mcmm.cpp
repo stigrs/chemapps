@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
         output_file = output_file + ".out";
 
         srs::fopen(from, input_file);
-        srs::fopen(to, output_file.c_str());
+        srs::fopen(to, output_file);
 
         Molecule mol(from, to);
         if (pot == "Gaussian" || pot == "gaussian") {

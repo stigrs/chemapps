@@ -54,7 +54,8 @@ TEST_CASE("test_molecule")
     srs::fopen(from, "test_molecule.inp");
 
     Molecule mol(from);
-    srs::dmatrix xyz = mol.get_xyz();
+    const srs::dmatrix& xyz = mol.get_xyz();
 
     CHECK(srs::approx_equal(xyz, xyz_ans, 1.0e-12));
 }
+

@@ -27,7 +27,7 @@
 //------------------------------------------------------------------------------
 
 struct Error : std::runtime_error {
-    Error(std::string s) : std::runtime_error(s) {}
+    Error(const std::string& s) : std::runtime_error(s) {}
 };
 
 //------------------------------------------------------------------------------

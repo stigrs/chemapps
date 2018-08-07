@@ -22,8 +22,8 @@
 
 Gauss_version Gauss_data::get_version() const
 {
-    const char pattern_start[] = "Cite this work as:";
-    const char pattern_ver[]   = "Gaussian";
+    const std::string pattern_start = "Cite this work as:";
+    const std::string pattern_ver   = "Gaussian";
 
     std::streampos orig_pos = from.tellg();
 
@@ -135,8 +135,8 @@ int Gauss_data::get_natoms() const
     int natoms = 0;
 
     if (filetype == out) {
-        const char pattern_start[] = "Input";
-        const char pattern_end[]   = "Distance";
+        const std::string pattern_start = "Input";
+        const std::string pattern_end   = "Distance";
 
         std::string line;
         std::string token;
@@ -153,9 +153,7 @@ int Gauss_data::get_natoms() const
                     if (line[1] == '-') {
                         break;
                     }
-                    else {
-                        iss2 >> natoms;
-                    }
+                    iss2 >> natoms;
                 }
             }
             else if (token == pattern_end) {
@@ -164,7 +162,7 @@ int Gauss_data::get_natoms() const
         }
     }
     else {  // filetype == fchk
-        const char pattern[] = "Number of atoms";
+        const std::string pattern = "Number of atoms";
 
         std::string line;
         while (std::getline(from, line)) {
@@ -172,7 +170,7 @@ int Gauss_data::get_natoms() const
             if (pos != std::string::npos) {
                 std::istringstream iss(line);
                 char ignore;
-                iss.ignore(std::strlen(pattern), '\n');
+                iss.ignore(pattern.length(), '\n');
                 iss >> ignore >> natoms;
                 break;
             }
@@ -479,24 +477,24 @@ int Gauss_data::get_no_irc_points() const
 
     std::string line;
     if (filetype == out) {
-        const char pattern[] = "-- Optimized point #";
+        const std::string pattern = "-- Optimized point #";
         while (std::getline(from, line)) {
             if (line.find(pattern, 0) != std::string::npos) {
                 std::istringstream iss(srs::trim(line, " "));
-                iss.ignore(std::strlen(pattern), '\n');
+                iss.ignore(pattern.length(), '\n');
                 iss >> npoints;
             }
         }
         npoints += 1;  // include starting point
     }
     else {  // filetype == fchk
-        const char pattern[]
+        const std::string pattern
             = "IRC point       1 Results for each geome   R   N=";
 
         while (std::getline(from, line)) {
             if (line.find(pattern, 0) != std::string::npos) {
                 std::istringstream iss(line);
-                iss.ignore(std::strlen(pattern), '\n');
+                iss.ignore(pattern.length(), '\n');
                 iss >> npoints;
                 break;
             }
@@ -517,7 +515,7 @@ void Gauss_data::get_irc_data(srs::dvector& mep) const
 
     std::string line;
     if (filetype == out) {
-        const char* pattern;
+        std::string pattern;
         if (get_version() == g03) {
             pattern = "Summary of reaction path following:";
         }
@@ -553,14 +551,14 @@ void Gauss_data::get_irc_data(srs::dvector& mep) const
         }
     }
     else {  // filetype == fchk
-        const char pattern[]
+        const std::string pattern
             = "IRC point       1 Results for each geome   R   N=";
 
         int n = 0;
         while (std::getline(from, line)) {
             if (line.find(pattern, 0) != std::string::npos) {
                 std::istringstream iss(line);
-                iss.ignore(std::strlen(pattern), '\n');
+                iss.ignore(pattern.length(), '\n');
                 iss >> n;
                 break;
             }
@@ -585,8 +583,8 @@ void Gauss_data::get_irc_geom(srs::dvector& geom) const
 
     std::string line;
     if (filetype == out) {
-        const char pattern_geom[] = "Z-Matrix orientation:";
-        const char pattern_opt[]  = "-- Optimized point #";
+        const std::string pattern_geom = "Z-Matrix orientation:";
+        const std::string pattern_opt  = "-- Optimized point #";
 
         const int natoms  = get_natoms();
         const int natoms3 = 3 * natoms;
@@ -638,14 +636,14 @@ void Gauss_data::get_irc_geom(srs::dvector& geom) const
         }
     }
     else {  // filetype == fchk
-        const char pattern[]
+        const std::string pattern
             = "IRC point       1 Geometries               R   N=";
 
         int n = 0;
         while (std::getline(from, line)) {
             if (line.find(pattern, 0) != std::string::npos) {
                 std::istringstream iss(line);
-                iss.ignore(std::strlen(pattern), '\n');
+                iss.ignore(pattern.length(), '\n');
                 iss >> n;
                 break;
             }
@@ -670,9 +668,9 @@ void Gauss_data::get_irc_grad(srs::dvector& grad) const
 
     std::string line;
     if (filetype == out) {
-        const char pattern_grad[]
+        const std::string pattern_grad
             = "Center     Atomic                   Forces";
-        const char pattern_opt[] = "-- Optimized point #";
+        const std::string pattern_opt = "-- Optimized point #";
 
         const int natoms  = get_natoms();
         const int natoms3 = 3 * natoms;
@@ -716,14 +714,14 @@ void Gauss_data::get_irc_grad(srs::dvector& grad) const
         }
     }
     else {  // filetype == fchk
-        const char pattern[]
+        const std::string pattern
             = "IRC point       1 Gradient at each geome   R   N=";
 
         int n = 0;
         while (std::getline(from, line)) {
             if (line.find(pattern, 0) != std::string::npos) {
                 std::istringstream iss(line);
-                iss.ignore(std::strlen(pattern), '\n');
+                iss.ignore(pattern.length(), '\n');
                 iss >> n;
                 break;
             }
@@ -747,8 +745,8 @@ void Gauss_data::get_irc_hess(srs::dvector& hess) const
     from.seekg(0, std::ios_base::beg);  // move to beginning of file
 
     if (filetype == out) {
-        const char pattern_hess[] = " The second derivative matrix:";
-        const char pattern_opt[]  = "-- Optimized point #";
+        const std::string pattern_hess = " The second derivative matrix:";
+        const std::string pattern_opt  = "-- Optimized point #";
 
         const int npoints = get_no_irc_points();
         const int natoms  = get_natoms();

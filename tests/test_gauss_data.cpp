@@ -21,6 +21,7 @@
 #include <srs/utils.h>
 #include <catch/catch.hpp>
 #include <fstream>
+#include <gsl/gsl>
 
 
 TEST_CASE("test_gauss_data")

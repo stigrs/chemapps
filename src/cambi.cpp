@@ -27,7 +27,7 @@
 //------------------------------------------------------------------------------
 
 struct Cambi_error : std::runtime_error {
-    Cambi_error(std::string s) : std::runtime_error(s) {}
+    Cambi_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 //------------------------------------------------------------------------------
@@ -234,11 +234,9 @@ void read_data(VdW_data& data)
         if (key == "End") {
             break;
         }
-        else {
-            auto it = input_data.find(key);
-            if (it != input_data.end()) {
-                from >> it->second;
-            }
+        auto it = input_data.find(key);
+        if (it != input_data.end()) {
+            from >> it->second;
         }
     }
 
