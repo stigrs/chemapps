@@ -38,7 +38,7 @@ change by forking the repo and open a pull request:
     * The new code is documented
 
 ## Coding Style Guide
-* The source code shall follow the [C++ Core Guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines),
+* The source code should follow the [C++ Core Guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines),
 especially when it comes to naming rules
 * The source code shall follow the style supplied in the .clang-format file
 * The source code shall be documented
