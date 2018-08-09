@@ -17,6 +17,7 @@
 #include <srs/utils.h>
 #include <algorithm>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -39,24 +40,25 @@ bool found(const std::vector<int>& a, std::vector<int>& b);
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc < 4) {
-        std::cerr << "usage: " << argv[0] << " map_file tml_file zmat_file\n";
+        std::cerr << "usage: " << args[0] << " map_file tml_file zmat_file\n";
         return 1;
     }
 
-    std::ifstream map_file(argv[1]);
+    std::ifstream map_file(args[1]);
     if (!map_file) {
         std::cerr << "could not open mapping file\n";
         return 1;
     }
 
-    std::ifstream tml_file(argv[2]);
+    std::ifstream tml_file(args[2]);
     if (!tml_file) {
         std::cerr << "could not open template file\n";
         return 1;
     }
 
-    std::ifstream zmat_file(argv[3]);
+    std::ifstream zmat_file(args[3]);
     if (!zmat_file) {
         std::cerr << "could not open z-matrix file\n";
         return 1;

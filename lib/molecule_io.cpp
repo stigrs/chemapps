@@ -155,7 +155,7 @@ void chem::read_mol_formula(std::istream& from,
     std::string buf;
     from >> buf;
 
-    int n = srs::from_string<int>(buf);
+    auto n = srs::from_string<int>(buf);
     Expects(n >= 1);
     formula.resize(n);
 

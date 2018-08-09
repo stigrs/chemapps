@@ -48,8 +48,8 @@ double wr::a_corr(const Molecule& mol, double e_barrier)
     if (mol.structure() == linear) {
         factor = 2.0;
     }
-    double s = static_cast<double>(mol.get_vib().get_freqs().size());
-    double r = static_cast<double>(mol.get_tor().get_pot_coeff().size());
+    auto s = static_cast<double>(mol.get_vib().get_freqs().size());
+    auto r = static_cast<double>(mol.get_tor().get_pot_coeff().size());
 
     double beta
         = (s - 1.0) * ((s + 0.5 * r + 0.5 * factor) / s) * sum_v2 / sum2_v;

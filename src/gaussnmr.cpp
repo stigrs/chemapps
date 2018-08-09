@@ -107,19 +107,18 @@ int main(int argc, char* argv[])
     srs::Format<double> fix8;
     fix8.fixed().width(9).precision(4);
 
-    for (std::size_t i = 0; i < nmr.size(); ++i) {
-        double shield
-            = std::accumulate(nmr[i].shield.begin(), nmr[i].shield.end(), 0.0)
-              / static_cast<double>(nmr[i].shield.size());
+    for (auto& ni : nmr) {
+        double shield = std::accumulate(ni.shield.begin(), ni.shield.end(), 0.0)
+                        / static_cast<double>(ni.shield.size());
 
-        std::cout << fix8(shield) << '\t' << nmr[i].shield.size() << '\t'
-                  << nmr[i].atom << '\t';
+        std::cout << fix8(shield) << '\t' << ni.shield.size() << '\t' << ni.atom
+                  << '\t';
 
-        std::sort(nmr[i].number.begin(), nmr[i].number.end());
+        std::sort(ni.number.begin(), ni.number.end());
 
-        for (srs::size_t j = 0; j < nmr[i].number.size(); ++j) {
-            std::cout << nmr[i].number[j];
-            if ((nmr[i].number.size() > 1) && (j < nmr[i].number.size() - 1)) {
+        for (srs::size_t j = 0; j < ni.number.size(); ++j) {
+            std::cout << ni.number[j];
+            if ((ni.number.size() > 1) && (j < ni.number.size() - 1)) {
                 std::cout << ',';
             }
         }

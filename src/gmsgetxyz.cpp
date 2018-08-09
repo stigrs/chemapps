@@ -17,6 +17,7 @@
 #include <srs/utils.h>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -28,7 +29,7 @@
 // Error reporting:
 
 struct IO_error : std::runtime_error {
-    IO_error(std::string s) : std::runtime_error(s) {}
+    IO_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 //------------------------------------------------------------------------------
@@ -44,13 +45,14 @@ void extract_geometry(const std::string& logfile);
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " file.log\n";
+        std::cout << "Usage: " << args[0] << " file.log\n";
         return 1;
     }
 
     try {
-        extract_geometry(argv[1]);
+        extract_geometry(args[1]);
     }
     catch (std::exception& e) {
         std::cerr << e.what() << '\n';

@@ -75,8 +75,8 @@ int main(int argc, char* argv[])
                 lines.push_back(data + '\n');
             }
         }
-        for (std::size_t i = 0; i < lines.size(); ++i) {
-            std::cout << lines[i];
+        for (auto l : lines) {
+            std::cout << l;
         }
     }
     catch (std::exception& e) {

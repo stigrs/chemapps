@@ -15,6 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <fstream>
+#include <gsl/gsl>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -25,17 +26,18 @@
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 2) {
-        std::cerr << "usage: " << argv[0] << " gaussian.fchk\n";
+        std::cerr << "usage: " << args[0] << " gaussian.fchk\n";
         return 1;
     }
-    std::ifstream from(argv[1]);
+    std::ifstream from(args[1]);
     if (!from) {
-        std::cerr << "cannot open " << argv[1] << '\n';
+        std::cerr << "cannot open " << args[1] << '\n';
         return 1;
     }
 
-    const char pattern[] = "Cartesian Force Constants";
+    const std::string pattern = "Cartesian Force Constants";
 
     bool found = false;
     double fc;

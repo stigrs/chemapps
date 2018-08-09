@@ -45,8 +45,8 @@ void Molrot::analysis(std::ostream& to)
 double Molrot::tot_mass() const
 {
     double totmass = 0.0;
-    for (std::size_t i = 0; i < atoms.size(); ++i) {
-        totmass += atoms[i].atomic_mass;
+    for (auto& at : atoms) {
+        totmass += at.atomic_mass;
     }
     return totmass;
 }
@@ -133,9 +133,9 @@ void Molrot::init(std::istream& from, const std::string& key)
 
     // Check if initialized:
 
-    for (auto it = input_data.begin(); it != input_data.end(); ++it) {
-        if (!it->second.is_init()) {
-            throw Molrot_error(it->first + " not initialized");
+    for (auto& it : input_data) {
+        if (!it.second.is_init()) {
+            throw Molrot_error(it.first + " not initialized");
         }
     }
 }

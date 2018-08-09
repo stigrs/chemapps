@@ -62,9 +62,9 @@ Collision::Collision(std::istream& from, const std::string& key)
     }
 
     // Check if initialized:
-    for (auto it = input_data.begin(); it != input_data.end(); ++it) {
-        if (!it->second.is_init()) {
-            throw Collision_error(it->first + " not initialized");
+    for (auto& it : input_data) {
+        if (!it.second.is_init()) {
+            throw Collision_error(it.first + " not initialized");
         }
     }
 
@@ -150,10 +150,9 @@ double Collision::average_mass() const
 
     int natoms = 0;
     if (!mol_formula.empty()) {
-        for (std::size_t i = 0; i < mol_formula.size(); ++i) {
-            natoms += mol_formula[i].stoich;
-            mavg += mol_formula[i].stoich
-                    * ptable::get_atomic_mass(mol_formula[i].atom);
+        for (auto& i : mol_formula) {
+            natoms += i.stoich;
+            mavg += i.stoich * ptable::get_atomic_mass(i.atom);
         }
         mavg /= gsl::narrow_cast<double>(natoms);
     }
@@ -168,10 +167,9 @@ double Collision::sigma_local() const
     double sloc = 0.0;
 
     int natoms = 0;
-    for (std::size_t i = 0; i < mol_formula.size(); ++i) {
-        natoms += mol_formula[i].stoich;
-        sloc += mol_formula[i].stoich
-                * sigma_loc_val[get_atomic_number(mol_formula[i].atom)];
+    for (auto& i : mol_formula) {
+        natoms += i.stoich;
+        sloc += i.stoich * sigma_loc_val[get_atomic_number(i.atom)];
     }
     sloc /= gsl::narrow_cast<double>(natoms);
     return 0.5 * (sloc + sigma_bath);
@@ -184,10 +182,9 @@ double Collision::epsilon_local() const
     double eloc = 0.0;
 
     int natoms = 0;
-    for (std::size_t i = 0; i < mol_formula.size(); ++i) {
-        natoms += mol_formula[i].stoich;
-        eloc += mol_formula[i].stoich
-                * epsilon_loc_val[get_atomic_number(mol_formula[i].atom)];
+    for (auto& i : mol_formula) {
+        natoms += i.stoich;
+        eloc += i.stoich * epsilon_loc_val[get_atomic_number(i.atom)];
     }
     eloc /= gsl::narrow_cast<double>(natoms);
     return std::sqrt(eloc * epsilon_bath);
@@ -299,9 +296,6 @@ double Collision::a_decay_parameter(double temp) const
             break;
         }
         else {
-            a = (4.0 * eps * (-12.0 * sigr12 + 6.0 * sigr6)  // force
-                 - 2.0 * ebar * std::pow(b / r, 2.0))
-                / r;
             r -= dr;
         }
     }
@@ -341,8 +335,8 @@ double Collision::mean_sqr_int_energy_change(double temp) const
 double Collision::mol_mass_lightest() const
 {
     double mlight = 1.0e+6;
-    for (std::size_t i = 0; i < mol_formula.size(); ++i) {
-        double mtmp = ptable::get_atomic_mass(mol_formula[i].atom);
+    for (auto& i : mol_formula) {
+        double mtmp = ptable::get_atomic_mass(i.atom);
         if (mtmp < mlight) {
             mlight = mtmp;
         }

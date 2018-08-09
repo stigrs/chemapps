@@ -28,6 +28,7 @@
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -42,12 +43,13 @@
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 2) {
-        std::cerr << "usage: " << argv[0] << " gaussian.fchk.gz\n";
+        std::cerr << "usage: " << args[0] << " gaussian.fchk.gz\n";
         return 1;
     }
 
-    std::string filename       = argv[1];
+    std::string filename       = args[1];
     std::string::size_type pos = filename.rfind(".fchk.gz");
     if (pos == std::string::npos) {
         std::cerr << filename << " is not a fchk.gz file\n";

@@ -17,6 +17,7 @@
 #include <chem/units.h>
 #include <srs/datum.h>
 #include <exception>
+#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -39,31 +40,32 @@ double convert(const double value);
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 4) {
-        usage(argv[0]);
+        usage(args[0]);
         return 1;
     }
 
     double value;
-    std::istringstream iss(argv[1]);
+    std::istringstream iss(args[1]);
     iss >> value;
     if (!iss) {
-        std::cerr << "Bad value: " << argv[1] << '\n';
-        usage(argv[0]);
+        std::cerr << "Bad value: " << args[1] << '\n';
+        usage(args[0]);
         return 1;
     }
 
     try {
-        have = Units::lexer(argv[2]);
-        want = Units::lexer(argv[3]);
+        have = Units::lexer(args[2]);
+        want = Units::lexer(args[3]);
 
-        std::cout << "You have: " << value << " " << argv[2] << '\n'
-                  << "You want: " << convert(value) << " " << argv[3] << '\n';
+        std::cout << "You have: " << value << " " << args[2] << '\n'
+                  << "You want: " << convert(value) << " " << args[3] << '\n';
     }
     catch (std::exception&) {
-        std::cerr << "Cannot convert " << value << " " << argv[2] << " to "
-                  << argv[3] << '\n';
-        usage(argv[0]);
+        std::cerr << "Cannot convert " << value << " " << args[2] << " to "
+                  << args[3] << '\n';
+        usage(args[0]);
         return 1;
     }
 }

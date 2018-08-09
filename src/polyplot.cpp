@@ -18,6 +18,7 @@
 #include <cstdlib>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -45,14 +46,15 @@ std::ifstream from;
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 2) {
-        std::cout << "usage: " << argv[0] << " poly.fu6\n";
+        std::cout << "usage: " << args[0] << " poly.fu6\n";
         return 1;
     }
 
-    from.open(argv[1]);
+    from.open(args[1]);
     if (!from.is_open()) {
-        std::cerr << "cannot open " << argv[1] << '\n';
+        std::cerr << "cannot open " << args[1] << '\n';
         return 1;
     }
 

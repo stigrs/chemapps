@@ -19,6 +19,7 @@
 #include <cstring>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -39,7 +40,7 @@ std::string pattern;
 
 //------------------------------------------------------------------------------
 
-void set_values(char* argv[]);
+void set_values(const gsl::multi_span<char*>& args);
 void get_data(std::ifstream& from);
 
 //------------------------------------------------------------------------------
@@ -50,17 +51,18 @@ void get_data(std::ifstream& from);
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc < 4) {
-        std::cerr << "usage: " << argv[0] << " variflex.out value unit [uni]\n";
+        std::cerr << "usage: " << args[0] << " variflex.out value unit [uni]\n";
         return 1;
     }
-    std::ifstream from(argv[1]);
+    std::ifstream from(args[1]);
     if (!from) {
-        std::cerr << "cannot open " << argv[1] << '\n';
+        std::cerr << "cannot open " << args[1] << '\n';
         return 1;
     }
     try {
-        set_values(argv);
+        set_values(args);
         get_data(from);
     }
     catch (std::exception& e) {
@@ -71,21 +73,21 @@ int main(int argc, char* argv[])
 
 //------------------------------------------------------------------------------
 
-void set_values(char* argv[])
+void set_values(const gsl::multi_span<char*>& args)
 {
-    val = std::atof(argv[2]);
+    val = std::atof(args[2]);
     if (val <= 0.0) {
         throw Error("bad value for T/P: " + srs::to_string(val));
     }
 
     bool get_uni = false;
     pattern      = "Pressure  Temp   k_bi-TST";
-    if ((argv[4] != 0) && (std::strcmp(argv[4], "uni") == 0)) {
+    if ((args[4] != nullptr) && (std::strcmp(args[4], "uni") == 0)) {
         pattern = "Pressure  Temp   k_uni-TST";
         get_uni = true;
     }
 
-    std::string unit = argv[3];
+    std::string unit = args[3];
     get_pressure     = false;
     if ((unit == "Torr") || (unit == "torr")) {
         std::cout << "P = " << val << " " << unit << '\n';

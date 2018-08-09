@@ -36,10 +36,9 @@ TEST_CASE("test_gaussnmr")
     Gauss_data gauss(from, out);
     gauss.get_nmr_data(nmr, nmr_method, degen_tol);
 
-    for (std::size_t i = 0; i < nmr.size(); ++i) {
-        shield.push_back(
-            std::accumulate(nmr[i].shield.begin(), nmr[i].shield.end(), 0.0)
-            / static_cast<double>(nmr[i].shield.size()));
+    for (auto& i : nmr) {
+        shield.push_back(std::accumulate(i.shield.begin(), i.shield.end(), 0.0)
+                         / static_cast<double>(i.shield.size()));
     }
     CHECK(shield.size() == 3);
     CHECK(srs::approx_equal(shield[0], 31.6691, 1.0e-12));

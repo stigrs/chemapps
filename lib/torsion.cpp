@@ -274,9 +274,9 @@ void Torsion::init(std::istream& from, const std::string& key)
     }
 
     // Check if initialized:
-    for (auto it = input_data.begin(); it != input_data.end(); ++it) {
-        if (!it->second.is_init()) {
-            throw Torsion_error(it->first + " not initialized");
+    for (auto& it : input_data) {
+        if (!it.second.is_init()) {
+            throw Torsion_error(it.first + " not initialized");
         }
     }
 

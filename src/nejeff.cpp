@@ -15,6 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 
 
@@ -23,19 +24,20 @@
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 3) {
-        std::cerr << "usage: " << argv[0] << " flux_file_1 flux_file_2\n";
+        std::cerr << "usage: " << args[0] << " flux_file_1 flux_file_2\n";
         return 1;
     }
 
-    std::ifstream from1(argv[1]);
+    std::ifstream from1(args[1]);
     if (!from1) {
-        std::cerr << "cannot open " << argv[1] << '\n';
+        std::cerr << "cannot open " << args[1] << '\n';
         return 1;
     }
-    std::ifstream from2(argv[2]);
+    std::ifstream from2(args[2]);
     if (!from2) {
-        std::cerr << "cannot open " << argv[2] << '\n';
+        std::cerr << "cannot open " << args[2] << '\n';
         return 1;
     }
 
@@ -50,7 +52,7 @@ int main(int argc, char* argv[])
     while (from1 >> e1 >> j1 >> n1) {
         from2 >> e2 >> j2 >> n2;
         if (!from2) {
-            std::cerr << "input flux file " << argv[2] << " too short?\n";
+            std::cerr << "input flux file " << args[2] << " too short?\n";
             return 1;
         }
         if (e1 != e2) {
@@ -70,7 +72,7 @@ int main(int argc, char* argv[])
         std::cout << e1 << " " << j1 << " " << neff << '\n';
     }
     if (from2 >> n2) {
-        std::cerr << "input flux file " << argv[1] << " too short?\n";
+        std::cerr << "input flux file " << args[1] << " too short?\n";
         return 1;
     }
 }

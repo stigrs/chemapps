@@ -53,9 +53,9 @@ std::vector<srs::ivector> Zmatrix::get_connectivities() const
 void Zmatrix::rotate_moiety(const std::vector<int>& moiety, double value)
 {
     if (atoms.size() > 3) {
-        for (std::size_t i = 0; i < moiety.size(); ++i) {
-            double phi = get_dihedral(moiety[i]);
-            set_dihedral(moiety[i], phi + value);
+        for (auto& mi : moiety) {
+            double phi = get_dihedral(mi);
+            set_dihedral(mi, phi + value);
         }
     }
 }

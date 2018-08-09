@@ -17,6 +17,7 @@
 #include <srs/utils.h>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -26,7 +27,7 @@
 // Error reporting:
 
 struct IO_error : std::runtime_error {
-    IO_error(std::string s) : std::runtime_error(s) {}
+    IO_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 //------------------------------------------------------------------------------
@@ -44,15 +45,16 @@ void get_xyz(const std::string& xyz_file);
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " mopac.tml file.xyz\n\n"
+        std::cerr << "Usage: " << args[0] << " mopac.tml file.xyz\n\n"
                   << "mopac.tml: Template file for MOPAC input file\n"
                   << "file.xyz:  File with XYZ coordinates\n";
         return 1;
     }
 
     try {
-        generate_mop(argv[1], argv[2]);
+        generate_mop(args[1], args[2]);
     }
     catch (std::exception& e) {
         std::cerr << e.what() << '\n';

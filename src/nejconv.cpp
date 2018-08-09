@@ -19,6 +19,7 @@
 #include <srs/utils.h>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -28,11 +29,11 @@
 //------------------------------------------------------------------------------
 
 struct Init_error : std::runtime_error {
-    Init_error(std::string s) : std::runtime_error(s) {}
+    Init_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 struct Conv_error : std::runtime_error {
-    Conv_error(std::string s) : std::runtime_error(s) {}
+    Conv_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 //------------------------------------------------------------------------------
@@ -66,15 +67,16 @@ void nej_conv(const std::string& filename);
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " inp_file nej_file\n";
+        std::cerr << "Usage: " << args[0] << " inp_file nej_file\n";
         return 1;
     }
 
     try {
-        init(argv[1]);
+        init(args[1]);
         vibr_count();
-        nej_conv(argv[2]);
+        nej_conv(args[2]);
     }
     catch (std::exception& e) {
         std::cerr << e.what() << '\n';
@@ -117,8 +119,8 @@ void vibr_count()
     vibr_nos[0] = 1.0;
 
     std::size_t rj;
-    for (std::size_t i = 0; i < freq.size(); ++i) {
-        rj = srs::nint(freq[i] / e_grid.step());
+    for (auto fi : freq) {
+        rj = srs::nint(fi / e_grid.step());
         for (std::size_t e = 0; e < vibr_nos.size() - rj; ++e) {
             vibr_nos[rj + e] += vibr_nos[e];
         }

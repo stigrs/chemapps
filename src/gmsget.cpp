@@ -16,6 +16,7 @@
 
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -27,11 +28,11 @@
 // Error reporting:
 
 struct IO_error : std::runtime_error {
-    IO_error(std::string s) : std::runtime_error(s) {}
+    IO_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 struct Run_error : std::runtime_error {
-    Run_error(std::string s) : std::runtime_error(s) {}
+    Run_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 //------------------------------------------------------------------------------
@@ -52,15 +53,16 @@ void extract_zpe(std::istream& from);
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " file.inp file.log\n";
+        std::cout << "Usage: " << args[0] << " file.inp file.log\n";
         return 1;
     }
 
     try {
         std::string runtyp;
-        parse_inp(argv[1], runtyp);
-        parse_log(argv[2], runtyp);
+        parse_inp(args[1], runtyp);
+        parse_log(args[2], runtyp);
     }
     catch (std::exception& e) {
         std::cerr << e.what() << '\n';

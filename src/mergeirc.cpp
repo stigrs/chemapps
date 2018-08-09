@@ -19,7 +19,9 @@
 #include <srs/utils.h>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
+#include <string>
 
 
 //-----------------------------------------------------------------------------
@@ -28,13 +30,13 @@ void print_array(std::ostream& to, srs::dvector& array);
 
 //-----------------------------------------------------------------------------
 
-const char pattern_irc_data[]
+const std::string pattern_irc_data
     = "IRC point       1 Results for each geome   R   N=";
 
-const char pattern_irc_geom[]
+const std::string pattern_irc_geom
     = "IRC point       1 Geometries               R   N=";
 
-const char pattern_irc_grad[]
+const std::string pattern_irc_grad
     = "IRC point       1 Gradient at each geome   R   N=";
 
 //-----------------------------------------------------------------------------
@@ -46,8 +48,9 @@ const char pattern_irc_grad[]
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc < 2) {
-        std::cerr << "usage: " << argv[0] << " file1 file2 ... fileN\n";
+        std::cerr << "usage: " << args[0] << " file1 file2 ... fileN\n";
         return 1;
     }
 
@@ -64,7 +67,7 @@ int main(int argc, char* argv[])
 
         int count = 1;
         while (count < argc) {
-            char* input_file = argv[count];
+            auto input_file = args[count];
             std::cout << "Reading " << input_file << " ...\n";
             srs::fopen(from, input_file);
 
@@ -108,8 +111,8 @@ void print_array(std::ostream& to, srs::dvector& array)
     int count       = 0;
     bool wrote_endl = false;
 
-    for (srs::size_t i = 0; i < array.size(); i++) {
-        to << sci(array[i]);
+    for (auto vi : array) {
+        to << sci(vi);
         count++;
         wrote_endl = false;
         if (count == 5) {

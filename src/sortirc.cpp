@@ -41,13 +41,13 @@ struct Bad_file : std::runtime_error {
 
 //------------------------------------------------------------------------------
 
-const char pattern_irc_data[]
+const std::string pattern_irc_data
     = "IRC point       1 Results for each geome   R   N=";
 
-const char pattern_irc_geom[]
+const std::string pattern_irc_geom
     = "IRC point       1 Geometries               R   N=";
 
-const char pattern_irc_grad[]
+const std::string pattern_irc_grad
     = "IRC point       1 Gradient at each geome   R   N=";
 
 //------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
         output_file += ".dat";
 
         srs::fopen(from, input_file);
-        srs::fopen(to, output_file.c_str());
+        srs::fopen(to, output_file);
 
         // Correct SMEP data and write to output:
 
@@ -245,8 +245,8 @@ void print_array(std::ostream& to, const srs::dvector& array)
     int count       = 0;
     bool wrote_endl = false;
 
-    for (srs::size_t i = 0; i < array.size(); i++) {
-        to << sci(array[i]);
+    for (auto v : array) {
+        to << sci(v);
         count++;
         wrote_endl = false;
         if (count == 5) {

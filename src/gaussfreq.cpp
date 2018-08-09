@@ -17,6 +17,7 @@
 #include <chem/gauss_data.h>
 #include <srs/array.h>
 #include <fstream>
+#include <gsl/gsl>
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -28,14 +29,15 @@
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 2) {
-        std::cerr << "usage: " << argv[0] << " gaussian.log\n";
+        std::cerr << "usage: " << args[0] << " gaussian.log\n";
         return 1;
     }
 
-    std::ifstream from(argv[1]);
+    std::ifstream from(args[1]);
     if (!from) {
-        std::cerr << "cannot open " << argv[1] << '\n';
+        std::cerr << "cannot open " << args[1] << '\n';
         return 1;
     }
 
@@ -44,9 +46,9 @@ int main(int argc, char* argv[])
     Gauss_data gauss(from, out);
     gauss.get_freqs(freqs);
 
-    for (srs::size_t i = 0; i < freqs.size(); ++i) {
+    for (auto vi : freqs) {
         std::cout << std::setiosflags(std::ios_base::fixed)
-                  << std::setprecision(4) << freqs[i] << '\t';
+                  << std::setprecision(4) << vi << '\t';
     }
     std::cout << '\n';
 }

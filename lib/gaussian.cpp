@@ -41,7 +41,7 @@ void Gaussian::init(std::istream& from, const std::string& key)
             if (token == "End") {
                 break;
             }
-            else if (token == "keywords") {
+            if (token == "keywords") {
                 std::string line;
                 std::getline(from, line);
                 if (line.empty()) {  // not entirely safe
@@ -60,9 +60,9 @@ void Gaussian::init(std::istream& from, const std::string& key)
 
     // Check if initialized:
 
-    for (auto it = input_data.begin(); it != input_data.end(); ++it) {
-        if (!it->second.is_init()) {
-            throw Gauss_error(it->first + " not initialized");
+    for (auto& it : input_data) {
+        if (!it.second.is_init()) {
+            throw Gauss_error(it.first + " not initialized");
         }
     }
 

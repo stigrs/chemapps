@@ -18,6 +18,7 @@
 #include <cstring>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -29,7 +30,7 @@
 // Error reporting:
 
 struct IO_error : std::runtime_error {
-    IO_error(std::string s) : std::runtime_error(s) {}
+    IO_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 //------------------------------------------------------------------------------
@@ -50,14 +51,15 @@ void bsse_se(const std::string& theory, const char* filename);
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " gaussian_file.out\n";
+        std::cerr << "Usage: " << args[0] << " gaussian_file.out\n";
         return 1;
     }
 
     try {
-        std::string theory = get_theory(argv[1]);
-        bsse_se(theory, argv[1]);
+        std::string theory = get_theory(args[1]);
+        bsse_se(theory, args[1]);
     }
     catch (std::exception& e) {
         std::cerr << "what: " << e.what() << '\n';

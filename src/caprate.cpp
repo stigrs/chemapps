@@ -24,6 +24,7 @@
 #include <cmath>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -70,13 +71,14 @@ srs::Array<double, 2> nej;  // N(E,J) data
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 3) {
-        std::cerr << "usage: " << argv[0] << " input_file nej_file\n";
+        std::cerr << "usage: " << args[0] << " input_file nej_file\n";
         return 1;
     }
     try {
-        read_input(argv[1]);
-        read_nej(argv[2]);
+        read_input(args[1]);
+        read_nej(args[2]);
         integrate();
     }
     catch (std::exception& e) {

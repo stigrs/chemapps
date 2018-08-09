@@ -17,6 +17,7 @@
 #include <srs/utils.h>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -27,7 +28,7 @@
 // Error reporting:
 
 struct IO_error : std::runtime_error {
-    IO_error(std::string s) : std::runtime_error(s) {}
+    IO_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 //------------------------------------------------------------------------------
@@ -45,15 +46,16 @@ void get_mopac_geom(const std::string& arc_file);
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " nwchem.tml mopac.arc\n\n"
+        std::cerr << "Usage: " << args[0] << " nwchem.tml mopac.arc\n\n"
                   << "nwchem.tml: Template file for NWChem input file\n"
                   << "mopac.arc:  Summary file from MOPAC calculation\n";
         return 1;
     }
 
     try {
-        generate_nw(argv[1], argv[2]);
+        generate_nw(args[1], args[2]);
     }
     catch (std::exception& e) {
         std::cerr << e.what() << '\n';

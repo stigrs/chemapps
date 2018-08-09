@@ -19,6 +19,7 @@
 #include <srs/utils.h>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <string>
 
@@ -27,14 +28,15 @@
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 2) {
-        std::cerr << "usage: " << argv[0] << " gaussian.log\n";
+        std::cerr << "usage: " << args[0] << " gaussian.log\n";
         return 1;
     }
 
     try {
         std::ifstream from;
-        srs::fopen(from, argv[1]);
+        srs::fopen(from, args[1]);
 
         std::string scan_coord;
         srs::dvector coord;

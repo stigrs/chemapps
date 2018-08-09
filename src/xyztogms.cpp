@@ -18,6 +18,7 @@
 #include <srs/utils.h>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -37,13 +38,14 @@ void convert(const std::string& input_file);
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 2) {
-        std::cerr << "usage: " << argv[0] << " file.xyz\n";
+        std::cerr << "usage: " << args[0] << " file.xyz\n";
         return 1;
     }
 
     try {
-        convert(argv[1]);
+        convert(args[1]);
     }
     catch (std::exception& e) {
         std::cerr << e.what() << '\n';

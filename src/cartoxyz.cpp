@@ -18,6 +18,7 @@
 #include <srs/utils.h>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -28,7 +29,7 @@
 // Error reporting:
 
 struct File_error : std::runtime_error {
-    File_error(std::string s) : std::runtime_error(s) {}
+    File_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 //------------------------------------------------------------------------------
@@ -44,8 +45,9 @@ void convert(const std::string& input_file, const std::string& fmt);
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc < 2) {
-        std::cerr << "usage: " << argv[0] << " file.car [format]\n\n"
+        std::cerr << "usage: " << args[0] << " file.car [format]\n\n"
                   << "format = gaussian (default)\n"
                   << "         gamess\n";
         return 1;
@@ -54,9 +56,9 @@ int main(int argc, char* argv[])
     try {
         std::string fmt = "gaussian";
         if (argc == 3) {
-            fmt = argv[2];
+            fmt = args[2];
         }
-        convert(argv[1], fmt);
+        convert(args[1], fmt);
     }
     catch (std::exception& e) {
         std::cerr << e.what() << '\n';

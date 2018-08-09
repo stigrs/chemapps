@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -32,27 +33,27 @@
 // Error reporting:
 
 struct Setup_error : std::runtime_error {
-    Setup_error(std::string s) : std::runtime_error(s) {}
+    Setup_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 struct Init_geom_error : std::runtime_error {
-    Init_geom_error(std::string s) : std::runtime_error(s) {}
+    Init_geom_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 struct Opt_geom_error : std::runtime_error {
-    Opt_geom_error(std::string s) : std::runtime_error(s) {}
+    Opt_geom_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 struct Create_input_error : std::runtime_error {
-    Create_input_error(std::string s) : std::runtime_error(s) {}
+    Create_input_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 struct Orbitals_error : std::runtime_error {
-    Orbitals_error(std::string s) : std::runtime_error(s) {}
+    Orbitals_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 struct Gms_run_error : std::runtime_error {
-    Gms_run_error(std::string s) : std::runtime_error(s) {}
+    Gms_run_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 //------------------------------------------------------------------------------
@@ -104,14 +105,15 @@ int nstep;
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 2) {
-        std::cerr << "usage: " << argv[0] << " setup_file\n";
+        std::cerr << "usage: " << args[0] << " setup_file\n";
         return 1;
     }
 
     try {
         std::ifstream from;
-        srs::fopen(from, argv[1]);
+        srs::fopen(from, args[1]);
 
         parse_setup(from);
         init_geom();
@@ -192,9 +194,9 @@ void parse_setup(std::ifstream& from)
 
     // Check if data are initialized:
 
-    for (auto it = input_data.begin(); it != input_data.end(); ++it) {
-        if (!it->second.is_init()) {
-            throw Setup_error(it->first + " not initialized");
+    for (auto& it : input_data) {
+        if (!it.second.is_init()) {
+            throw Setup_error(it.first + " not initialized");
         }
     }
 
@@ -382,8 +384,8 @@ void step_geom()
 {
     switch (coord) {
     case cart:
-        for (srs::size_t i = 0; i < fragment.size(); i++) {
-            geom(fragment[i] - 1, axis) += stepsize;
+        for (auto i : fragment) {
+            geom(i - 1, axis) += stepsize;
         }
         break;
     case zmat:
@@ -426,8 +428,8 @@ void create_input(const std::string& new_inp_file,
     switch (orbstart) {
     case mcscf_opt:
         get_orbitals(old_dat_file);
-        for (unsigned i = 0; i < orbitals.size(); i++) {
-            to << orbitals[i] << '\n';
+        for (const auto& orb : orbitals) {
+            to << orb << '\n';
         }
     case guess:
     default:

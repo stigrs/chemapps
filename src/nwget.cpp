@@ -16,6 +16,7 @@
 
 #include <exception>
 #include <fstream>
+#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -29,7 +30,7 @@
 // Error reporting:
 
 struct IO_error : std::runtime_error {
-    IO_error(std::string s) : std::runtime_error(s) {}
+    IO_error(const std::string& s) : std::runtime_error(s) {}
 };
 
 //------------------------------------------------------------------------------
@@ -51,16 +52,17 @@ void extract_zpe(std::istream& from, const std::string& theory);
 //
 int main(int argc, char* argv[])
 {
+    auto args = gsl::multi_span<char*>(argv, argc);
     if (argc != 3) {
-        std::cout << "Usage: " << argv[0] << " file.nw file.out\n";
+        std::cout << "Usage: " << args[0] << " file.nw file.out\n";
         return 1;
     }
 
     std::vector<std::pair<std::string, std::string>> task;
 
     try {
-        parse_nw(argv[1], task);
-        parse_out(argv[2], task);
+        parse_nw(args[1], task);
+        parse_out(args[2], task);
     }
     catch (std::exception& e) {
         std::cerr << e.what() << '\n';
@@ -107,24 +109,21 @@ void parse_nw(const std::string& nwfile,
 void parse_out(const std::string& outfile,
                std::vector<std::pair<std::string, std::string>>& task)
 {
-    typedef std::vector<std::pair<std::string, std::string>>::const_iterator
-        Citer;
-
     std::ifstream from(outfile.c_str());
     if (!from) {
         throw IO_error("cannot open " + outfile);
     }
 
-    for (Citer it = task.begin(); it != task.end(); ++it) {
-        std::cout << "TASK " << (*it).first << ' ' << (*it).second << ":\n";
-        if ((*it).second == "optimize") {
-            extract_optimized_energy(from, (*it).first);
+    for (auto it : task) {
+        std::cout << "TASK " << it.first << ' ' << it.second << ":\n";
+        if (it.second == "optimize") {
+            extract_optimized_energy(from, it.first);
         }
-        else if ((*it).second == "freq") {
-            extract_zpe(from, (*it).first);
+        else if (it.second == "freq") {
+            extract_zpe(from, it.first);
         }
         else {
-            extract_energy(from, (*it).first);
+            extract_energy(from, it.first);
         }
     }
 }
