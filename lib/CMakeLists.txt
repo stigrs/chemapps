@@ -21,6 +21,7 @@ set(
     molvib.cpp
     mopac.cpp
     ptable.cpp
+	statecount.cpp
     thermochem.cpp
     thermodata.cpp
     torsion.cpp

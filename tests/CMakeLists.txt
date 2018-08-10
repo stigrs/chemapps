@@ -85,6 +85,7 @@ set(PROGRAMS
     test_molvib
     test_mopac
     test_ptable
+	test_statecount
     test_thermochem
     test_thermodata
     test_torsion
