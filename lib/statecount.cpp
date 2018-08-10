@@ -28,20 +28,14 @@ srs::dvector statecount::bswine(const srs::dvector& vibr,
                                 const srs::dvector& rot)
 {
     srs::dvector result = srs::zeros<srs::dvector>(ngrains);
-
-    if (sum) {  // count sum of states
-        if (!rot.empty()) {
-            result = rot;
-        }
-        else {
+    if (!rot.empty()) {  // initialize with rotational states
+        result = rot;
+    }
+    else {
+        if (sum) {  // count sum of states
             result = srs::ones<srs::dvector>(ngrains);
         }
-    }
-    else {  // count density of states
-        if (!rot.empty()) {
-            result = rot;
-        }
-        else {
+        else {  // count density of states
             result(0) = 1.0;
         }
     }
