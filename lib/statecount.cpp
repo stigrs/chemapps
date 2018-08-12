@@ -50,3 +50,20 @@ srs::dvector statecount::bswine(const srs::dvector& vibr,
     }
     return result;
 }
+
+srs::dvector statecount::free_rotor(
+    int sigma, double rotc, int ngrains, double egrain, bool sum)
+{
+    double f = -0.5;  // density of states
+    if (sum) {
+        f = 0.5;
+    }
+    double qr = std::sqrt(datum::pi) / (sigma * std::sqrt(rotc));
+    double gf = boost::math::tgamma(f + 1.0);
+
+    srs::dvector result(ngrains);
+    for (int i = 0; i < ngrains; ++i) {
+        result(i) = qr * std::pow(i * egrain, f) / gf;
+    }
+    return result;
+}

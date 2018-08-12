@@ -44,6 +44,22 @@ srs::dvector bswine(const srs::dvector& vibr,
                     bool sum                = false,
                     const srs::dvector& rot = srs::dvector{});
 
+//
+// Calculate the density or sum of states for one independent free rotor.
+//
+// Algorithm:
+//   Eq. 4.19 in Forst (2003)
+//
+// Args:
+//   sigma: symmetry number of free rotor
+//   rotc: rotational constant (cm^-1)
+//   ngrains: number of energy grains
+//   egrain: energy grain size (cm^-1)
+//   sum: flag to specify if sum of states should be computed
+//
+srs::dvector free_rotor(
+    int sigma, double rotc, int ngrains, double egrain, bool sum = false);
+
 }  // namespace statecount
 
 #endif  // CHEM_STATECOUNT_H
