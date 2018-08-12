@@ -32,8 +32,8 @@ namespace statecount {
 //   vibr: collection of n harmonic oscillators
 //   ngrains: the number of energy grains
 //   egrain: energy grain size (cm^-1)
-//   rot: array with density or sum of rotational states
 //   sum: flag to specify if sum of states should be computed
+//   rot: array with density or sum of rotational states
 //
 // Returns:
 //   rovibrational density or sum of states
@@ -43,9 +43,6 @@ srs::dvector bswine(const srs::dvector& vibr,
                     double egrain           = 1.0,
                     bool sum                = false,
                     const srs::dvector& rot = srs::dvector{});
-
-srs::dvector free_rotor(
-    int sigma, double rotc, int ngrains, double egrain = 1.0, bool sum = false);
 
 }  // namespace statecount
 
