@@ -16,6 +16,7 @@
 
 #include <chem/statecount.h>
 #include <srs/array.h>
+#include <srs/datum.h>
 #include <srs/math.h>
 #include <catch/catch.hpp>
 #include <iostream>
@@ -50,5 +51,130 @@ TEST_CASE("test_statecount")
 
         CHECK(srs::approx_equal(wres, wans, 1.0e-12));
         CHECK(srs::approx_equal(dres, dans, 1.0e-2, "reldiff"));
+    }
+
+    SECTION("Ethane_free_rotor")
+    {
+        double emax   = 40000.0;
+        double egrain = 5.0;
+        int ngrains   = 1 + srs::round<int>(emax / egrain);
+
+        srs::dvector vibr = {2915.0,
+                             2915.0,
+                             1388.0,
+                             995.0,
+                             1370.0,
+                             2974.0,
+                             2974.0,
+                             1460.0,
+                             1460.0,
+                             822.0,
+                             822.0,
+                             2950.0,
+                             2950.0,
+                             1469.0,
+                             1469.0,
+                             1190.0,
+                             1190.0};
+
+        double sigma = 3.0;
+        double rotc  = 10.704;
+
+        auto wrot = sc::free_rotor(sigma, rotc, ngrains, egrain, true);
+        auto wsum = sc::bswine(vibr, ngrains, egrain, true, wrot);
+
+        srs::dvector en = {500.0,
+                           1000.0,
+                           2000.0,
+                           4000.0,
+                           6000.0,
+                           8000.0,
+                           10000.0,
+                           20000.0,
+                           30000.0,
+                           40000.0};
+
+        srs::dvector wsum_ans = {4.3,
+                                 12.7,
+                                 88.0,
+                                 1728.0,
+                                 1.8211e+4,
+                                 13.071e+4,
+                                 7.1416e+5,
+                                 5.0222e+8,
+                                 5.0613e+10,
+                                 1.86446e+12};
+
+        srs::ivector idx;
+        for (auto ei : en) {
+            idx.push_back(srs::round<int>(ei / egrain));
+        }
+        for (int i = 0; i < idx.size(); ++i) {
+            CHECK(srs::approx_equal(
+                wsum(idx(i)), wsum_ans(i), 6.0e-2, "reldiff"));
+        }
+    }
+
+    SECTION("Ethane_hindered_rotor")
+    {
+        double emax   = 40000.0;
+        double egrain = 5.0;
+        int ngrains   = 1 + srs::round<int>(emax / egrain);
+
+        srs::dvector vibr = {2915.0,
+                             2915.0,
+                             1388.0,
+                             995.0,
+                             1370.0,
+                             2974.0,
+                             2974.0,
+                             1460.0,
+                             1460.0,
+                             822.0,
+                             822.0,
+                             2950.0,
+                             2950.0,
+                             1469.0,
+                             1469.0,
+                             1190.0,
+                             1190.0};
+
+        double sigma = 3.0;
+        double rotc  = 10.704;
+        double v0    = 1024.0;
+
+        auto wrot = sc::hindered_rotor(sigma, rotc, v0, ngrains, egrain, true);
+        auto wsum = sc::bswine(vibr, ngrains, egrain, true, wrot);
+
+        srs::dvector en = {500.0,
+                           1000.0,
+                           2000.0,
+                           4000.0,
+                           6000.0,
+                           8000.0,
+                           10000.0,
+                           20000.0,
+                           30000.0,
+                           40000.0};
+
+        srs::dvector wsum_ans = {2.0,
+                                 8.0,
+                                 55.7,
+                                 1187.0,
+                                 1.3111e+4,
+                                 9.8719e+4,
+                                 5.7428e+5,
+                                 4.2130e+8,
+                                 4.4204e+10,
+                                 1.66923e+12};
+
+        srs::ivector idx;
+        for (auto ei : en) {
+            idx.push_back(srs::round<int>(ei / egrain));
+        }
+        for (int i = 0; i < idx.size(); ++i) {
+            CHECK(
+                srs::approx_equal(wsum(idx(i)), wsum_ans(i), 0.23, "reldiff"));
+        }
     }
 }
