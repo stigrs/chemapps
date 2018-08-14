@@ -53,7 +53,7 @@ TEST_CASE("test_statecount")
         CHECK(srs::approx_equal(dres, dans, 1.0e-2, "reldiff"));
     }
 
-    SECTION("Ethane_free_rotor")
+    SECTION("Ethane_free_rotor")  // Stein and Rabinovitch (1973)
     {
         double emax   = 40000.0;
         double egrain = 5.0;
@@ -115,7 +115,7 @@ TEST_CASE("test_statecount")
         }
     }
 
-    SECTION("Ethane_hindered_rotor")
+    SECTION("Ethane_hindered_rotor")  // Stein and Rabinovitch (1973)
     {
         double emax   = 40000.0;
         double egrain = 5.0;
@@ -175,6 +175,73 @@ TEST_CASE("test_statecount")
         for (int i = 0; i < idx.size(); ++i) {
             CHECK(
                 srs::approx_equal(wsum(idx(i)), wsum_ans(i), 0.23, "reldiff"));
+        }
+    }
+
+    SECTION("NH3")  // Stein and Rabinovitch (1973)
+    {
+        srs::dvector vibr = {3337.0, 950.0, 3414.0, 3414.0, 1628.0, 1628.0};
+
+        double emax   = 34976.0;
+        double egrain = 1.0;
+        int ngrains   = 1 + srs::round<int>(emax / egrain);
+
+        auto wsum = sc::bswine(vibr, ngrains, egrain, true);
+
+        srs::dvector en = {3.4980E+03,
+                           6.9950E+03,
+                           1.0493E+04,
+                           1.399E+04,
+                           1.7488E+04,
+                           2.4483E+04};
+
+        srs::dvector wsum_ans = {14., 94., 375., 1135., 2916., 13518.};
+
+        srs::ivector idx;
+        for (auto ei : en) {
+            idx.push_back(srs::round<int>(ei / egrain));
+        }
+        for (int i = 0; i < idx.size(); ++i) {
+            CHECK(srs::approx_equal(
+                wsum(idx(i)), wsum_ans(i), 1.0e-8, "reldiff"));
+        }
+    }
+
+    SECTION("Cyclopropane")  // Stein and Rabinovitch (1973)
+    {
+        srs::dvector vibr = {3221., 3221., 3221., 3221., 3221., 3221., 1478.,
+                             1478., 1478., 1118., 1118., 1118., 1118., 1118.,
+                             1118., 1118., 879.,  879.,  879.,  750.,  750.};
+
+        double emax   = 34976.0;
+        double egrain = 1.0;
+        int ngrains   = 1 + srs::round<int>(emax / egrain);
+
+        auto wsum = sc::bswine(vibr, ngrains, egrain, true);
+
+        srs::dvector en = {3.4980E+03,
+                           6.9950E+03,
+                           1.0493E+04,
+                           1.399E+04,
+                           1.7488E+04,
+                           2.4483E+04,
+                           3.4976E+04};
+
+        srs::dvector wsum_ans = {802.,
+                                 77522.,
+                                 2680083.,
+                                 49612574.,
+                                 6.11428E+08,
+                                 4.0751802E+10,
+                                 5.8325046E+12};
+
+        srs::ivector idx;
+        for (auto ei : en) {
+            idx.push_back(srs::round<int>(ei / egrain));
+        }
+        for (int i = 0; i < idx.size(); ++i) {
+            CHECK(srs::approx_equal(
+                wsum(idx(i)), wsum_ans(i), 1.0e-8, "reldiff"));
         }
     }
 }
