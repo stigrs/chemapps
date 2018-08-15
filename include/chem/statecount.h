@@ -62,6 +62,13 @@ srs::dvector bswine(const srs::dvector& vibr,
                     bool sum                = false,
                     const srs::dvector& rot = srs::dvector{});
 
+srs::dvector steinrab(const srs::dvector& vibr,
+                      double sigma,
+                      double rotc,
+                      int ngrains,
+                      double egrain = 1.0,
+                      bool sum      = false);
+
 //
 // Calculate the density or sum of states for one independent free rotor.
 //

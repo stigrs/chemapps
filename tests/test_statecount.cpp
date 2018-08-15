@@ -14,6 +14,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <chem/energy_levels.h>
 #include <chem/statecount.h>
 #include <srs/array.h>
 #include <srs/datum.h>
@@ -146,6 +147,9 @@ TEST_CASE("test_statecount")
         auto wrot = sc::hindered_rotor(sigma, rotc, v0, ngrains, egrain, true);
         auto wsum = sc::bswine(vibr, ngrains, egrain, true, wrot);
 
+        auto ehrot
+            = energy_levels::hindered_rotor(sigma, rotc, v0, ngrains * egrain);
+        std::cout << ehrot << std::endl;
         srs::dvector en = {500.0,
                            1000.0,
                            2000.0,
@@ -178,7 +182,7 @@ TEST_CASE("test_statecount")
         }
     }
 
-    SECTION("NH3")  // Stein and Rabinovitch (1973)
+    SECTION("NH3_bswine")  // Stein and Rabinovitch (1973)
     {
         srs::dvector vibr = {3337.0, 950.0, 3414.0, 3414.0, 1628.0, 1628.0};
 
@@ -207,7 +211,7 @@ TEST_CASE("test_statecount")
         }
     }
 
-    SECTION("Cyclopropane")  // Stein and Rabinovitch (1973)
+    SECTION("Cyclopropane_bswine")  // Stein and Rabinovitch (1973)
     {
         srs::dvector vibr = {3221., 3221., 3221., 3221., 3221., 3221., 1478.,
                              1478., 1478., 1118., 1118., 1118., 1118., 1118.,
@@ -242,6 +246,134 @@ TEST_CASE("test_statecount")
         for (int i = 0; i < idx.size(); ++i) {
             CHECK(srs::approx_equal(
                 wsum(idx(i)), wsum_ans(i), 1.0e-8, "reldiff"));
+        }
+    }
+
+    SECTION("NH3_steinrab")  // Stein and Rabinovitch (1973)
+    {
+        srs::dvector vibr = {3337.0, 950.0, 3414.0, 3414.0, 1628.0, 1628.0};
+
+        double emax   = 34976.0;
+        double egrain = 1.0;
+        int ngrains   = 1 + srs::round<int>(emax / egrain);
+
+        auto wsum = sc::steinrab(vibr, 0.0, 0.0, ngrains, egrain, true);
+
+        srs::dvector en = {3.4980E+03,
+                           6.9950E+03,
+                           1.0493E+04,
+                           1.399E+04,
+                           1.7488E+04,
+                           2.4483E+04};
+
+        srs::dvector wsum_ans = {14., 94., 375., 1135., 2916., 13518.};
+
+        srs::ivector idx;
+        for (auto ei : en) {
+            idx.push_back(srs::round<int>(ei / egrain));
+        }
+        for (int i = 0; i < idx.size(); ++i) {
+            CHECK(srs::approx_equal(
+                wsum(idx(i)), wsum_ans(i), 1.0e-8, "reldiff"));
+        }
+    }
+
+    SECTION("Cyclopropane_steinrab")  // Stein and Rabinovitch (1973)
+    {
+        srs::dvector vibr = {3221., 3221., 3221., 3221., 3221., 3221., 1478.,
+                             1478., 1478., 1118., 1118., 1118., 1118., 1118.,
+                             1118., 1118., 879.,  879.,  879.,  750.,  750.};
+
+        double emax   = 34976.0;
+        double egrain = 1.0;
+        int ngrains   = 1 + srs::round<int>(emax / egrain);
+
+        auto wsum = sc::steinrab(vibr, 0.0, 0.0, ngrains, egrain, true);
+
+        srs::dvector en = {3.4980E+03,
+                           6.9950E+03,
+                           1.0493E+04,
+                           1.399E+04,
+                           1.7488E+04,
+                           2.4483E+04,
+                           3.4976E+04};
+
+        srs::dvector wsum_ans = {802.,
+                                 77522.,
+                                 2680083.,
+                                 49612574.,
+                                 6.11428E+08,
+                                 4.0751802E+10,
+                                 5.8325046E+12};
+
+        srs::ivector idx;
+        for (auto ei : en) {
+            idx.push_back(srs::round<int>(ei / egrain));
+        }
+        for (int i = 0; i < idx.size(); ++i) {
+            CHECK(srs::approx_equal(
+                wsum(idx(i)), wsum_ans(i), 1.0e-8, "reldiff"));
+        }
+    }
+
+    SECTION("Ethane_free_rotor_steinrab")  // Stein and Rabinovitch (1973)
+    {
+        double emax   = 40000.0;
+        double egrain = 5.0;
+        int ngrains   = 1 + srs::round<int>(emax / egrain);
+
+        srs::dvector vibr = {2915.0,
+                             2915.0,
+                             1388.0,
+                             995.0,
+                             1370.0,
+                             2974.0,
+                             2974.0,
+                             1460.0,
+                             1460.0,
+                             822.0,
+                             822.0,
+                             2950.0,
+                             2950.0,
+                             1469.0,
+                             1469.0,
+                             1190.0,
+                             1190.0};
+
+        double sigma = 3.0;
+        double rotc  = 10.704;
+
+        auto wsum = sc::steinrab(vibr, sigma, rotc, ngrains, egrain, true);
+
+        srs::dvector en = {500.0,
+                           1000.0,
+                           2000.0,
+                           4000.0,
+                           6000.0,
+                           8000.0,
+                           10000.0,
+                           20000.0,
+                           30000.0,
+                           40000.0};
+
+        srs::dvector wsum_ans = {4.3,
+                                 12.7,
+                                 88.0,
+                                 1728.0,
+                                 1.8211e+4,
+                                 13.071e+4,
+                                 7.1416e+5,
+                                 5.0222e+8,
+                                 5.0613e+10,
+                                 1.86446e+12};
+
+        srs::ivector idx;
+        for (auto ei : en) {
+            idx.push_back(srs::round<int>(ei / egrain));
+        }
+        for (int i = 0; i < idx.size(); ++i) {
+            CHECK(srs::approx_equal(
+                wsum(idx(i)), wsum_ans(i), 5.0e-2, "reldiff"));
         }
     }
 }

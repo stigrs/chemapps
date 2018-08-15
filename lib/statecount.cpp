@@ -14,6 +14,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <chem/energy_levels.h>
 #include <chem/statecount.h>
 #include <srs/datum.h>
 #include <srs/math.h>
@@ -71,6 +72,51 @@ srs::dvector statecount::bswine(const srs::dvector& vibr,
         result *= 1.0 / egrain;
     }
     return result;
+}
+
+srs::dvector statecount::steinrab(const srs::dvector& vibr,
+                                  double sigma,
+                                  double rotc,
+                                  int ngrains,
+                                  double egrain,
+                                  bool sum)
+{
+    srs::dvector at = srs::zeros<srs::dvector>(ngrains);
+    srs::dvector tt = srs::zeros<srs::dvector>(ngrains);
+
+    at(0) = 1.0;
+    tt(0) = 1.0;
+
+    if (rotc != 0.0) {
+        auto rj = energy_levels::free_rotor(rotc, ngrains * egrain);
+        for (srs::size_t k = 0; k < rj.size(); ++k) {
+            int rjk = srs::round<int>(rj(k) / egrain);
+            for (int i = rjk; i < ngrains; ++i) {
+                at(i) += 2.0 * tt(i - rjk);
+            }
+        }
+        tt = (1.0 / sigma) * at;
+        at = tt;
+    }
+    for (auto w : vibr) {
+        auto rj = energy_levels::harmonic_oscillator(w, ngrains * egrain);
+        for (srs::size_t k = 0; k < rj.size(); ++k) {
+            int rjk = srs::round<int>(rj(k) / egrain);
+            for (int i = rjk; i < ngrains; ++i) {
+                at(i) += tt(i - rjk);
+            }
+        }
+        tt = at;
+    }
+    if (sum) {
+        for (int i = 1; i < ngrains; ++i) {
+            tt(i) += tt(i - 1);
+        }
+    }
+    else {
+        tt *= 1.0 / egrain;
+    }
+    return tt;
 }
 
 srs::dvector statecount::free_rotor(

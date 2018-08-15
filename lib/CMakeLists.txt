@@ -12,6 +12,7 @@ link_directories(${SRS_LIB_DIR})
 set(
     SRC_FILES
     collision.cpp
+	energy_levels.cpp
 	gaussian.cpp
     gauss_data.cpp
     mcmm.cpp
