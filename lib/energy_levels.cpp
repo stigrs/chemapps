@@ -17,9 +17,13 @@
 #include <chem/energy_levels.h>
 #include <srs/math.h>
 #include <cmath>
+#include <gsl/gsl>
 
 srs::dvector energy_levels::harmonic_oscillator(double freq, double emax)
 {
+    Expects(freq > 0.0);
+    Expects(emax > 0.0);
+
     int kmax = 1 + srs::round<int>(emax / freq);
     srs::dvector result(kmax);
     for (int i = 0; i < kmax; ++i) {
@@ -30,6 +34,9 @@ srs::dvector energy_levels::harmonic_oscillator(double freq, double emax)
 
 srs::dvector energy_levels::free_rotor(double rotc, double emax)
 {
+    Expects(rotc > 0.0);
+    Expects(emax > 0.0);
+
     srs::dvector result;
     double ej = 0.0;
     int j     = 1;
@@ -46,6 +53,11 @@ srs::dvector energy_levels::hindered_rotor(double sigma,
                                            double barrier,
                                            double emax)
 {
+    Expects(sigma >= 1.0);
+    Expects(rotc > 0.0);
+    Expects(barrier >= 0.0);
+    Expects(emax > 0.0);
+
     srs::dvector result;
 
     if (barrier > 1.0) {  // hindered rotor
@@ -83,8 +95,8 @@ srs::dvector energy_levels::hindered_rotor(double sigma,
             if (ns == 0) {
                 zpe = es;
             }
-            if ((ns > 0) && (es - zpe) > 0.01) {  // avoid a very small energy
-                result.push_back(es - zpe);       // level just above zero
+            if (ns > 0) {
+                result.push_back(es - zpe);
             }
             ++ns;
         }
