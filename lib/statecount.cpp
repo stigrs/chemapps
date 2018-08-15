@@ -124,10 +124,8 @@ srs::dvector statecount::free_rotor(
 {
     srs::dvector result = srs::zeros<srs::dvector>(ngrains);
 
-    double k = 0.0;
     double f = -0.5;
     if (sum) {
-        k = 1.0;
         f = 0.5;
     }
     double qr = std::sqrt(datum::pi) / (sigma * std::sqrt(rotc));

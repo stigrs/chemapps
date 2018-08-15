@@ -66,7 +66,7 @@ if(WIN32)
     set(Boost_USE_STATIC_LIBS ON)
     find_package(Boost 1.65.0 REQUIRED)
 else()
-    find_package(Boost 1.65.0 COMPONENTS program_options iostreams REQUIRED) # Not recognized by CMake 3.10 on Windows
+    find_package(Boost 1.65.0 COMPONENTS program_options REQUIRED) # Not recognized by CMake 3.10 on Windows
 endif()
 
 # GSL library is required.

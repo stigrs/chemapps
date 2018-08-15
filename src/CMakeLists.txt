@@ -16,7 +16,7 @@ set(
     cambi
     caprate
     cartoxyz
-    fchkgztoxyz
+    fchktoxyz
     gausscan
     gausscp
     gaussfreq
