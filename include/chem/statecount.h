@@ -65,6 +65,7 @@ srs::dvector bswine(const srs::dvector& vibr,
 srs::dvector steinrab(const srs::dvector& vibr,
                       double sigma,
                       double rotc,
+                      double barrier,
                       int ngrains,
                       double egrain = 1.0,
                       bool sum      = false);

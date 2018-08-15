@@ -77,6 +77,7 @@ srs::dvector statecount::bswine(const srs::dvector& vibr,
 srs::dvector statecount::steinrab(const srs::dvector& vibr,
                                   double sigma,
                                   double rotc,
+                                  double barrier,
                                   int ngrains,
                                   double egrain,
                                   bool sum)
@@ -87,19 +88,30 @@ srs::dvector statecount::steinrab(const srs::dvector& vibr,
     at(0) = 1.0;
     tt(0) = 1.0;
 
+    double emax = ngrains * egrain;
+
     if (rotc != 0.0) {
-        auto rj = energy_levels::free_rotor(rotc, ngrains * egrain);
+        srs::dvector rj;
+        double dd = 0.0;      // degeneracy
+        if (barrier > 1.0) {  // hindered rotor
+            dd = 1.0;
+            rj = energy_levels::hindered_rotor(sigma, rotc, barrier, emax);
+        }
+        else {  // free rotor
+            dd = 2.0;
+            rj = energy_levels::free_rotor(rotc, emax);
+        }
         for (srs::size_t k = 0; k < rj.size(); ++k) {
             int rjk = srs::round<int>(rj(k) / egrain);
             for (int i = rjk; i < ngrains; ++i) {
-                at(i) += 2.0 * tt(i - rjk);
+                at(i) += dd * tt(i - rjk);
             }
         }
         tt = (1.0 / sigma) * at;
         at = tt;
     }
     for (auto w : vibr) {
-        auto rj = energy_levels::harmonic_oscillator(w, ngrains * egrain);
+        auto rj = energy_levels::harmonic_oscillator(w, emax);
         for (srs::size_t k = 0; k < rj.size(); ++k) {
             int rjk = srs::round<int>(rj(k) / egrain);
             for (int i = rjk; i < ngrains; ++i) {
