@@ -1,8 +1,15 @@
 Molecule
-  elec_state 4 [ 2.0 0.0 2.0 140.0 ]
+  spin_mult
+  2
+  so_degen
+  2 [2 2]
+  so_energy
+  2 [0.0 140.0]
+  elec_energy
+  -0.5
   geometry
     8
-    Ethane  
+    Ethane
     C  0.0000  0.0000  0.7637
     C  0.0000  0.0000 -0.7637
     H  0.0000  1.0121  1.1564
@@ -12,4 +19,3 @@ Molecule
     H -0.8765  0.5060 -1.1564
     H  0.8765  0.5060 -1.1564
 End
-

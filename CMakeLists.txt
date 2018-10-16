@@ -1,25 +1,21 @@
 cmake_minimum_required(VERSION 3.4.3)
-project(ChemApps CXX)
+project(chemlib CXX)
 
-# By default, ChemApps is install in the HOME directory.
-if(WIN32)
-    set(CMAKE_INSTALL_PREFIX "C:/Users/$ENV{USERNAME}")
-else()
-    set(CMAKE_INSTALL_PREFIX $ENV{HOME})
-endif()
+#-------------------------------------------------------------------------------
+#
+# Set compiler options:
+
+# Enforce C++14 standard.
+set(CMAKE_CXX_STANDARD 14)
 
 # Export compile commands.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Enforce C++14 standard (needed for GSL).
-set(CMAKE_CXX_STANDARD 14)
-
-if(MSVC)
+if(WIN32)
     option(BUILD_SHARED_LIBS "Compile shared libraries." OFF)
 else()
     option(BUILD_SHARED_LIBS "Compile shared libraries." ON)
 endif()
-option(BUILD_TESTS "Build tests." ON)
 
 # Set default MSVC compiler options to avoid D9025 error.
 if(MSVC)
@@ -28,90 +24,127 @@ endif()
 
 # Set release compiler options.
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wpedantic -Wall -Wshadow -Wextra -Wno-missing-braces -Werror")
-endif()
-if (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++14 -Wall -Wshadow -Wextra -Wno-missing-braces -Werror")
-endif()
-if(APPLE)
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -framework Accelerate")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_RELEASE} -Wpedantic -Wall -Wshadow -Wextra -Wno-missing-braces -Werror -Wno-error=strict-overflow")
 endif()
 if(MSVC)
-    set(CMAKE_CXX_FLAGS_RELEASE "/std:c++14 /W4 /WX /GR /EHsc /MT /O2")
+    set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /std:c++14 /W4 /WX /wd4100 /GR /EHsc /MT /O2")
 endif()
 
 # Set debugging compiler options.
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pg -Wpedantic -Wall -Wshadow -Wextra -Wno-missing-braces -Werror")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -pg")
-endif()
-if (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++14 -pg -Wall -Wshadow -Wextra -Wno-missing-braces -Werror")
-    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -pg")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wpedantic -Wall -Wshadow -Wextra -Wno-missing-braces -Werror -Wno-error=strict-overflow")
 endif()
 if(MSVC)
-    set(CMAKE_CXX_FLAGS_DEBUG "/std:c++14 /EHsc /W4 /WX /MT /GR /Zi /Od")
+    set(CMAKE_CXX_FLAGS_DEBUG "/std:c++14 /EHsc /W4 /WX /wd4100 /MT /GR /Zi /Od")
 endif()
 
-# Set definitions.
-set(ChemApps_DEFINITIONS_DEBUG -DGSL_THROW_ON_CONTRACT_VIOLATION)
-set(ChemApps_DEFINITIONS_RELEASE -DNDEBUG -DGSL_THROW_ON_CONTRACT_VIOLATION)
-add_compile_options(
-    "$<$<CONFIG:Debug>:${ChemApps_DEFINITIONS_DEBUG}>"
-    "$<$<CONFIG:Release>:${ChemApps_DEFINITIONS_RELEASE}>" 
-)
+#-------------------------------------------------------------------------------
+#
+# Include external dependencies:
 
-# Boost library is required.
-if(WIN32)
-    set(Boost_USE_STATIC_LIBS ON)
-    find_package(Boost 1.65.0 REQUIRED)
+include(ExternalProject)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+find_package(Git)
+
+# BLAS and LAPACK is required.
+if(DEFINED ENV{MKLROOT})
+	find_package(MKL)
+	if(MKL_FOUND)
+		add_definitions(${MKL_DEFINITIONS})
+		set(BLAS_INCLUDE_DIRS ${MKL_INCLUDE_DIRS})
+		set(BLAS_LIBRARIES ${MKL_LIBRARIES})
+		set(LAPACK_LIBRARIES "")
+	endif()
 else()
-    find_package(Boost 1.65.0 COMPONENTS program_options REQUIRED) # Not recognized by CMake 3.10 on Windows
+	set(BLA_VENDOR "OpenBLAS")
+	if(WIN32)
+		set(BLAS_DIR C:/local/OpenBLAS.0.2.14.1/lib/native)
+		if(${CMAKE_CL_64} EQUAL 1)
+			find_file(BLAS_LIBRARIES libopenblas.dll.a HINTS ${BLAS_DIR}/lib/x64)
+			set(BLAS_BIN "${BLAS_DIR}/bin/x64")
+		else()
+			find_file(BLAS_LIBRARIES libopenblas.dll.a HINTS ${BLAS_DIR}/lib/win32)
+			set(BLAS_BIN "${BLAS_DIR}/bin/win32")
+		endif()
+	elseif(APPLE)
+		set(BLAS_DIR /usr/local/opt/openblas)
+		find_file(BLAS_LIBRARIES libopenblas.dylib HINTS ${BLAS_DIR}/lib)
+	else()
+		# Workaround: LAPACKE is not a part of OpenBLAS on Ubuntu
+		set(BLAS_DIR /usr)
+		find_package(BLAS)
+		find_file(LAPACK_LIBRARIES liblapacke.so HINTS ${BLAS_DIR}/lib ${BLAS_DIR}/lib/x86_64-linux-gnu) 
+		find_path(BLAS_INCLUDE_DIRS cblas.h HINTS ${BLAS_DIR}/include /usr/include /usr/local/include)
+		find_path(LAPACKE_INCLUDE_DIRS lapacke.h HINTS ${BLAS_DIR}/include /usr/include /usr/local/include)
+	endif()
+	find_path(BLAS_INCLUDE_DIRS cblas.h HINTS ${BLAS_DIR}/include)
+	find_path(LAPACKE_INCLUDE_DIRS lapacke.h HINTS ${BLAS_DIR}/include)
 endif()
 
-# GSL library is required.
-find_path(GSL_INCLUDE_DIR gsl HINTS $ENV{HOME}/include /usr/include /usr/local/include)
-
-# Intel MKL is required.
-find_path(MKL_INCLUDE_DIR mkl.h HINTS $ENV{MKL_INCLUDE_DIR} $ENV{MKLROOT}/include /opt/intel/mkl/include)
-if(WIN32)
-    find_path(MKL_LIB_DIR mkl_core.lib HINTS $ENV{MKL_LIB_DIR})
+# Stdutils is required.
+find_package(Stdutils)
+if(Stdutils_FOUND)
+    add_custom_target(Stdutils)
 else()
-    find_path(MKL_LIB_DIR libmkl_core.a HINTS $ENV{MKL_LIB_DIR} $ENV{MKLROOT}/lib/intel64 /opt/intel/mkl/lib/intel64)
-    if(APPLE)
-        find_path(TBB_LIB_DIR libtbb.dylib HINTS /opt/intel/tbb/lib)
-    endif()
+    list(APPEND STDUTILS_CMAKE_ARGS
+        "-DCMAKE_INSTALL_PREFIX:STRING=${CMAKE_BINARY_DIR}/external"
+        "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
+        "-DBUILD_TESTS=OFF"
+    )
+    ExternalProject_Add(
+        Stdutils
+        PREFIX ${CMAKE_BINARY_DIR}/stdutils
+        GIT_REPOSITORY https://github.com/stigrs/stdutils.git
+        CMAKE_ARGS ${STDUTILS_CMAKE_ARGS}
+        LOG_DOWNLOAD 1
+        UPDATE_DISCONNECTED 0
+    )
+    set(Stdutils_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/external/include)
 endif()
- 
-# LIBSRS is required.
-find_path(SRS_INCLUDE_DIR srs HINTS $ENV{HOME}/include /usr/include /usr/local/include)
-if(WIN32)
-    find_path(SRS_LIB_DIR srs.lib HINTS $ENV{HOME}/lib)
-elseif(APPLE)
-    find_path(SRS_LIB_DIR libsrs.dylib HINTS $ENV{HOME}/lib /usr/lib /usr/local/lib)
+
+# Numlib is required.
+find_package(Numlib)
+if(Numlib_FOUND)
+    add_custom_target(Numlib)
 else()
-    find_path(SRS_LIB_DIR libsrs.so HINTS $ENV{HOME}/lib /usr/lib /usr/local/lib)
+    list(APPEND NUMLIB_CMAKE_ARGS
+        "-DCMAKE_INSTALL_PREFIX:STRING=${CMAKE_BINARY_DIR}/external"
+        "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
+        "-DBUILD_TESTS=OFF"
+        "-DBUILD_BENCH=OFF"
+        "-DBUILD_EXAMPLES=OFF"
+    )
+    ExternalProject_Add(
+        Numlib
+        PREFIX ${CMAKE_BINARY_DIR}/numlib
+        GIT_REPOSITORY https://github.com/stigrs/numlib.git
+        CMAKE_ARGS ${NUMLIB_CMAKE_ARGS}
+        LOG_DOWNLOAD 1
+        UPDATE_DISCONNECTED 0
+    )
+    set(Numlib_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/external/include)
+    set(Numlib_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/external/lib)
+    set(Numlib_LIBRARIES "numlib")
 endif()
 
-add_library(chem_h INTERFACE)
+#-------------------------------------------------------------------------------
+#
+# Build the software:
 
-target_include_directories(chem_h INTERFACE
-    $<BUILD_INTERFACE:
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-        ${GSL_INCLUDE_DIR}
-        ${SRS_INCLUDE_DIR}
-    >
-)
-
-install(
-    DIRECTORY include/chem
-    DESTINATION include
-)
-
+# Create chemlib library.
 add_subdirectory(lib)
-add_subdirectory(src)
+
+# Enable testing.
+option(BUILD_TESTS "Build tests." ON)
 
 if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+# Install target.
+install(
+    DIRECTORY include/chemlib
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.h"
+)
