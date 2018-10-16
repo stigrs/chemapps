@@ -1,14 +1,28 @@
-// Copyright (c) 2017 Stig Rune Sellevag
+////////////////////////////////////////////////////////////////////////////////
 //
-// This file is distributed under the MIT License. See the accompanying file
-// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
-// and conditions.
+// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
+//
+// This code is licensed under the MIT License (MIT).
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+//
+////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CHEMLIB_TORSION_H
-#define CHEMLIB_TORSION_H
+#ifndef CHEM_TORSION_H
+#define CHEM_TORSION_H
 
 #include <chem/impl/geometry.h>
 #include <chem/impl/rotation.h>
+#include <numlib/traits.h>
+#include <numlib/matrix.h>
+#include <iostream>
+#include <string>
 
 namespace Chem {
 
@@ -35,11 +49,103 @@ namespace Impl {
     public:
         Torsion() = delete;
 
-        Torsion
+        Torsion(Geometry& g, Rotation& r)
+            : geom(g), rot(r), perform_analysis{false}
+        {
+        }
+
+        Torsion(std::istream& from,
+                const std::string& key,
+                Geometry& g,
+                Rotation& r);
+
+        // Copy semantics:
+        Torsion(const Torsion&) = default;
+        Torsion& operator=(const Torsion&) = default;
+
+        // Move semantics:
+        Torsion(Torsion&&) = default;
+        Torsion& operator=(Torsion&&) = default;
+
+        ~Torsion() = default;
+
+        // Perform torsional mode analysis.
+        void analysis(std::ostream& to = std::cout);
+
+        // Get total number of minima (eq 1 in C&T, 2000).
+        int tot_minima() const { return Numlib::sum(sigma); }
+
+        // Calculate effective symmetry number.
+        double symmetry_number() const;
+
+        // Calculate reduced moment of inertia.
+        double red_moment_of_inertia();
+
+        // Calculate effective moment of inertia.
+        double eff_moment_of_inertia() const;
+
+        // Calculate rotational constant for torsional mode.
+        Numlib::Vec<double> constant() const;
+
+        // Return potential coefficients.
+        const auto& pot_coeff() const { return pot; }
+
+        // Return torsional frequencies.
+        const auto& frequencies() const { return freq; }
+
+    private:
+        // Validate input data.
+        void validate() const;
+
+        // Set up axis system for rotating top.
+        void axis_system();
+
+        // Calculate center of mass for rotating top.
+        void center_of_mass();
+
+        // Set up direction cosines matrix.
+        void direction_cosines();
+
+        // Calculate moment of inertia of rotating top.
+        void top_moment_of_inertia();
+
+        Geometry& geom;
+        Rotation& rot;
+
+        bool perform_analysis;
+
+        Numlib::Mat<double> alpha; // direction cosines
+        Numlib::Mat<double> xyz;   // local copy of Cartesian coordinates
+
+        Numlib::Vec<int> rot_axis; // rotational axis
+        Numlib::Vec<int> rot_top;  // rotating top moiety
+        Numlib::Vec<int> sigma;    // symmetry number
+
+        Numlib::Vec<double> rmi;  // red. moment of inertia
+        Numlib::Vec<double> pot;  // potential coefficients
+        Numlib::Vec<double> freq; // torsional frequencies
+
+        Numlib::Vec<double> x_axis; // x axis of rotating top
+        Numlib::Vec<double> y_axis; // y axis of rotating top
+        Numlib::Vec<double> z_axis; // z axis of rotating top
+
+        Numlib::Vec<double> origo; // origo of rotating top
+        Numlib::Vec<double> com;   // center of mass of rotating top
+
+        double am;  // moment of inertia of rotating top
+        double bm;  // xz product of inertia
+        double cm;  // yz product of inertia
+        double um;  // off-balance factor
     };
 
-} // Molecule_impl
+    inline double Torsion::symmetry_number() const
+    {
+        // Eq. 8 in Chuang and Truhlar (2000):
+        return tot_minima() / narrow_cast<double>(sigma.size());
+    }
 
-} // Chemlib
+}  // namespace Impl
 
-#endif // CHEMLIB_TORSION_H
+}  // namespace Chem
+
+#endif  // CHEM_TORSION_H
