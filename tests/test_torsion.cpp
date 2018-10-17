@@ -15,26 +15,37 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/molecule.h>
-#include <numlib/matrix.h>
 #include <stdutils/stdutils.h>
 #include <catch2/catch.hpp>
 #include <cmath>
 #include <fstream>
 
-TEST_CASE("test_rotation")
+TEST_CASE("test_torsion")
 {
     using namespace Chem;
-    using namespace Numlib;
     using namespace Stdutils;
 
-    std::ifstream from;
-    fopen(from, "test_rotation.inp");
-    Molecule mol(from);
+    SECTION("CH2ClCH2Cl")
+    {
+        std::ifstream from;
+        fopen(from, "test_ch2clch2cl.inp");
 
-    Numlib::Vec<double> ans = {127.63201, 24.89071, 24.02767};
-    Numlib::Vec<double> res = mol.rot_constants();
+        Molecule mol(from);
+        double rmi = mol.tor_red_moment();
 
-    for (Index i = 0; i < ans.size(); ++i) {
-        CHECK(std::abs(res(i) - ans(i)) < 1.0e-4);
+        const double rmi_ans = 58.76991427;  // Chuang and Truhlar (2000)
+        CHECK(std::abs(rmi - rmi_ans) < 9.0e-2);
+    }
+
+    SECTION("CH3OH")
+    {
+        std::ifstream from;
+        fopen(from, "test_ch3oh.inp");
+
+        Molecule mol(from);
+        double rmi = mol.tor_red_moment();
+
+        const double rmi_ans = 2.19;  // Chuang and Truhlar (2000)
+        CHECK(std::abs(rmi - rmi_ans) < 2.0e-2);
     }
 }

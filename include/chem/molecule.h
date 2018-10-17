@@ -21,6 +21,7 @@
 #include <chem/impl/geometry.h>
 #include <chem/impl/rotation.h>
 #include <chem/impl/vibration.h>
+#include <chem/impl/torsion.h>
 #include <iostream>
 #include <string>
 
@@ -49,6 +50,9 @@ public:
     // Get number of atoms.
     auto num_atoms() const { return geom.atoms().size(); }
 
+    // Get atoms in molecule.
+    const auto& atoms() const { return geom.atoms(); }
+
     // Get net electronic charge.
     auto net_charge() const { return elec.net_charge(); }
 
@@ -64,9 +68,6 @@ public:
     // Get energies of spin-orbit states.
     const auto& spin_orbit_energy() const { return elec.spin_orbit_energy(); }
 
-    // Get atoms in molecule.
-    const auto& atoms() const { return geom.atoms(); }
-
     // Get Cartesian coordinates.
     auto& cart_coord() { return geom.cart_coord(); }
     const auto& cart_coord() const { return geom.cart_coord(); }
@@ -76,7 +77,7 @@ public:
     const auto& int_coord() const { return geom.int_coord(); }
 
     // Get rotational constants.
-    auto rot_const() { return rot.constants(); }
+    auto rot_constants() { return rot.constants(); }
 
     // Get rotational symmetry.
     auto rot_symmetry() { return rot.symmetry(); }
@@ -102,11 +103,33 @@ public:
     // Force constants of vibrational modes.
     const auto& vib_force_constants() const { return vib.force_constants(); }
 
+    // Total number of torsional minima.
+    int tot_tor_minima() const { return tor.tot_minima(); }
+
+    // Effective torsional symmetry number.
+    double tor_symmetry_number() const { return tor.symmetry_number(); }
+
+    // Reduced moment of inertia for torsional mode.
+    double tor_red_moment() { return tor.red_moment(); }
+
+    // Effective moment of inertia for torsional mode.
+    double tor_eff_moment() const { return tor.eff_moment(); }
+
+    // Rotational constant for torsional mode.
+    auto tor_constant() const { return tor.constant(); }
+
+    // Potential coefficients for torsional mode.
+    const auto& tor_pot_coeff() const { return tor.pot_coeff(); }
+
+    // Torsional frequencies.
+    const auto& tor_frequencies() const { return tor.frequencies(); }
+
 private:
     Impl::Elec_state elec;  // molecular electronic states
     Impl::Geometry geom;    // molecular geometry
     Impl::Rotation rot;     // molecular rotations
     Impl::Vibration vib;    // molecular vibrations
+    Impl::Torsion tor;      // internal torsional modes
 };
 
 }  // namespace Chem

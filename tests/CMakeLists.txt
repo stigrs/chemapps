@@ -61,7 +61,7 @@ function(add_chemapps_test name)
         ${name} 
         test_catch2
         chem
-	    ${BLAS_LIBRARIES}
+	${BLAS_LIBRARIES}
         ${LAPACK_LIBRARIES}
         ${Numlib_LIBRARIES}
     ) 
@@ -74,6 +74,7 @@ set(PROGRAMS
     test_periodic_table
     test_rotation
     test_vibration
+    test_torsion
     test_zmatrix
 )
 

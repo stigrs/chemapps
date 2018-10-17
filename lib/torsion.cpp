@@ -49,14 +49,14 @@ Chem::Impl::Torsion::Torsion(std::istream& from,
     if ((rot_top.size() > 0) && rmi_tor.empty()) {
         perform_analysis = true;
         rmi_tor.resize(1);
-        rmi_tor(0) = red_moment_of_inertia();
+        rmi_tor(0) = red_moment();
     }
 
     // Check if data are sensible:
     validate();
 }
 
-double Chem::Impl::Torsion::red_moment_of_inertia()
+double Chem::Impl::Torsion::red_moment()
 {
     // Rotate molecule to principal axes and compute principal moments:
 
@@ -115,18 +115,22 @@ double Chem::Impl::Torsion::red_moment_of_inertia()
 
 void Chem::Impl::Torsion::validate() const
 {
-    if (rot_axis.size() != 2) {
-        throw std::runtime_error("bad rot_axis size");
+    if (!rot_axis.empty()) {
+        if (rot_axis.size() != 2) {
+            throw std::runtime_error("bad rot_axis size");
+        }
+        if (rot_axis(1) > narrow_cast<int>(geom.atoms().size())) {
+            throw std::runtime_error("bad rot_axis");
+        }
     }
-    if (rot_axis(1) > narrow_cast<int>(geom.atoms().size())) {
-        throw std::runtime_error("bad rot_axis");
-    }
-    if (rot_top.size() > narrow_cast<int>(geom.atoms().size())) {
-        throw std::runtime_error("bad rot_top size");
-    }
-    for (auto ri : rot_top) {
-        if (ri > narrow_cast<int>(geom.atoms().size())) {
-            throw std::runtime_error("bad center in rot_top");
+    if (!rot_top.empty()) {
+        if (rot_top.size() > narrow_cast<int>(geom.atoms().size())) {
+            throw std::runtime_error("bad rot_top size");
+        }
+        for (auto ri : rot_top) {
+            if (ri > narrow_cast<int>(geom.atoms().size())) {
+                throw std::runtime_error("bad center in rot_top");
+            }
         }
     }
     if (!sigma_tor.empty()) {
@@ -275,7 +279,7 @@ void Chem::Impl::Torsion::top_moment_of_inertia()
     }
 }
 
-double Chem::Impl::Torsion::eff_moment_of_inertia() const
+double Chem::Impl::Torsion::eff_moment() const
 {
     double imom_eff = 0.0;
     if (tot_minima() > 0) {

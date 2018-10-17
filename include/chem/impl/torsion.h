@@ -82,10 +82,10 @@ namespace Impl {
         double symmetry_number() const;
 
         // Calculate reduced moment of inertia.
-        double red_moment_of_inertia();
+        double red_moment();
 
         // Calculate effective moment of inertia.
-        double eff_moment_of_inertia() const;
+        double eff_moment() const;
 
         // Calculate rotational constant for torsional mode.
         Numlib::Vec<double> constant() const;
