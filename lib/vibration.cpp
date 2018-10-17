@@ -148,8 +148,6 @@ void Chem::Impl::Vibration::print() const
     }
 }
 
-//------------------------------------------------------------------------------
-
 Numlib::Mat<double> Chem::Impl::Vibration::mw_hessians() const
 {
     Numlib::Mat<double> hess_mw(hess.rows(), hess.cols());

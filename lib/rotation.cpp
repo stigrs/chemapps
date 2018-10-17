@@ -88,8 +88,6 @@ std::string Chem::Impl::Rotation::symmetry()
     return symm;
 }
 
-//------------------------------------------------------------------------------
-
 Numlib::Vec<double> Chem::Impl::Rotation::center_of_mass() const
 {
     Numlib::Vec<double> com(3);

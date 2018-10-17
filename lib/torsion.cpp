@@ -111,8 +111,6 @@ double Chem::Impl::Torsion::red_moment()
     return am - lambdam;
 }
 
-//------------------------------------------------------------------------------
-
 void Chem::Impl::Torsion::validate() const
 {
     if (!rot_axis.empty()) {
