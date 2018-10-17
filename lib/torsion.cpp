@@ -14,7 +14,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <chem/torsion.h>
+#include <chem/impl/torsion.h>
 #include <numlib/constants.h>
 #include <stdutils/stdutils.h>
 #include <algorithm>
@@ -23,10 +23,10 @@
 #include <stdexcept>
 #include <cassert>
 
-void Chem::Impl::Torsion::Torsion(std::istream& from,
-                                  const std::string& key,
-                                  Geometry& g,
-                                  Rotation& r)
+Chem::Impl::Torsion::Torsion(std::istream& from,
+                             const std::string& key,
+                             Geometry& g,
+                             Rotation& r)
     : geom(g), rot(r)
 {
     using namespace Stdutils;
@@ -118,14 +118,14 @@ void Chem::Impl::Torsion::validate() const
     if (rot_axis.size() != 2) {
         throw std::runtime_error("bad rot_axis size");
     }
-    if (rot_axis(1) > narrow_cast<int>(rot.atoms.size())) {
+    if (rot_axis(1) > narrow_cast<int>(geom.atoms().size())) {
         throw std::runtime_error("bad rot_axis");
     }
-    if (rot_top.size() > narrow_cast<int>(rot.atoms.size())) {
+    if (rot_top.size() > narrow_cast<int>(geom.atoms().size())) {
         throw std::runtime_error("bad rot_top size");
     }
     for (auto ri : rot_top) {
-        if (ri > narrow_cast<int>(rot.atoms.size())) {
+        if (ri > narrow_cast<int>(geom.atoms().size())) {
             throw std::runtime_error("bad center in rot_top");
         }
     }
