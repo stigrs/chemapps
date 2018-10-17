@@ -52,6 +52,9 @@ namespace Impl {
         Torsion(Geometry& g, Rotation& r)
             : geom(g), rot(r), perform_analysis{false}
         {
+            alpha = Numlib::zeros<Numlib::Mat<double>>(3, 3);
+            top_origo = Numlib::zeros<Numlib::Vec<double>>(3);
+            top_com = Numlib::zeros<Numlib::Vec<double>>(3);
         }
 
         Torsion(std::istream& from,
@@ -73,7 +76,7 @@ namespace Impl {
         void analysis(std::ostream& to = std::cout);
 
         // Get total number of minima (eq 1 in C&T, 2000).
-        int tot_minima() const { return Numlib::sum(sigma); }
+        int tot_minima() const { return Numlib::sum(sigma_tor); }
 
         // Calculate effective symmetry number.
         double symmetry_number() const;
@@ -88,10 +91,10 @@ namespace Impl {
         Numlib::Vec<double> constant() const;
 
         // Return potential coefficients.
-        const auto& pot_coeff() const { return pot; }
+        const auto& pot_coeff() const { return pot_tor; }
 
         // Return torsional frequencies.
-        const auto& frequencies() const { return freq; }
+        const auto& frequencies() const { return freq_tor; }
 
     private:
         // Validate input data.
@@ -117,35 +120,35 @@ namespace Impl {
         Numlib::Mat<double> alpha; // direction cosines
         Numlib::Mat<double> xyz;   // local copy of Cartesian coordinates
 
-        Numlib::Vec<int> rot_axis; // rotational axis
-        Numlib::Vec<int> rot_top;  // rotating top moiety
-        Numlib::Vec<int> sigma;    // symmetry number
+        Numlib::Vec<int> rot_axis;  // rotational axis
+        Numlib::Vec<int> rot_top;   // rotating top moiety
+        Numlib::Vec<int> sigma_tor; // symmetry number
 
-        Numlib::Vec<double> rmi;  // red. moment of inertia
-        Numlib::Vec<double> pot;  // potential coefficients
-        Numlib::Vec<double> freq; // torsional frequencies
+        Numlib::Vec<double> rmi_tor;  // red. moment of inertia
+        Numlib::Vec<double> pot_tor;  // potential coefficients
+        Numlib::Vec<double> freq_tor; // torsional frequencies
 
         Numlib::Vec<double> x_axis; // x axis of rotating top
         Numlib::Vec<double> y_axis; // y axis of rotating top
         Numlib::Vec<double> z_axis; // z axis of rotating top
 
-        Numlib::Vec<double> origo; // origo of rotating top
-        Numlib::Vec<double> com;   // center of mass of rotating top
+        Numlib::Vec<double> top_origo; // origo of rotating top
+        Numlib::Vec<double> top_com;   // center of mass of rotating top
 
-        double am;  // moment of inertia of rotating top
-        double bm;  // xz product of inertia
-        double cm;  // yz product of inertia
-        double um;  // off-balance factor
+        double am; // moment of inertia of rotating top
+        double bm; // xz product of inertia
+        double cm; // yz product of inertia
+        double um; // off-balance factor
     };
 
     inline double Torsion::symmetry_number() const
     {
         // Eq. 8 in Chuang and Truhlar (2000):
-        return tot_minima() / narrow_cast<double>(sigma.size());
+        return tot_minima() / narrow_cast<double>(sigma_tor.size());
     }
 
-}  // namespace Impl
+} // namespace Impl
 
-}  // namespace Chem
+} // namespace Chem
 
-#endif  // CHEM_TORSION_H
+#endif // CHEM_TORSION_H

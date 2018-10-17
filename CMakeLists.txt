@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.4.3)
-project(chemlib CXX)
+project(chemapps CXX)
 
 #-------------------------------------------------------------------------------
 #
@@ -144,7 +144,8 @@ endif()
 
 # Install target.
 install(
-    DIRECTORY include/chemlib
+    DIRECTORY include/chem
     DESTINATION include
     FILES_MATCHING PATTERN "*.h"
 )
+

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.4.3)
-project(chemlib_tests CXX)
+project(chemapps_tests CXX)
 
 include_directories(${chemlib_SOURCE_DIR}/include)
 include_directories(${Stdutils_INCLUDE_DIRS})
@@ -55,12 +55,12 @@ target_link_libraries(
 )
 add_dependencies(test_catch2 catch2)
 
-function(add_chemlib_test name)
+function(add_chemapps_test name)
     add_executable(${name} ${name}.cpp)
     target_link_libraries (
         ${name} 
         test_catch2
-        chemlib
+        chem
 	    ${BLAS_LIBRARIES}
         ${LAPACK_LIBRARIES}
         ${Numlib_LIBRARIES}
@@ -78,5 +78,6 @@ set(PROGRAMS
 )
 
 foreach(program ${PROGRAMS})
-    add_chemlib_test(${program})
+    add_chemapps_test(${program})
 endforeach()
+

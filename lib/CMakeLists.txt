@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.4.3)
-project(libchemlib CXX)
+project(libchem CXX)
 
 include_directories(${chemlib_SOURCE_DIR}/include)
 include_directories(${Stdutils_INCLUDE_DIRS})
@@ -20,23 +20,24 @@ set(
     molecule_io.cpp
 	periodic_table.cpp
     rotation.cpp
+    torsion.cpp
     vibration.cpp
     zmatrix.cpp
 )
 add_library(
-    chemlib 
+    chem 
     ${SRC_FILES}
 )
-add_dependencies(chemlib Stdutils Numlib)
+add_dependencies(chem Stdutils Numlib)
 target_link_libraries(
-    chemlib 
+    chem 
 	${BLAS_LIBRARIES}
     ${LAPACK_LIBRARIES}
     ${Numlib_LIBRARIES} 
 ) 
 
 install(
-    TARGETS chemlib
+    TARGETS chem
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
 )
