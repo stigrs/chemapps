@@ -71,7 +71,7 @@ public:
     void load(std::istream& from);
 
     // Print Z matrix.
-    void print() const;
+    void print(std::ostream& to = std::cout) const;
 
 protected:
     // Build Z matrix from Cartesian coordinates. The code is based on the
@@ -179,26 +179,15 @@ inline void Zmatrix::set_dihedral(int index, double value)
 
 inline void Zmatrix::load(std::istream& from)
 {
-    Impl::read_zmat_format(from,
-                           atoms,
-                           distances,
-                           angles,
-                           dihedrals,
-                           bond_connect,
-                           angle_connect,
-                           dihedral_connect);
+    Impl::read_zmat_format(from, atoms, distances, angles, dihedrals,
+                           bond_connect, angle_connect, dihedral_connect);
     build_xyz();
 }
 
-inline void Zmatrix::print() const
+inline void Zmatrix::print(std::ostream& to) const
 {
-    Impl::print_zmat_format(atoms,
-                            distances,
-                            angles,
-                            dihedrals,
-                            bond_connect,
-                            angle_connect,
-                            dihedral_connect);
+    Impl::print_zmat_format(to, atoms, distances, angles, dihedrals,
+                            bond_connect, angle_connect, dihedral_connect);
 }
 
 }  // namespace Chem

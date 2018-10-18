@@ -17,16 +17,18 @@
 #include <chem/impl/molecule_io.h>
 #include <chem/periodic_table.h>
 #include <stdutils/stdutils.h>
+#include <sstream>
+#include <stdexcept>
 
 void Chem::Impl::read_xyz_format(std::istream& from,
-                                 std::vector<Chem::Element>& atoms,
+                                 std::vector<Element>& atoms,
                                  Numlib::Mat<double>& xyz,
                                  std::string& title)
 {
     // Get number of atoms:
     int natoms;
     from >> natoms;
-    from.ignore(); // need to consume '\n' before reading title line
+    from.ignore();  // need to consume '\n' before reading title line
     from.clear();
 
     xyz.resize(natoms, 3);
@@ -44,7 +46,7 @@ void Chem::Impl::read_xyz_format(std::istream& from,
     // Read XYZ coordinates:
     for (int i = 0; i < natoms; ++i) {
         from >> symbol >> x >> y >> z;
-        atoms[i]  = Chem::Periodic_table::get_element(symbol);
+        atoms[i] = Periodic_table::get_element(symbol);
         xyz(i, 0) = x;
         xyz(i, 1) = y;
         xyz(i, 2) = z;
@@ -52,7 +54,7 @@ void Chem::Impl::read_xyz_format(std::istream& from,
 }
 
 void Chem::Impl::read_zmat_format(std::istream& from,
-                                  std::vector<Chem::Element>& atoms,
+                                  std::vector<Element>& atoms,
                                   Numlib::Vec<double>& distances,
                                   Numlib::Vec<double>& angles,
                                   Numlib::Vec<double>& dihedrals,
@@ -62,10 +64,13 @@ void Chem::Impl::read_zmat_format(std::istream& from,
 {
     atoms.clear();
 
+    from.clear();
+    from.seekg(0, std::ios_base::beg);
+
     std::string line;
     std::string symbol;
 
-    int natoms = 0;
+    int natoms         = 0;
     std::streamoff pos = 0;
 
     // Count number of atoms:
@@ -76,31 +81,32 @@ void Chem::Impl::read_zmat_format(std::istream& from,
         if (symbol.find("#") != std::string::npos) {
             continue;
         }
-        if (symbol.find("zmatrix") != std::string::npos) {
+        else if (symbol.find("zmatrix") != std::string::npos) {
             pos = from.tellg();
         }
-        if (Chem::Periodic_table::atomic_symbol_is_valid(symbol)) {
-            atoms.push_back(Chem::Periodic_table::get_element(symbol));
+        else if (Periodic_table::atomic_symbol_is_valid(symbol)) {
+            atoms.push_back(Periodic_table::get_element(symbol));
             natoms += 1;
         }
-        if (symbol.empty()) {
+        else if (symbol.empty()) {
             break;
         }
     }
+
     // Load Z matrix:
 
     from.clear();
     from.seekg(pos, std::ios_base::beg);
 
-    distances.resize(natoms);
-    angles.resize(natoms);
-    dihedrals.resize(natoms);
-    bond_connect.resize(natoms);
-    angle_connect.resize(natoms);
-    dihedral_connect.resize(natoms);
+    distances.resize(natoms, 0.0);
+    angles.resize(natoms, 0.0);
+    dihedrals.resize(natoms, 0.0);
+    bond_connect.resize(natoms, 0);
+    angle_connect.resize(natoms, 0);
+    dihedral_connect.resize(natoms, 0);
 
     if (natoms > 0) {
-        std::getline(from, line); // first atom is already read
+        std::getline(from, line);  // first atom is already read
     }
     int iat1;
     double distance;
@@ -108,7 +114,7 @@ void Chem::Impl::read_zmat_format(std::istream& from,
         std::getline(from, line);
         std::istringstream iss(line);
         iss >> symbol >> iat1 >> distance;
-        distances(1) = distance;
+        distances(1)    = distance;
         bond_connect(1) = iat1 - 1;
     }
     int iat2;
@@ -117,9 +123,9 @@ void Chem::Impl::read_zmat_format(std::istream& from,
         std::getline(from, line);
         std::istringstream iss(line);
         iss >> symbol >> iat1 >> distance >> iat2 >> angle;
-        distances(2) = distance;
-        bond_connect(2) = iat1 - 1;
-        angles(2) = angle;
+        distances(2)     = distance;
+        bond_connect(2)  = iat1 - 1;
+        angles(2)        = angle;
         angle_connect(2) = iat2 - 1;
     }
     int iat3;
@@ -134,40 +140,83 @@ void Chem::Impl::read_zmat_format(std::istream& from,
                 >> angle    >> iat3 
                 >> dihedral;
             // clang-format on
-            distances(i) = distance;
-            bond_connect(i) = iat1 - 1;
-            angles(i) = angle;
-            angle_connect(i) = iat2 - 1;
-            dihedrals(i) = dihedral;
+            distances(i)        = distance;
+            bond_connect(i)     = iat1 - 1;
+            angles(i)           = angle;
+            angle_connect(i)    = iat2 - 1;
+            dihedrals(i)        = dihedral;
             dihedral_connect(i) = iat3 - 1;
         }
     }
 }
 
-void Chem::Impl::print_elec_states(const Numlib::Vec<double>& elec_state)
+void Chem::Impl::read_mol_formula(std::istream& from,
+                                  std::vector<Mol_formula>& formula)
 {
-    using namespace Stdutils;
+    std::string buf;
+    from >> buf;
 
-    Format<char> line;
-    line.width(34).fill('-');
+    auto n = Stdutils::from_string<int>(buf);
+    assert(n >= 1);
+    formula.resize(n);
 
-    Format<double> fix;
-    fix.fixed().width(6).precision(2);
+    char ch;
+    std::string atom;
+    int stoich;
 
-    std::cout << "Electronic states:\n"
-              << line('-') << '\n'
-              << " #\tEnergy/cm^-1\tDegeneracy\n"
-              << line('-') << '\n';
-    int it = 1;
-    for (Index i = 0; i < elec_state.size(); i += 2) {
-        std::cout << " " << it << '\t' << fix(elec_state(i + 1)) << "\t\t"
-                  << elec_state(i) << '\n';
-        it += 1;
+    from >> ch;
+    if (ch != '[') {
+        throw std::runtime_error("'[' missing in molecular formula");
     }
-    std::cout << line('-') << '\n';
+    for (int i = 0; i < n; ++i) {
+        from >> atom >> stoich >> ch;
+        if (!from) {
+            throw std::runtime_error("found no data for molecular formula");
+        }
+        if ((ch != ',') && (ch != ';') && (ch != ']')) {
+            throw std::runtime_error("bad separator in molecular formula: " +
+                                     Stdutils::to_string(ch));
+        }
+        if (ch == ']') {
+            from.unget();
+        }
+        if (!Periodic_table::atomic_symbol_is_valid(atom)) {
+            throw std::runtime_error("bad atomic symbol: " + atom);
+        }
+        if (stoich < 1) {
+            throw std::runtime_error("bad stoichiometry: " +
+                                     Stdutils::to_string(stoich));
+        }
+        formula[i].atom   = atom;
+        formula[i].stoich = stoich;
+    }
+    from >> ch;
+    if (ch != ']') {
+        throw std::runtime_error("']' missing in molecular formula");
+    }
 }
 
-void Chem::Impl::print_zmat_format(const std::vector<Chem::Element>& atoms,
+void Chem::Impl::print_xyz_format(std::ostream& to,
+                                  const std::vector<Element>& atoms,
+                                  const Numlib::Mat<double>& xyz,
+                                  const std::string& title)
+{
+    Stdutils::Format<double> fix;
+    fix.fixed().width(10);
+
+    to << atoms.size() << '\n';
+    to << title << '\n';
+    for (std::size_t i = 0; i < atoms.size(); ++i) {
+        to << atoms[i].atomic_symbol << '\t';
+        for (Index j = 0; j < xyz.cols(); ++j) {
+            to << fix(xyz(i, j)) << '\t';
+        }
+        to << '\n';
+    }
+}
+
+void Chem::Impl::print_zmat_format(std::ostream& to,
+                                   const std::vector<Element>& atoms,
                                    const Numlib::Vec<double>& distances,
                                    const Numlib::Vec<double>& angles,
                                    const Numlib::Vec<double>& dihedrals,
@@ -182,27 +231,92 @@ void Chem::Impl::print_zmat_format(const std::vector<Chem::Element>& atoms,
     ifix.fixed().width(3);
 
     if (!atoms.empty()) {
-        std::cout << atoms[0].atomic_symbol << '\n';
+        to << atoms[0].atomic_symbol << '\n';
     }
     if (atoms.size() > 1) {
-        std::cout << atoms[1].atomic_symbol << '\t' << ifix(bond_connect(1) + 1)
-                  << "  " << dfix(distances(1)) << '\n';
+        to << atoms[1].atomic_symbol << '\t' << ifix(bond_connect(1) + 1)
+           << "  " << dfix(distances(1)) << '\n';
     }
     if (atoms.size() > 2) {
-        std::cout << atoms[2].atomic_symbol << '\t' << ifix(bond_connect(2) + 1)
-                  << "  " << dfix(distances(2)) << "  "
-                  << ifix(angle_connect(2) + 1) << "  " << dfix(angles(2))
-                  << '\n';
+        to << atoms[2].atomic_symbol << '\t' << ifix(bond_connect(2) + 1)
+           << "  " << dfix(distances(2)) << "  " << ifix(angle_connect(2) + 1)
+           << "  " << dfix(angles(2)) << '\n';
     }
     if (atoms.size() > 3) {
         for (std::size_t i = 3; i < atoms.size(); ++i) {
-            std::cout << atoms[i].atomic_symbol << '\t'
-                      << ifix(bond_connect(i) + 1) << "  " << dfix(distances(i))
-                      << "  " << ifix(angle_connect(i) + 1) << "  "
-                      << dfix(angles(i)) << "  "
-                      << ifix(dihedral_connect(i) + 1) << "  "
-                      << dfix(dihedrals(i)) << '\n';
+            to << atoms[i].atomic_symbol << '\t' << ifix(bond_connect(i) + 1)
+               << "  " << dfix(distances(i)) << "  "
+               << ifix(angle_connect(i) + 1) << "  " << dfix(angles(i)) << "  "
+               << ifix(dihedral_connect(i) + 1) << "  " << dfix(dihedrals(i))
+               << '\n';
         }
     }
+}
+
+void Chem::Impl::print_elec_states(std::ostream& to,
+                                   const Numlib::Vec<double>& elec_state)
+{
+    Stdutils::Format<char> line;
+    line.width(34).fill('-');
+
+    Stdutils::Format<double> fix;
+    fix.fixed().width(6).precision(2);
+
+    to << "Electronic states:\n"
+       << line('-') << '\n'
+       << " #\tEnergy/cm^-1\tDegeneracy\n"
+       << line('-') << '\n';
+    int it = 1;
+    for (Index i = 0; i < elec_state.size(); i += 2) {
+        to << " " << it << '\t' << fix(elec_state(i + 1)) << "\t\t"
+           << elec_state(i) << '\n';
+        it += 1;
+    }
+    to << line('-') << '\n';
+}
+
+void Chem::Impl::print_geometry(std::ostream& to,
+                                const std::vector<Element>& atoms,
+                                const Numlib::Mat<double>& xyz,
+                                const std::string& unit)
+{
+    Stdutils::Format<char> line;
+    Stdutils::Format<double> fix;
+    line.width(58).fill('-');
+    fix.fixed().width(10);
+
+    if (!atoms.empty()) {
+        to << line('-') << '\n'
+           << "Center\tAtomic\t\t    Coordinates/" << unit << '\n'
+           << "Number\tSymbol\t   X\t\t   Y\t\t   Z\n"
+           << line('-') << '\n';
+        for (std::size_t i = 0; i < atoms.size(); ++i) {
+            to << i + 1 << '\t' << atoms[i].atomic_symbol << '\t';
+            for (Index j = 0; j < xyz.cols(); ++j) {
+                to << fix(xyz(i, j)) << '\t';
+            }
+            to << '\n';
+        }
+        to << line('-') << '\n';
+    }
+}
+
+void Chem::Impl::print_atomic_masses(std::ostream& to,
+                                     const std::vector<Element>& atoms)
+{
+    Stdutils::Format<double> fix;
+    fix.fixed().width(10);
+
+    Stdutils::Format<int> gen;
+    gen.width(3);
+
+    double totmass = 0.0;
+    for (std::size_t i = 0; i < atoms.size(); ++i) {
+        to << "Center " << gen(i + 1) << " has atomic number "
+           << gen(atoms[i].atomic_number) << " and mass "
+           << fix(atoms[i].atomic_mass) << '\n';
+        totmass += atoms[i].atomic_mass;
+    }
+    to << "Molecular mass:\t" << totmass << " amu\n";
 }
 

@@ -18,71 +18,52 @@
 #include <chem/impl/molecule_io.h>
 #include <chem/periodic_table.h>
 #include <stdutils/stdutils.h>
+#include <stdexcept>
+#include <cassert>
 
-Collision::Collision(std::istream& from, const std::string& key)
+Chem::Collision::Collision(std::istream& from, const std::string& key)
 {
+    using namespace Stdutils;
+
     // Populate local sigma and epsilon values:
     set_sigma_local_values();
     set_epsilon_local_values();
 
     // Read input data:
-    std::string coll_integral_str;
+    std::string coll_int_str;
 
-    std::map<std::string, srs::Input> input_data;
-    input_data["coll_integral"] = srs::Input(coll_integral_str, "forst");
-    input_data["mass_bath"] = srs::Input(mass_bath);
-    input_data["mass_mol"] = srs::Input(mass_mol);
-    input_data["epsilon_bath"] = srs::Input(epsilon_bath);
-    input_data["epsilon_mol"] = srs::Input(epsilon_mol);
-    input_data["sigma_bath"] = srs::Input(sigma_bath);
-    input_data["sigma_mol"] = srs::Input(sigma_mol);
-    input_data["vibr_high"] = srs::Input(vibr_high, 0.0);
-
-    if (srs::find_section(from, key)) {
-        std::string token;
-        while (from >> token) {
-            if (token == "End") {
-                break;
-            }
-            else if (token == "mol_formula") {
-                chem::read_mol_formula(from, mol_formula);
-            }
-            else {
-                auto it = input_data.find(token);
-                if (it != input_data.end()) {
-                    from >> it->second;
-                }
-            }
+    auto pos = find_token(from, key);
+    if (pos != -1) {
+        get_token_value(from, pos, "coll_integral", coll_int_str, "forst");
+        get_token_value(from, pos, "mass_bath", mass_bath);
+        get_token_value(from, pos, "mass_mol", mass_mol);
+        get_token_value(from, pos, "epsilon_bath", epsilon_bath);
+        get_token_value(from, pos, "epsilon_mol", epsilon_mol);
+        get_token_value(from, pos, "sigma_bath", sigma_bath);
+        get_token_value(from, pos, "sigma_mol", sigma_mol);
+        get_token_value(from, pos, "vibr_high", vibr_high, 0.0);
+        pos = find_token(from, "mol_formula");
+        if (pos != -1) {
+            Chem::Impl::read_mol_formula(from, mol_formula);
         }
     }
-    else {
-        throw Collision_error("cannot find " + key + " section");
-    }
-
-    // Check if initialized:
-    for (auto& it : input_data) {
-        if (!it.second.is_init()) {
-            throw Collision_error(it.first + " not initialized");
-        }
-    }
-
     // Validate input data:
 
-    if (coll_integral_str == "troe") {
+    if (coll_int_str == "troe") {
         coll_integral = troe;
     }
-    else if (coll_integral_str == "forst") {
+    else if (coll_int_str == "forst") {
         coll_integral = forst;
     }
     else {
-        throw Collision_error("bad coll_integral: " + coll_integral_str);
+        throw std::runtime_error("bad coll_integral: " + coll_integral_str);
     }
-    Expects(mass_bath > 0.0);
-    Expects(mass_mol > 0.0);
-    Expects(epsilon_bath > 0.0);
-    Expects(epsilon_mol > 0.0);
-    Expects(sigma_bath > 0.0);
-    Expects(sigma_mol > 0.0);
+    assert(mass_bath > 0.0);
+    assert(mass_mol > 0.0);
+    assert(epsilon_bath > 0.0);
+    assert(epsilon_mol > 0.0);
+    assert(sigma_bath > 0.0);
+    assert(sigma_mol > 0.0);
 }
 
 void Collision::biased_random_walk(double temp, std::ostream& to) const
