@@ -250,15 +250,10 @@ void Chem::Impl::Vibration::trans_hess_int_coord(Numlib::Cube<double>& dmat,
     // Construct n_vib other orthogonal vectors and put them at the beginning
     // of the transformation matrix D:
 
-    // Note: Algorithm is for column-major storage order so we need to
-    // transpose matrices back and forth.
-
     Numlib::Matrix_slice<2> ms2(natoms3, natoms3);
     Numlib::Mat<double> tmp(ms2, dmat.data());
 
-    tmp = Numlib::transpose(tmp);
     Numlib::schmidt(tmp, n_tr_rot);
-    tmp = Numlib::transpose(tmp);
 
     Numlib::Matrix_slice<3> ms3(natoms3, natoms, 3);
     dmat = Numlib::Cube<double>(ms3, tmp.data());

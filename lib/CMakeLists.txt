@@ -18,7 +18,7 @@ set(
     geometry.cpp
     molecule.cpp
     molecule_io.cpp
-	periodic_table.cpp
+    periodic_table.cpp
     rotation.cpp
     torsion.cpp
     vibration.cpp
@@ -31,7 +31,7 @@ add_library(
 add_dependencies(chem Stdutils Numlib)
 target_link_libraries(
     chem 
-	${BLAS_LIBRARIES}
+    ${BLAS_LIBRARIES}
     ${LAPACK_LIBRARIES}
     ${Numlib_LIBRARIES} 
 ) 
