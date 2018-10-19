@@ -30,18 +30,26 @@ Chem::Impl::Vibration::Vibration(std::istream& from,
 {
     using namespace Stdutils;
 
+    std::string token;
+    Numlib::Vec<double> tmp;
+
     auto pos = find_token(from, key);
     if (pos != -1) {
-        std::string token;
-        Numlib::Vec<double> tmp;
         while (from >> token) {
             if (token == "frequencies") {
                 from >> freqs;
+                break;
             }
+        }
+    }
+    pos = find_token(from, key);
+    if (pos != -1) {
+        while (from >> token) {
             if (token == "hessians") {
                 from >> tmp;
-                hess = Numlib::Symm_mat<double, Numlib::lower_triang>(tmp);
+                hess = Numlib::Symm_mat<double, Numlib::lo>(tmp);
                 calc_normal_modes();
+                break;
             }
         }
     }
@@ -70,7 +78,7 @@ void Chem::Impl::Vibration::calc_normal_modes()
     int n_tr_rot;              // number of translational and rotational modes
 
     trans_hess_int_coord(dmat, lmat, n_tr_rot);
-    Numlib::Symm_mat<double, Numlib::lower_triang> fc_int(lmat);
+    Numlib::Symm_mat<double, Numlib::lo> fc_int(lmat);
 
     // Calculate vibrational frequencies:
 
@@ -121,7 +129,7 @@ void Chem::Impl::Vibration::calc_normal_modes()
     l_cart = Numlib::Cube<double>(ms, ltmp.data());
 }
 
-void Chem::Impl::Vibration::print() const
+void Chem::Impl::Vibration::print(std::ostream& to) const
 {
     Stdutils::Format<char> line;
     line.width(26).fill('-');
@@ -131,20 +139,20 @@ void Chem::Impl::Vibration::print() const
 
     if (freqs.size() > 0) {
         int it = 0;
-        std::cout << "\nVibrational modes (cm^-1):\n" << line('-') << '\n';
+        to << "\nVibrational modes (cm^-1):\n" << line('-') << '\n';
         for (Index i = 0; i < freqs.size(); ++i) {
-            std::cout << fix(freqs(i));
+            to << fix(freqs(i));
             if ((it == 8) && (freqs.size() > 9)) {
-                std::cout << '\n';
+                to << '\n';
             }
             it += 1;
         }
         double zpe = zero_point_energy();
-        std::cout << "\n\nZero-point vibrational energy: "
-                  << zpe / Numlib::Constants::au_to_icm << " Hartree\n\n";
+        to << "\n\nZero-point vibrational energy: "
+           << zpe / Numlib::Constants::au_to_icm << " Hartree\n\n";
     }
     if (!hess.empty()) {
-        print_normal_modes();
+        print_normal_modes(to);
     }
 }
 
@@ -297,14 +305,14 @@ void Chem::Impl::Vibration::freqs_unit_conv(Numlib::Vec<double>& vib) const
     }
 }
 
-void Chem::Impl::Vibration::print_cart_freqs() const
+void Chem::Impl::Vibration::print_cart_freqs(std::ostream& to) const
 {
     Stdutils::Format<char> line;
     line.width(24).fill('-');
     Stdutils::Format<double> fix;
     fix.fixed().width(10).precision(4);
 
-    auto h_mw = Numlib::Symm_mat<double, Numlib::lower_triang>(mw_hessians());
+    auto h_mw = Numlib::Symm_mat<double, Numlib::lo>(mw_hessians());
 
     Numlib::Vec<double> hv_cart(h_mw.rows());
     Numlib::Mat<double> v;
@@ -312,24 +320,24 @@ void Chem::Impl::Vibration::print_cart_freqs() const
     Numlib::eigs(h_mw, v, hv_cart);
     freqs_unit_conv(hv_cart);
 
-    std::cout << "Low frequencies (cm^-1):\n" << line('-') << '\n';
+    to << "Low frequencies (cm^-1):\n" << line('-') << '\n';
 
     Index n = hv_cart.size() > 9 ? 9 : hv_cart.size();
     Index iter = 0;
     for (Index i = 0; i < n; ++i) {
-        std::cout << fix(hv_cart(i)) << "  ";
+        to << fix(hv_cart(i)) << "  ";
         if (iter >= 5) {
-            std::cout << '\n';
+            to << '\n';
             iter = 0;
         }
         ++iter;
     }
-    std::cout << '\n';
+    to << '\n';
 }
 
-void Chem::Impl::Vibration::print_normal_modes() const
+void Chem::Impl::Vibration::print_normal_modes(std::ostream& to) const
 {
-    print_cart_freqs();
+    print_cart_freqs(to);
 
     Stdutils::Format<char> line;
     line.fill('-').width(24);
@@ -337,17 +345,16 @@ void Chem::Impl::Vibration::print_normal_modes() const
     Stdutils::Format<double> fix;
     fix.fixed().width(16).precision(4);
 
-    std::cout << "\nMode\tWavenumber/cm^-1\n" << line('-') << '\n';
+    to << "\nMode\tWavenumber/cm^-1\n" << line('-') << '\n';
     for (Index i = 0; i < freqs.size(); ++i) {
-        std::cout << i + 1 << '\t' << fix(freqs(i)) << '\n';
+        to << i + 1 << '\t' << fix(freqs(i)) << '\n';
     }
 
-    std::cout << "\nZero-point vibrational energy: "
-              << zero_point_energy() * Numlib::Constants::icm_to_kJ
-              << " kJ/mol\n\n";
+    to << "\nZero-point vibrational energy: "
+       << zero_point_energy() * Numlib::Constants::icm_to_kJ << " kJ/mol\n\n";
 
     line.width(21);
-    std::cout << "Normal mode analysis:\n" << line('-') << "\n\n";
+    to << "Normal mode analysis:\n" << line('-') << "\n\n";
 
     line.width(30);
     fix.width(10);
@@ -356,22 +363,22 @@ void Chem::Impl::Vibration::print_normal_modes() const
     fix2.fixed().width(6).precision(2);
 
     for (Index i = 0; i < freqs.size(); ++i) {
-        std::cout << "Mode:\t" << i + 1 << '\n'
-                  << line('-') << '\n'
-                  << "Wavenumber:\t" << fix(freqs(i)) << " cm^-1\n"
-                  << "Red. mass:\t" << fix(mu_freqs(i)) << " amu\n"
-                  << "Force const:\t" << fix(k_fc(i)) << " mDyne/A\n\n"
-                  << "Cartesian normal coordinates:\n"
-                  << line('-') << '\n'
-                  << "Atom\t  X\t  Y\t  Z\n";
+        to << "Mode:\t" << i + 1 << '\n'
+           << line('-') << '\n'
+           << "Wavenumber:\t" << fix(freqs(i)) << " cm^-1\n"
+           << "Red. mass:\t" << fix(mu_freqs(i)) << " amu\n"
+           << "Force const:\t" << fix(k_fc(i)) << " mDyne/A\n\n"
+           << "Cartesian normal coordinates:\n"
+           << line('-') << '\n'
+           << "Atom\t  X\t  Y\t  Z\n";
         for (std::size_t j = 0; j < geom.atoms().size(); ++j) {
-            std::cout << geom.atoms()[j].atomic_symbol;
+            to << geom.atoms()[j].atomic_symbol;
             for (int k = 0; k < 3; ++k) {
-                std::cout << '\t' << fix2(l_cart(k, j, i));
+                to << '\t' << fix2(l_cart(k, j, i));
             }
-            std::cout << '\n';
+            to << '\n';
         }
-        std::cout << '\n';
+        to << '\n';
     }
 }
 

@@ -67,7 +67,7 @@ namespace Impl {
         const auto& force_constants() const { return k_fc; }
 
         // Print vibrational modes.
-        void print() const;
+        void print(std::ostream& to = std::cout) const;
 
     private:
         // Calculate mass-weighted Hessians.
@@ -92,23 +92,23 @@ namespace Impl {
         void freqs_unit_conv(Numlib::Vec<double>& vib) const;
 
         // Print Cartesian frequencies.
-        void print_cart_freqs() const;
+        void print_cart_freqs(std::ostream& to) const;
 
         // Print normal modes.
-        void print_normal_modes() const;
+        void print_normal_modes(std::ostream& to) const;
 
         Geometry& geom;
         Rotation& rot;
 
-        Numlib::Symm_mat<double, Numlib::lower_triang> hess; // packed Hessians
-        Numlib::Vec<double> freqs;    // vibrational frequencies
+        Numlib::Symm_mat<double, Numlib::lo> hess; // packed Hessians
+        Numlib::Vec<double> freqs;                 // vibrational frequencies
         Numlib::Vec<double> mu_freqs; // reduces masses for vibrational modes
         Numlib::Vec<double> k_fc;     // force constants for vibrational modes
         Numlib::Cube<double> l_cart;  // Cartesian displacements
     };
 
-}  // namespace Impl
+} // namespace Impl
 
-}  // namespace Chem
+} // namespace Chem
 
-#endif  // CHEM_VIBRATION_H
+#endif // CHEM_VIBRATION_H
