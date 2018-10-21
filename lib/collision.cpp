@@ -30,11 +30,11 @@ Chem::Collision::Collision(std::istream& from, const std::string& key)
     set_epsilon_local_values();
 
     // Read input data:
-    std::string coll_int_str;
+    std::string coll_int_str = "forst";
 
     auto pos = find_token(from, key);
     if (pos != -1) {
-        get_token_value(from, pos, "coll_integral", coll_int_str, "forst");
+        get_token_value(from, pos, "coll_integral", coll_int_str, coll_int_str);
         get_token_value(from, pos, "mass_bath", mass_bath);
         get_token_value(from, pos, "mass_mol", mass_mol);
         get_token_value(from, pos, "epsilon_bath", epsilon_bath);
@@ -42,7 +42,7 @@ Chem::Collision::Collision(std::istream& from, const std::string& key)
         get_token_value(from, pos, "sigma_bath", sigma_bath);
         get_token_value(from, pos, "sigma_mol", sigma_mol);
         get_token_value(from, pos, "vibr_high", vibr_high, 0.0);
-        pos = find_token(from, "mol_formula");
+        pos = find_token(from, "mol_formula", pos);
         if (pos != -1) {
             Chem::Impl::read_mol_formula(from, mol_formula);
         }
@@ -56,7 +56,7 @@ Chem::Collision::Collision(std::istream& from, const std::string& key)
         coll_integral = forst;
     }
     else {
-        throw std::runtime_error("bad coll_integral: " + coll_integral_str);
+        throw std::runtime_error("bad coll_integral: " + coll_int_str);
     }
     assert(mass_bath > 0.0);
     assert(mass_mol > 0.0);
@@ -66,7 +66,7 @@ Chem::Collision::Collision(std::istream& from, const std::string& key)
     assert(sigma_mol > 0.0);
 }
 
-void Collision::biased_random_walk(double temp, std::ostream& to) const
+void Chem::Collision::biased_random_walk(double temp, std::ostream& to) const
 {
     Stdutils::Format<char> line;
     line.width(35).fill('-');
@@ -123,7 +123,7 @@ void Collision::biased_random_walk(double temp, std::ostream& to) const
        << "sqrt(<E^2>):\t\t\t" << e2 << " cm-1\n";
 }
 
-double Collision::average_mass() const
+double Chem::Collision::average_mass() const
 {
     double mavg = 0.0; // average mass of atoms in molecule
 
@@ -139,7 +139,7 @@ double Collision::average_mass() const
     return 1.0 / ((1.0 / (mavg * natoms - mavg)) + (1.0 / mavg));
 }
 
-double Collision::sigma_local() const
+double Chem::Collision::sigma_local() const
 {
     using namespace Periodic_table;
 
@@ -154,7 +154,7 @@ double Collision::sigma_local() const
     return 0.5 * (sloc + sigma_bath);
 }
 
-double Collision::epsilon_local() const
+double Chem::Collision::epsilon_local() const
 {
     using namespace Periodic_table;
 
@@ -169,7 +169,7 @@ double Collision::epsilon_local() const
     return std::sqrt(eloc * epsilon_bath);
 }
 
-double Collision::coll_omega22(double temp) const
+double Chem::Collision::coll_omega22(double temp) const
 {
     double red_temp = temp / epsilon_complex();
 
@@ -189,14 +189,16 @@ double Collision::coll_omega22(double temp) const
     return omega22;
 }
 
-double Collision::collision_time(double temp) const
+double Chem::Collision::collision_time(double temp) const
 {
+    using namespace Numlib::Constants;
+
     const double ang2m = 1.0e-10; // angstrom to meters
     const double dr = 0.0005;     // step size
 
     const double d = dist_interact(temp);
     const double b = impact_parameter(temp);
-    const double etr = energy_trans_avg(temp) * datum::icm_to_K;
+    const double etr = energy_trans_avg(temp) * icm_to_K;
     const double eps = epsilon_complex();
     const double sig = sigma_complex();
 
@@ -216,11 +218,11 @@ double Collision::collision_time(double temp) const
             r -= dr;
         }
     }
-    return tc *= (std::sqrt(2.0 * reduced_mass() * datum::m_u) * dr * ang2m /
-                  std::sqrt(datum::k));
+    return tc *=
+           (std::sqrt(2.0 * reduced_mass() * m_u) * dr * ang2m / std::sqrt(k));
 }
 
-void Collision::set_sigma_local_values()
+void Chem::Collision::set_sigma_local_values()
 {
     using namespace Periodic_table;
 
@@ -236,7 +238,7 @@ void Collision::set_sigma_local_values()
     sigma_loc_val[get_atomic_number("I")] = 4.0;
 }
 
-void Collision::set_epsilon_local_values()
+void Chem::Collision::set_epsilon_local_values()
 {
     using namespace Periodic_table;
 
@@ -252,7 +254,7 @@ void Collision::set_epsilon_local_values()
     epsilon_loc_val[get_atomic_number("I")] = 230.0;
 }
 
-double Collision::a_decay_parameter(double temp) const
+double Chem::Collision::a_decay_parameter(double temp) const
 {
     using namespace Numlib::Constants;
 
@@ -290,19 +292,21 @@ double Collision::a_decay_parameter(double temp) const
     return a /= std::sqrt(0.5 * ebar * average_mass() * m_u);
 }
 
-double Collision::mean_sqr_int_energy_change(double temp) const
+double Chem::Collision::mean_sqr_int_energy_change(double temp) const
 {
+    using namespace Numlib::Constants;
+
     // Evaluate eq. 38 in Lim and Gilbert (1990):
 
     const double ang2m = 1.0e-10; // angstrom to meter
 
-    const double ebar = energy_trans_avg(temp) * datum::icm_to_K * datum::k;
-    const double eps = epsilon_local() * datum::k;
+    const double ebar = energy_trans_avg(temp) * icm_to_K * k;
+    const double eps = epsilon_local() * k;
     const double sig = sigma_local() * ang2m;
-    const double mlight = mol_mass_lightest() * datum::m_u;
-    const double nu = vibr_high * datum::c_0 * 100.0;
-    const double k = 4.0 * datum::pi * datum::pi * mlight * nu * nu;
-    const double deltax = std::sqrt(2.0 * ebar / k);
+    const double mlight = mol_mass_lightest() * m_u;
+    const double nu = vibr_high * c_0 * 100.0;
+    const double kk = 4.0 * pi * pi * mlight * nu * nu;
+    const double deltax = std::sqrt(2.0 * ebar / kk);
     const double f = 6.0 / 5.0;
     const double x = sig / f;
 
@@ -312,17 +316,18 @@ double Collision::mean_sqr_int_energy_change(double temp) const
     // Evaluate eq. 40 in Lim and Gilbert (1990):
 
     return std::pow((ebar - std::min(std::abs(deltav), 0.5 * ebar)) * nu, 2.0) /
-           (datum::J_to_icm * datum::J_to_icm);
+           (J_to_icm * J_to_icm);
 }
 
-double Collision::mol_mass_lightest() const
+double Chem::Collision::mol_mass_lightest() const
 {
     double mlight = 1.0e+6;
     for (auto& i : mol_formula) {
-        double mtmp = ptable::get_atomic_mass(i.atom);
+        double mtmp = Periodic_table::get_atomic_mass(i.atom);
         if (mtmp < mlight) {
             mlight = mtmp;
         }
     }
     return mlight;
 }
+

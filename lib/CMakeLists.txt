@@ -14,6 +14,7 @@ endif()
 
 set(
     SRC_FILES
+    collision.cpp
     elec_state.cpp
     geometry.cpp
     molecule.cpp
