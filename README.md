@@ -1,4 +1,4 @@
-# ChemApps - A C++ Chemistry Toolkit
+# ChemApps - A C++ Chemistry Toolkit [![Build Status](https://travis-ci.org/stigrs/chemapps.svg?branch=unstable)](https://travis-ci.org/stigrs/chemapps)
 
 ChemApps provides a suite of utility tools and programs for thermochemistry
 and chemical kinetics.

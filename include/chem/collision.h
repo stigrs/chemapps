@@ -17,22 +17,16 @@
 #ifndef CHEM_COLLISION_H
 #define CHEM_COLLISION_H
 
-#include <chem/mol_type.h>
-#include <srs/datum.h>
+#include <chem/traits.h>
+#include <numlib/constants.h>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
-// Error reporting:
+namespace Chem {
 
-struct Collision_error : std::runtime_error {
-    Collision_error(std::string s) : std::runtime_error(s) {}
-};
-
-//
 // Class providing methods for computing collision integrals and Lennard-Jones
 // collision rates.
 //
@@ -114,21 +108,21 @@ private:
     // Find lightest mass of molecule.
     double mol_mass_lightest() const;
 
-    enum Coll_omega22_t { troe, forst };  // collision integral equations
+    enum Coll_omega22_t { troe, forst }; // collision integral equations
 
     Coll_omega22_t coll_integral;
 
-    double mass_bath;     // mass of bath gas in amu
-    double mass_mol;      // mass of molecule in amu
-    double epsilon_bath;  // LJ well depth of bath gas in kelvin
-    double epsilon_mol;   // LJ well depth of molecule in kelvin
-    double sigma_bath;    // LJ collision diam. of bath gas in angstrom
-    double sigma_mol;     // LJ collision diam. of molecule in angstrom
-    double vibr_high;     // highest vibrational frequency of molecule in cm-1
+    double mass_bath;    // mass of bath gas in amu
+    double mass_mol;     // mass of molecule in amu
+    double epsilon_bath; // LJ well depth of bath gas in kelvin
+    double epsilon_mol;  // LJ well depth of molecule in kelvin
+    double sigma_bath;   // LJ collision diam. of bath gas in angstrom
+    double sigma_mol;    // LJ collision diam. of molecule in angstrom
+    double vibr_high;    // highest vibrational frequency of molecule in cm-1
 
-    std::vector<double> sigma_loc_val;     // local sigma values
-    std::vector<double> epsilon_loc_val;   // local epsilon values
-    std::vector<Mol_formula> mol_formula;  // molecular formula of collider
+    std::vector<double> sigma_loc_val;    // local sigma values
+    std::vector<double> epsilon_loc_val;  // local epsilon values
+    std::vector<Mol_formula> mol_formula; // molecular formula of collider
 };
 
 inline double Collision::reduced_mass() const
@@ -149,16 +143,16 @@ inline double Collision::sigma_complex() const
 inline double Collision::lj_coll_freq(double temp) const
 {
     double sig = sigma_complex();
-    double mu  = reduced_mass();
+    double mu = reduced_mass();
 
-    return 4.87e+14 * std::sqrt(temp / 1000.0) * std::sqrt(20.0 / mu)
-           * std::pow(sig / 5.0, 2.0) * coll_omega22(temp);
+    return 4.87e+14 * std::sqrt(temp / 1000.0) * std::sqrt(20.0 / mu) *
+           std::pow(sig / 5.0, 2.0) * coll_omega22(temp);
 }
 
 inline double Collision::lj_coll_rate(double temp) const
 {
     double sig = sigma_complex();
-    double mu  = reduced_mass();
+    double mu = reduced_mass();
 
     return 4.5713e-12 * sig * sig * std::sqrt(temp / mu) * coll_omega22(temp);
 }
@@ -171,9 +165,9 @@ inline double Collision::impact_parameter(double temp) const
 inline double Collision::s_parameter(double temp) const
 {
     double edot = mean_sqr_int_energy_change(temp);
-    double tc   = collision_time(temp);
-    double a    = a_decay_parameter(temp);
-    double c    = c_autocorr_osc_freq();
+    double tc = collision_time(temp);
+    double a = a_decay_parameter(temp);
+    double c = c_autocorr_osc_freq();
 
     return std::sqrt(edot * tc * 2.0 * a / (a * a + c * c));
 }
@@ -184,8 +178,6 @@ inline double Collision::mean_sqr_energy_transfer_coll(double temp) const
     return 2.0 * s * s;
 }
 
-//------------------------------------------------------------------------------
-
 inline double Collision::dist_interact(double temp) const
 {
     double d = sigma_complex() * std::sqrt(coll_omega22(temp));
@@ -194,13 +186,17 @@ inline double Collision::dist_interact(double temp) const
 
 inline double Collision::energy_trans_avg(double temp) const
 {
-    return 2.0e-3 * datum::k * temp * datum::N_A / datum::icm_to_kJ;
+    using namespace Numlib::Constants;
+    return 2.0e-3 * k * temp * N_A / icm_to_kJ;
 }
 
 inline double Collision::c_autocorr_osc_freq() const
 {
-    const double nu = vibr_high * datum::c_0 * 100.0;
-    return 2.0 * datum::pi * nu;
+    using namespace Numlib::Constants;
+    return 2.0 * pi * vibr_high * c_0 * 100.0;
 }
 
-#endif  // CHEM_COLLISION_H
+} // namespace Chem
+
+#endif // CHEM_COLLISION_H
+

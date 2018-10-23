@@ -18,30 +18,30 @@
 #define CHEM_ZMATRIX_H
 
 #include <chem/element.h>
-#include <srs/array.h>
-#include <iostream>
-#include <stdexcept>
-#include <string>
+#include <chem/impl/molecule_io.h>
+#include <numlib/matrix.h>
 #include <vector>
 
-// Error reporting:
+namespace Chem {
 
-struct Zmatrix_error : std::runtime_error {
-    Zmatrix_error(std::string s) : std::runtime_error(s) {}
-};
-
-// Forward declarations to allow friend declarations:
-
-class Molecule;
-
-//
 // Class for handling Z matrices.
 //
 class Zmatrix {
 public:
-    Zmatrix(std::vector<Element>& atoms_, srs::dmatrix& xyz_);
+    Zmatrix() = default;
 
-    Zmatrix(const Zmatrix& zmat);
+    // Construct Z matrix from atoms and Cartesian coordinates.
+    Zmatrix(std::vector<Element>& atoms_, Numlib::Mat<double>& xyz_);
+
+    // Copy semantics:
+    Zmatrix(const Zmatrix&) = default;
+    Zmatrix& operator=(const Zmatrix&) = default;
+
+    // Move semantics:
+    Zmatrix(Zmatrix&&) = default;
+    Zmatrix& operator=(Zmatrix&&) = default;
+
+    ~Zmatrix() = default;
 
     // Get bond distance.
     double get_distance(int index) const;
@@ -53,7 +53,7 @@ public:
     double get_dihedral(int index) const;
 
     // Get connectivities.
-    std::vector<srs::ivector> get_connectivities() const;
+    std::vector<Numlib::Vec<int>> get_connectivities() const;
 
     // Set bond distance.
     void set_distance(int index, double value);
@@ -71,9 +71,7 @@ public:
     void load(std::istream& from);
 
     // Print Z matrix.
-    void print(std::ostream& to);
-
-    friend class Molecule;
+    void print(std::ostream& to = std::cout) const;
 
 protected:
     // Build Z matrix from Cartesian coordinates. The code is based on the
@@ -88,72 +86,71 @@ protected:
     void build_xyz();
 
     // Find index to nearest atom.
-    int find_nearest_atom(const srs::dvector& dist) const;
+    int find_nearest_atom(const Numlib::Vec<double>& dist) const;
 
     // Find new connection.
-    int find_new_connection(const srs::ivector& iatms,
-                            const srs::ivector& connectivity) const;
+    int find_new_connection(const Numlib::Vec<int>& iatms,
+                            const Numlib::Vec<int>& connectivity) const;
 
     // Calculate position of another atom based on internal coordinates. The
     // code is based on the qcl code written by Ben Albrecht released under
     // the MIT license.
-    srs::dvector calc_position(int i) const;
+    Numlib::Vec<double> calc_position(int i) const;
 
 private:
     std::vector<Element>& atoms;
-    srs::dmatrix& xyz;
+    Numlib::Mat<double>& xyz;
 
-    srs::dvector distances;
-    srs::dvector angles;
-    srs::dvector dihedrals;
+    Numlib::Vec<double> distances;
+    Numlib::Vec<double> angles;
+    Numlib::Vec<double> dihedrals;
 
-    srs::ivector bond_connect;
-    srs::ivector angle_connect;
-    srs::ivector dihedral_connect;
+    Numlib::Vec<int> bond_connect;
+    Numlib::Vec<int> angle_connect;
+    Numlib::Vec<int> dihedral_connect;
 };
 
-inline Zmatrix::Zmatrix(std::vector<Element>& atoms_, srs::dmatrix& xyz_)
+inline Zmatrix::Zmatrix(std::vector<Element>& atoms_, Numlib::Mat<double>& xyz_)
     : atoms(atoms_), xyz(xyz_)
 {
-    distances.resize(atoms.size(), 0.0);
-    angles.resize(atoms.size(), 0.0);
-    dihedrals.resize(atoms.size(), 0.0);
+    if (!atoms.empty()) {
+        distances.resize(atoms.size());
+        angles.resize(atoms.size());
+        dihedrals.resize(atoms.size());
 
-    bond_connect.resize(atoms.size(), 0);
-    angle_connect.resize(atoms.size(), 0);
-    dihedral_connect.resize(atoms.size(), 0);
+        bond_connect.resize(atoms.size());
+        angle_connect.resize(atoms.size());
+        dihedral_connect.resize(atoms.size());
 
-    build_zmat();
+        build_zmat();
+    }
 }
 
 inline double Zmatrix::get_distance(int index) const
 {
+    double res = 0.0;
     if (atoms.size() > 1) {
-        return distances(index);
+        res = distances(index);
     }
-    else {
-        return 0.0;
-    }
+    return res;
 }
 
 inline double Zmatrix::get_angle(int index) const
 {
+    double res = 0.0;
     if (atoms.size() > 2) {
-        return angles(index);
+        res = angles(index);
     }
-    else {
-        return 0.0;
-    }
+    return res;
 }
 
 inline double Zmatrix::get_dihedral(int index) const
 {
+    double res = 0.0;
     if (atoms.size() > 3) {
-        return dihedrals(index);
+        res = dihedrals(index);
     }
-    else {
-        return 0.0;
-    }
+    return res;
 }
 
 inline void Zmatrix::set_distance(int index, double value)
@@ -180,4 +177,20 @@ inline void Zmatrix::set_dihedral(int index, double value)
     }
 }
 
+inline void Zmatrix::load(std::istream& from)
+{
+    Impl::read_zmat_format(from, atoms, distances, angles, dihedrals,
+                           bond_connect, angle_connect, dihedral_connect);
+    build_xyz();
+}
+
+inline void Zmatrix::print(std::ostream& to) const
+{
+    Impl::print_zmat_format(to, atoms, distances, angles, dihedrals,
+                            bond_connect, angle_connect, dihedral_connect);
+}
+
+}  // namespace Chem
+
 #endif  // CHEM_ZMATRIX_H
+

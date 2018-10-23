@@ -14,48 +14,64 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <chem/element.h>
 #include <chem/molecule.h>
-#include <srs/array.h>
-#include <srs/utils.h>
-#include <catch/catch.hpp>
+#include <numlib/matrix.h>
+#include <stdutils/stdutils.h>
+#include <catch2/catch.hpp>
+#include <cmath>
 #include <fstream>
-
 
 TEST_CASE("test_molecule")
 {
-    srs::dmatrix xyz_ans(8, 3);
-    xyz_ans(0, 0) = 0.0000;
-    xyz_ans(0, 1) = 0.0000;
-    xyz_ans(0, 2) = 0.7637;
-    xyz_ans(1, 0) = 0.0000;
-    xyz_ans(1, 1) = 0.0000;
-    xyz_ans(1, 2) = -0.7637;
-    xyz_ans(2, 0) = 0.0000;
-    xyz_ans(2, 1) = 1.0121;
-    xyz_ans(2, 2) = 1.1564;
-    xyz_ans(3, 0) = -0.8765;
-    xyz_ans(3, 1) = -0.5060;
-    xyz_ans(3, 2) = 1.1564;
-    xyz_ans(4, 0) = 0.8765;
-    xyz_ans(4, 1) = -0.5060;
-    xyz_ans(4, 2) = 1.1564;
-    xyz_ans(5, 0) = 0.0000;
-    xyz_ans(5, 1) = -1.0121;
-    xyz_ans(5, 2) = -1.1564;
-    xyz_ans(6, 0) = -0.8765;
-    xyz_ans(6, 1) = 0.5060;
-    xyz_ans(6, 2) = -1.1564;
-    xyz_ans(7, 0) = 0.8765;
-    xyz_ans(7, 1) = 0.5060;
-    xyz_ans(7, 2) = -1.1564;
+    using namespace Chem;
+    using namespace Numlib;
+    using namespace Stdutils;
 
     std::ifstream from;
-    srs::fopen(from, "test_molecule.inp");
+    fopen(from, "test_molecule.inp");
+    Molecule mol(from, "Molecule", false);
 
-    Molecule mol(from);
-    const srs::dmatrix& xyz = mol.get_xyz();
+    SECTION("num_atoms") { CHECK(mol.num_atoms() == 8); }
 
-    CHECK(srs::approx_equal(xyz, xyz_ans, 1.0e-12));
+    SECTION("net_charge") { CHECK(mol.net_charge() == 0); }
+
+    SECTION("spin_mult") { CHECK(mol.spin_mult() == 2); }
+
+    SECTION("elec_energy")
+    {
+        CHECK(std::abs(mol.elec_energy() + 0.5) < 1.0e-12);
+    }
+
+    SECTION("spin-orbit")
+    {
+        Vec<int> degen_ans = {2, 2};
+        Vec<double> energy_ans = {0.0, 140.0};
+
+        CHECK(same_extents(mol.spin_orbit_degen(), mol.spin_orbit_energy()));
+
+        CHECK(mol.spin_orbit_degen() == degen_ans);
+
+        for (Index i = 0; i < degen_ans.size(); ++i) {
+            CHECK(std::abs(mol.spin_orbit_energy()(i) - energy_ans(i)) <
+                  1.0e-12);
+        }
+    }
+
+    SECTION("geometry")
+    {
+        Mat<double> ans = {
+            {0.0000, 0.0000, 0.7637},   {0.0000, 0.0000, -0.7637},
+            {0.0000, 1.0121, 1.1564},   {-0.8765, -0.5060, 1.1564},
+            {0.8765, -0.5060, 1.1564},  {0.0000, -1.0121, -1.1564},
+            {-0.8765, 0.5060, -1.1564}, {0.8765, 0.5060, -1.1564}};
+
+        auto res = mol.cart_coord();
+        CHECK(same_extents(res, ans));
+
+        for (Index i = 0; i < ans.rows(); ++i) {
+            for (Index j = 0; j < ans.cols(); ++j) {
+                CHECK(std::abs(res(i, j) - ans(i, j)) < 1.0e-12);
+            }
+        }
+    }
 }
-

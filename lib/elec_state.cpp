@@ -14,19 +14,25 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <chem/molecule.h>
+#include <chem/impl/elec_state.h>
+#include <stdutils/stdutils.h>
+#include <cassert>
 
-Chem::Molecule::Molecule(std::istream& from,
-                         const std::string& key,
-                         bool verbose)
-    : elec(from, key),
-      geom(from, key),
-      rot(from, key, geom),
-      vib(from, key, geom, rot),
-      tor(from, key, geom, rot)
+Chem::Impl::Elec_state::Elec_state(std::istream& from, const std::string& key)
 {
-    if (verbose) {
-        std::cout << "verbose\n";
+    using namespace Stdutils;
+
+    so_degen = {1};
+    so_energy = {0.0};
+
+    auto pos = find_token(from, key);
+    if (pos != -1) {
+        get_token_value(from, pos, "charge", charge, 0);
+        get_token_value(from, pos, "spin_mult", spin, 1);
+        get_token_value(from, pos, "elec_energy", energy, 0.0);
+        get_token_value(from, pos, "so_degen", so_degen, so_degen);
+        get_token_value(from, pos, "so_energy", so_energy, so_energy);
     }
+    assert(same_extents(so_degen, so_energy));
 }
 

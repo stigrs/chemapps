@@ -15,20 +15,23 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/molecule.h>
-#include <srs/utils.h>
-#include <catch/catch.hpp>
+#include <stdutils/stdutils.h>
+#include <catch2/catch.hpp>
 #include <cmath>
 #include <fstream>
 
 TEST_CASE("test_torsion")
 {
+    using namespace Chem;
+    using namespace Stdutils;
+
     SECTION("CH2ClCH2Cl")
     {
         std::ifstream from;
-        srs::fopen(from, "test_torsion_ch2clch2cl.inp");
+        fopen(from, "test_ch2clch2cl.inp");
 
         Molecule mol(from);
-        double rmi = mol.get_tor().red_moment_of_inertia();
+        double rmi = mol.tor_red_moment();
 
         const double rmi_ans = 58.76991427;  // Chuang and Truhlar (2000)
         CHECK(std::abs(rmi - rmi_ans) < 9.0e-2);
@@ -37,10 +40,10 @@ TEST_CASE("test_torsion")
     SECTION("CH3OH")
     {
         std::ifstream from;
-        srs::fopen(from, "test_torsion_ch3oh.inp");
+        fopen(from, "test_ch3oh.inp");
 
         Molecule mol(from);
-        double rmi = mol.get_tor().red_moment_of_inertia();
+        double rmi = mol.tor_red_moment();
 
         const double rmi_ans = 2.19;  // Chuang and Truhlar (2000)
         CHECK(std::abs(rmi - rmi_ans) < 2.0e-2);

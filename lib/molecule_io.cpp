@@ -14,15 +14,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <chem/molecule_io.h>
-#include <chem/ptable.h>
-#include <srs/utils.h>
+#include <chem/impl/molecule_io.h>
+#include <chem/periodic_table.h>
+#include <stdutils/stdutils.h>
 #include <sstream>
+#include <stdexcept>
 
-void chem::read_xyz_format(std::istream& from,
-                           std::vector<Element>& atoms,
-                           srs::dmatrix& xyz,
-                           std::string& title)
+void Chem::Impl::read_xyz_format(std::istream& from,
+                                 std::vector<Element>& atoms,
+                                 Numlib::Mat<double>& xyz,
+                                 std::string& title)
 {
     // Get number of atoms:
     int natoms;
@@ -40,26 +41,26 @@ void chem::read_xyz_format(std::istream& from,
 
     // Read title line:
     std::getline(from, title);
-    title = srs::trim(title, " ");
+    title = Stdutils::trim(title, " ");
 
     // Read XYZ coordinates:
     for (int i = 0; i < natoms; ++i) {
         from >> symbol >> x >> y >> z;
-        atoms[i]  = ptable::get_element(symbol);
+        atoms[i] = Periodic_table::get_element(symbol);
         xyz(i, 0) = x;
         xyz(i, 1) = y;
         xyz(i, 2) = z;
     }
 }
 
-void chem::read_zmat_format(std::istream& from,
-                            std::vector<Element>& atoms,
-                            srs::dvector& distances,
-                            srs::dvector& angles,
-                            srs::dvector& dihedrals,
-                            srs::ivector& bond_connect,
-                            srs::ivector& angle_connect,
-                            srs::ivector& dihedral_connect)
+void Chem::Impl::read_zmat_format(std::istream& from,
+                                  std::vector<Element>& atoms,
+                                  Numlib::Vec<double>& distances,
+                                  Numlib::Vec<double>& angles,
+                                  Numlib::Vec<double>& dihedrals,
+                                  Numlib::Vec<int>& bond_connect,
+                                  Numlib::Vec<int>& angle_connect,
+                                  Numlib::Vec<int>& dihedral_connect)
 {
     atoms.clear();
 
@@ -83,8 +84,8 @@ void chem::read_zmat_format(std::istream& from,
         else if (symbol.find("zmatrix") != std::string::npos) {
             pos = from.tellg();
         }
-        else if (ptable::atomic_symbol_is_valid(symbol)) {
-            atoms.push_back(ptable::get_element(symbol));
+        else if (Periodic_table::atomic_symbol_is_valid(symbol)) {
+            atoms.push_back(Periodic_table::get_element(symbol));
             natoms += 1;
         }
         else if (symbol.empty()) {
@@ -149,14 +150,14 @@ void chem::read_zmat_format(std::istream& from,
     }
 }
 
-void chem::read_mol_formula(std::istream& from,
-                            std::vector<Mol_formula>& formula)
+void Chem::Impl::read_mol_formula(std::istream& from,
+                                  std::vector<Mol_formula>& formula)
 {
     std::string buf;
     from >> buf;
 
-    auto n = srs::from_string<int>(buf);
-    Expects(n >= 1);
+    auto n = Stdutils::from_string<int>(buf);
+    assert(n >= 1);
     formula.resize(n);
 
     char ch;
@@ -165,67 +166,68 @@ void chem::read_mol_formula(std::istream& from,
 
     from >> ch;
     if (ch != '[') {
-        throw Mol_IO_error("'[' missing in molecular formula");
+        throw std::runtime_error("'[' missing in molecular formula");
     }
     for (int i = 0; i < n; ++i) {
         from >> atom >> stoich >> ch;
         if (!from) {
-            throw Mol_IO_error("found no data for molecular formula");
+            throw std::runtime_error("found no data for molecular formula");
         }
         if ((ch != ',') && (ch != ';') && (ch != ']')) {
-            throw Mol_IO_error("bad separator in molecular formula: "
-                               + srs::to_string(ch));
+            throw std::runtime_error("bad separator in molecular formula: " +
+                                     Stdutils::to_string(ch));
         }
         if (ch == ']') {
             from.unget();
         }
-        if (!ptable::atomic_symbol_is_valid(atom)) {
-            throw Mol_IO_error("bad atomic symbol: " + atom);
+        if (!Periodic_table::atomic_symbol_is_valid(atom)) {
+            throw std::runtime_error("bad atomic symbol: " + atom);
         }
         if (stoich < 1) {
-            throw Mol_IO_error("bad stoichiometry: " + srs::to_string(stoich));
+            throw std::runtime_error("bad stoichiometry: " +
+                                     Stdutils::to_string(stoich));
         }
         formula[i].atom   = atom;
         formula[i].stoich = stoich;
     }
     from >> ch;
     if (ch != ']') {
-        throw Mol_IO_error("']' missing in molecular formula");
+        throw std::runtime_error("']' missing in molecular formula");
     }
 }
 
-void chem::print_xyz_format(std::ostream& to,
-                            const std::vector<Element>& atoms,
-                            const srs::dmatrix& xyz,
-                            const std::string& title)
+void Chem::Impl::print_xyz_format(std::ostream& to,
+                                  const std::vector<Element>& atoms,
+                                  const Numlib::Mat<double>& xyz,
+                                  const std::string& title)
 {
-    srs::Format<double> fix;
+    Stdutils::Format<double> fix;
     fix.fixed().width(10);
 
     to << atoms.size() << '\n';
     to << title << '\n';
     for (std::size_t i = 0; i < atoms.size(); ++i) {
         to << atoms[i].atomic_symbol << '\t';
-        for (srs::size_t j = 0; j < xyz.cols(); ++j) {
+        for (Index j = 0; j < xyz.cols(); ++j) {
             to << fix(xyz(i, j)) << '\t';
         }
         to << '\n';
     }
 }
 
-void chem::print_zmat_format(std::ostream& to,
-                             std::vector<Element>& atoms,
-                             srs::dvector& distances,
-                             srs::dvector& angles,
-                             srs::dvector& dihedrals,
-                             srs::ivector& bond_connect,
-                             srs::ivector& angle_connect,
-                             srs::ivector& dihedral_connect)
+void Chem::Impl::print_zmat_format(std::ostream& to,
+                                   const std::vector<Element>& atoms,
+                                   const Numlib::Vec<double>& distances,
+                                   const Numlib::Vec<double>& angles,
+                                   const Numlib::Vec<double>& dihedrals,
+                                   const Numlib::Vec<int>& bond_connect,
+                                   const Numlib::Vec<int>& angle_connect,
+                                   const Numlib::Vec<int>& dihedral_connect)
 {
-    srs::Format<double> dfix;
+    Stdutils::Format<double> dfix;
     dfix.fixed().width(10).precision(4);
 
-    srs::Format<int> ifix;
+    Stdutils::Format<int> ifix;
     ifix.fixed().width(3);
 
     if (!atoms.empty()) {
@@ -251,12 +253,13 @@ void chem::print_zmat_format(std::ostream& to,
     }
 }
 
-void chem::print_elec_states(std::ostream& to, const srs::dvector& elec_state)
+void Chem::Impl::print_elec_states(std::ostream& to,
+                                   const Numlib::Vec<double>& elec_state)
 {
-    srs::Format<char> line;
+    Stdutils::Format<char> line;
     line.width(34).fill('-');
 
-    srs::Format<double> fix;
+    Stdutils::Format<double> fix;
     fix.fixed().width(6).precision(2);
 
     to << "Electronic states:\n"
@@ -264,7 +267,7 @@ void chem::print_elec_states(std::ostream& to, const srs::dvector& elec_state)
        << " #\tEnergy/cm^-1\tDegeneracy\n"
        << line('-') << '\n';
     int it = 1;
-    for (srs::size_t i = 0; i < elec_state.size(); i += 2) {
+    for (Index i = 0; i < elec_state.size(); i += 2) {
         to << " " << it << '\t' << fix(elec_state(i + 1)) << "\t\t"
            << elec_state(i) << '\n';
         it += 1;
@@ -272,13 +275,13 @@ void chem::print_elec_states(std::ostream& to, const srs::dvector& elec_state)
     to << line('-') << '\n';
 }
 
-void chem::print_geometry(std::ostream& to,
-                          const std::vector<Element>& atoms,
-                          const srs::dmatrix& xyz,
-                          const std::string& unit)
+void Chem::Impl::print_geometry(std::ostream& to,
+                                const std::vector<Element>& atoms,
+                                const Numlib::Mat<double>& xyz,
+                                const std::string& unit)
 {
-    srs::Format<char> line;
-    srs::Format<double> fix;
+    Stdutils::Format<char> line;
+    Stdutils::Format<double> fix;
     line.width(58).fill('-');
     fix.fixed().width(10);
 
@@ -289,7 +292,7 @@ void chem::print_geometry(std::ostream& to,
            << line('-') << '\n';
         for (std::size_t i = 0; i < atoms.size(); ++i) {
             to << i + 1 << '\t' << atoms[i].atomic_symbol << '\t';
-            for (srs::size_t j = 0; j < xyz.cols(); ++j) {
+            for (Index j = 0; j < xyz.cols(); ++j) {
                 to << fix(xyz(i, j)) << '\t';
             }
             to << '\n';
@@ -298,13 +301,13 @@ void chem::print_geometry(std::ostream& to,
     }
 }
 
-void chem::print_atomic_masses(std::ostream& to,
-                               const std::vector<Element>& atoms)
+void Chem::Impl::print_atomic_masses(std::ostream& to,
+                                     const std::vector<Element>& atoms)
 {
-    srs::Format<double> fix;
+    Stdutils::Format<double> fix;
     fix.fixed().width(10);
 
-    srs::Format<int> gen;
+    Stdutils::Format<int> gen;
     gen.width(3);
 
     double totmass = 0.0;
@@ -316,3 +319,4 @@ void chem::print_atomic_masses(std::ostream& to,
     }
     to << "Molecular mass:\t" << totmass << " amu\n";
 }
+

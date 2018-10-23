@@ -19,16 +19,19 @@
 
 #include <string>
 
-//
+namespace Chem {
+
 // Struct for holding an element in the Periodic Table of Elements.
-//
 struct Element {
-    std::string atomic_symbol;  // atomic or isotopic symbol
-    int atomic_number;          // atomic number
-    int mass_number;            // mass number
-    double atomic_mass;         // atomic mass
-    double atomic_weight;       // atomic weight
-    double isotope_comp;        // isotopic composition
+    std::string atomic_symbol; // atomic or isotopic symbol
+    int atomic_number;         // atomic number
+    int mass_number;           // mass number
+    double atomic_mass;        // atomic mass
+    double atomic_weight;      // atomic weight
+    double isotope_comp;       // isotopic composition
 };
 
+}  // namespace Chem
+
 #endif  // CHEM_ELEMENT_H
+

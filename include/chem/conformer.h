@@ -18,31 +18,39 @@
 #define CHEM_CONFORMER_H
 
 #include <chem/element.h>
-#include <srs/array.h>
+#include <numlib/matrix.h>
 #include <vector>
 
-//
+namespace Chem {
+
 // Simple structure for storing conformers.
 //
 struct Conformer {
-    Conformer() {}
-    explicit Conformer(double e, const srs::dmatrix& x)
-        : energy(e), atoms(0), xyz(x)
+    Conformer() = default;
+
+    explicit Conformer(double e, const Numlib::Mat<double>& x)
+        : energy{e}, atoms{0} xyz(x)
     {
         iter = 0;
     }
 
-    Conformer(double e, const std::vector<Element>& at, const srs::dmatrix& x)
-        : energy(e), atoms(at), xyz(x)
+    Conformer(double e,
+              const std::vector<Element>& at,
+              const Numlib::Mat<double>& x)
+        : energy{e}, atoms(at), xyz(x)
     {
         iter = 0;
     }
 
-    Conformer(const Conformer& c) : atoms(c.atoms), xyz(c.xyz)
-    {
-        energy = c.energy;
-        iter   = c.iter;
-    }
+    // Copy semantics:
+    Conformer(const Conformer&) = default;
+    Conformer& operator=(const Conformer&) = default;
+
+    // Move semantics:
+    Conformer(Conformer&&) = default;
+    Conformer& operator=(Conformer&&) = default;
+
+    ~Conformer() = default;
 
     // Compare conformers by energy.
     bool operator<(const Conformer& c) const { return energy < c.energy; }
@@ -52,8 +60,11 @@ struct Conformer {
 
     double energy;               // conformer energy
     std::vector<Element> atoms;  // atoms
-    srs::dmatrix xyz;            // Cartesian coordinates
+    Numlib::Mat<double> xyz;     // Cartesian coordinates
     int iter;                    // iterator to be used for counting
 };
 
-#endif  // CHEM_CONFORMER_H
+} // namespace Chem
+
+#endif // CHEM_CONFORMER_H
+

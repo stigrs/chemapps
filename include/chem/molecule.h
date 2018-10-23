@@ -17,113 +17,122 @@
 #ifndef CHEM_MOLECULE_H
 #define CHEM_MOLECULE_H
 
-#include <chem/element.h>
-#include <chem/mol_type.h>
-#include <chem/molrot.h>
-#include <chem/molvib.h>
-#include <chem/torsion.h>
-#include <chem/zmatrix.h>
-#include <srs/array.h>
+#include <chem/impl/elec_state.h>
+#include <chem/impl/geometry.h>
+#include <chem/impl/rotation.h>
+#include <chem/impl/vibration.h>
+#include <chem/impl/torsion.h>
 #include <iostream>
-#include <memory>
-#include <stdexcept>
 #include <string>
-#include <vector>
 
-//------------------------------------------------------------------------------
+namespace Chem {
 
-// Error reporting:
-
-struct Mol_error : std::runtime_error {
-    Mol_error(std::string s) : std::runtime_error(s) {}
-};
-
-//------------------------------------------------------------------------------
-
-//
-// Class for holding molecule data.
+// Class for holding molecule objects.
 //
 class Molecule {
 public:
-    Molecule()
-    {
-        zmat = std::make_unique<Zmatrix>(atoms, xyz);
-        rot  = std::make_unique<Molrot>(atoms, xyz);
-        vib  = std::make_unique<Molvib>(*rot);
-        tor  = std::make_unique<Torsion>(*rot);
-    }
+    Molecule() = default;
 
     Molecule(std::istream& from,
-             std::ostream& to       = std::cout,
              const std::string& key = "Molecule",
-             bool verbose           = false)
-    {
-        init(from, to, key, verbose);
-    }
+             bool verbose = false);
 
-    Molecule(const Molecule& mol);
+    // Copy semantics:
+    Molecule(const Molecule&) = default;
+    Molecule& operator=(const Molecule&) = default;
 
-    // Initialize molecule.
-    void init(std::istream& from,
-              std::ostream& to,
-              const std::string& key,
-              bool verbose);
+    // Move semantics:
+    Molecule(Molecule&&) = default;
+    Molecule& operator=(Molecule&&) = default;
 
-    // Return molecular structure (atom, linear, nonlinear).
-    Mol_type structure() const;
-
-    // Return true if molecule has torsional modes.
-    bool has_torsions() const { return tor->tot_minima() > 0; }
-
-    // Calculate total molecular mass.
-    double tot_mass() const { return rot->tot_mass(); }
+    ~Molecule() = default;
 
     // Get number of atoms.
-    srs::size_t size() const { return static_cast<srs::size_t>(atoms.size()); }
+    auto num_atoms() const { return geom.atoms().size(); }
 
-    const std::string get_title() const { return title; }
-    const std::vector<Element>& get_atoms() const { return atoms; }
-    const srs::dmatrix& get_xyz() const { return xyz; }
-    const srs::dvector& get_elec_state() const { return elec_state; }
+    // Get atoms in molecule.
+    const auto& atoms() const { return geom.atoms(); }
 
-    Zmatrix& get_zmat() const { return *zmat; }
-    Molrot& get_rot() const { return *rot; }
-    Molvib& get_vib() const { return *vib; }
-    Torsion& get_tor() const { return *tor; }
+    // Get net electronic charge.
+    auto net_charge() const { return elec.net_charge(); }
 
-    int get_charge() const { return charge; }
-    double get_elec_energy() const { return elec_energy; }
+    // Get spin multiplicity.
+    auto spin_mult() const { return elec.spin_mult(); }
 
-    void set_xyz(const srs::dmatrix& xyz_);
-    void set_charge(const int charge_) { charge = charge_; }
-    void set_elec_energy(const double energy) { elec_energy = energy; }
+    // Get electronic energy.
+    auto elec_energy() const { return elec.elec_energy(); }
 
-    void print_data(std::ostream& to, const std::string& key) const;
+    // Get degeneracies of spin-orbit states.
+    const auto& spin_orbit_degen() const { return elec.spin_orbit_degen(); }
+
+    // Get energies of spin-orbit states.
+    const auto& spin_orbit_energy() const { return elec.spin_orbit_energy(); }
+
+    // Get Cartesian coordinates.
+    auto& cart_coord() { return geom.cart_coord(); }
+    const auto& cart_coord() const { return geom.cart_coord(); }
+
+    // Get internal coordinates.
+    auto& int_coord() { return geom.int_coord(); }
+    const auto& int_coord() const { return geom.int_coord(); }
+
+    // Get rotational constants.
+    auto rot_constants() { return rot.constants(); }
+
+    // Get rotational symmetry.
+    auto rot_symmetry() { return rot.symmetry(); }
+
+    // Get principal moments.
+    auto principal_moments() { return rot.principal_moments(); }
+
+    // Get principal axes.
+    auto principal_axes() { return rot.principal_axes(); }
+
+    // Get Hessians.
+    const auto& hessians() const { return vib.hessians(); }
+
+    // Zero-point vibrational energy.
+    double zero_point_energy() const { return vib.zero_point_energy(); }
+
+    // Vibrational frequencies.
+    const auto& frequencies() const { return vib.frequencies(); }
+
+    // Reduced masses of vibrational modes.
+    const auto& vib_red_masses() const { return vib.red_masses(); }
+
+    // Force constants of vibrational modes.
+    const auto& vib_force_constants() const { return vib.force_constants(); }
+
+    // Total number of torsional minima.
+    int tot_tor_minima() const { return tor.tot_minima(); }
+
+    // Effective torsional symmetry number.
+    double tor_symmetry_number() const { return tor.symmetry_number(); }
+
+    // Reduced moment of inertia for torsional mode.
+    double tor_red_moment() { return tor.red_moment(); }
+
+    // Effective moment of inertia for torsional mode.
+    double tor_eff_moment() const { return tor.eff_moment(); }
+
+    // Rotational constant for torsional mode.
+    auto tor_constant() const { return tor.constant(); }
+
+    // Potential coefficients for torsional mode.
+    const auto& tor_pot_coeff() const { return tor.pot_coeff(); }
+
+    // Torsional frequencies.
+    const auto& tor_frequencies() const { return tor.frequencies(); }
 
 private:
-    std::string title;  // molecule information
-
-    std::vector<Element> atoms;  // atoms in molecule
-    srs::dmatrix xyz;            // cartesian coordinates in angstroms
-    srs::dvector elec_state;     // electronic state
-
-    int charge;          // molecular charge
-    double elec_energy;  // electronic ground-state energy [Hartree]
-
-    std::unique_ptr<Zmatrix> zmat;
-    std::unique_ptr<Molrot> rot;
-    std::unique_ptr<Molvib> vib;
-    std::unique_ptr<Torsion> tor;
+    Impl::Elec_state elec;  // molecular electronic states
+    Impl::Geometry geom;    // molecular geometry
+    Impl::Rotation rot;     // molecular rotations
+    Impl::Vibration vib;    // molecular vibrations
+    Impl::Torsion tor;      // internal torsional modes
 };
 
-inline void Molecule::set_xyz(const srs::dmatrix& xyz_)
-{
-    // Note: Moment of inertia for torsional modes is currently not updated
-    // when the geometry is changed. This may change in future versions.
-    //
-    // TODO (stigrs@gmail.com) Check if torsional modes need to be updated.
-    xyz = xyz_;
-    zmat->build_zmat();
-}
+}  // namespace Chem
 
 #endif  // CHEM_MOLECULE_H
+

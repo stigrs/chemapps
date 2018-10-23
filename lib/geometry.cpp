@@ -14,19 +14,37 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <chem/molecule.h>
+#include <chem/impl/geometry.h>
+#include <stdutils/stdutils.h>
 
-Chem::Molecule::Molecule(std::istream& from,
-                         const std::string& key,
-                         bool verbose)
-    : elec(from, key),
-      geom(from, key),
-      rot(from, key, geom),
-      vib(from, key, geom, rot),
-      tor(from, key, geom, rot)
+Chem::Impl::Geometry::Geometry(std::istream& from, const std::string& key)
+    : atms(), xyz(), zmat(atms, xyz)
 {
-    if (verbose) {
-        std::cout << "verbose\n";
+    using namespace Stdutils;
+
+    auto pos = find_token(from, key);
+    if (pos != -1) {
+        pos = find_token(from, "geometry", pos);
+        if (pos != -1) {
+            Impl::read_xyz_format(from, atms, xyz, title);
+        }
     }
+    if (atms.empty()) {
+        pos = find_token(from, key);
+        if (pos != -1) {
+            from.ignore();
+            from.clear();
+            zmat.load(from);
+        }
+    }
+}
+
+double Chem::Impl::Geometry::tot_mass() const
+{
+    double res = 0.0;
+    for (const auto& at : atms) {
+        res += at.atomic_mass;
+    }
+    return res;
 }
 

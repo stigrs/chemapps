@@ -15,18 +15,26 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/molecule.h>
+#include <numlib/matrix.h>
+#include <stdutils/stdutils.h>
+#include <catch2/catch.hpp>
+#include <cmath>
+#include <fstream>
 
-Chem::Molecule::Molecule(std::istream& from,
-                         const std::string& key,
-                         bool verbose)
-    : elec(from, key),
-      geom(from, key),
-      rot(from, key, geom),
-      vib(from, key, geom, rot),
-      tor(from, key, geom, rot)
+TEST_CASE("test_rotation")
 {
-    if (verbose) {
-        std::cout << "verbose\n";
+    using namespace Chem;
+    using namespace Numlib;
+    using namespace Stdutils;
+
+    std::ifstream from;
+    fopen(from, "test_rotation.inp");
+    Molecule mol(from);
+
+    Numlib::Vec<double> ans = {127.63201, 24.89071, 24.02767};
+    Numlib::Vec<double> res = mol.rot_constants();
+
+    for (Index i = 0; i < ans.size(); ++i) {
+        CHECK(std::abs(res(i) - ans(i)) < 1.0e-4);
     }
 }
-

@@ -14,19 +14,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <chem/molecule.h>
+#ifndef CHEM_TRAITS_H
+#define CHEM_TRAITS_H
 
-Chem::Molecule::Molecule(std::istream& from,
-                         const std::string& key,
-                         bool verbose)
-    : elec(from, key),
-      geom(from, key),
-      rot(from, key, geom),
-      vib(from, key, geom, rot),
-      tor(from, key, geom, rot)
-{
-    if (verbose) {
-        std::cout << "verbose\n";
-    }
-}
+#include <string>
+
+namespace Chem {
+
+// Enumeration of molecular structure types.
+enum Mol_type { atom, linear, nonlinear };
+
+// Enumeration of potential types.
+enum Pot_type { type1, type2 };
+
+// Struct for holding molecular formula.
+struct Mol_formula {
+    std::string atom; // atomic or isotopic symbol
+    int stoich;       // stoichiometry
+};
+
+}  // namespace Chem
+
+#endif  // CHEM_TRAITS_H
 
