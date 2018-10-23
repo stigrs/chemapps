@@ -204,8 +204,7 @@ void Chem::Impl::Torsion::axis_system()
 
     // Check if x and z axes are perpendicular:
 
-    double xz_angle = Numlib::dot(x_axis, z_axis) / (x_norm * z_norm);
-    assert(std::abs(xz_angle) < tol);
+    assert(std::abs(Numlib::dot(x_axis, z_axis) / (x_norm * z_norm)) < tol);
 
     // Generate y axis perpendicular to x and z axes:
 

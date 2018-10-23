@@ -7,7 +7,7 @@ notifications:
 
 # Use Linux unless specified otherwise
 os: linux
-dist: trusty
+dist: precise
 
 cache:
   directories:

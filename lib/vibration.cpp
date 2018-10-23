@@ -381,4 +381,3 @@ void Chem::Impl::Vibration::print_normal_modes(std::ostream& to) const
         to << '\n';
     }
 }
-
