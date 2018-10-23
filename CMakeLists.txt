@@ -124,7 +124,7 @@ else()
     )
     set(Numlib_INCLUDE_DIRS ${CMAKE_BINARY_DIR}/external/include)
     set(Numlib_LIBRARY_DIRS ${CMAKE_BINARY_DIR}/external/lib)
-    set(Numlib_LIBRARIES "numlib")
+    set(Numlib_LIBRARIES "num")
 endif()
 
 #-------------------------------------------------------------------------------
