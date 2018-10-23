@@ -98,12 +98,12 @@ void Chem::Impl::read_zmat_format(std::istream& from,
     from.clear();
     from.seekg(pos, std::ios_base::beg);
 
-    distances.resize(natoms, 0.0);
-    angles.resize(natoms, 0.0);
-    dihedrals.resize(natoms, 0.0);
-    bond_connect.resize(natoms, 0);
-    angle_connect.resize(natoms, 0);
-    dihedral_connect.resize(natoms, 0);
+    distances.resize(natoms);
+    angles.resize(natoms);
+    dihedrals.resize(natoms);
+    bond_connect.resize(natoms);
+    angle_connect.resize(natoms);
+    dihedral_connect.resize(natoms);
 
     if (natoms > 0) {
         std::getline(from, line);  // first atom is already read

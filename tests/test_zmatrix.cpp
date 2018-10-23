@@ -33,14 +33,14 @@ TEST_CASE("test_zmatrix")
     Molecule mol(from);
 
     SECTION("num_atoms") { CHECK(mol.num_atoms() == 14); }
-#if 0
+
     SECTION("bond_distances")
     {
         Vec<double> bonds = {1.54, 1.54, 1.54, 1.09, 1.09, 1.09, 1.09,
                              1.09, 1.09, 1.09, 1.09, 1.09, 1.09};
 
-        for (int i = 1; i < mol.size(); ++i) {
-            CHECK(std::abs(mol.get_zmat().get_distance(i) - bonds(i - 1)) <
+        for (std::size_t i = 1; i < mol.num_atoms(); ++i) {
+            CHECK(std::abs(mol.int_coord().get_distance(i) - bonds(i - 1)) <
                   1.0e-12);
         }
     }
@@ -50,8 +50,8 @@ TEST_CASE("test_zmatrix")
         Vec<double> angles = {110.0, 110.0, 110.0, 110.0, 110.0, 110.0,
                               110.0, 110.0, 110.0, 110.0, 110.0, 110.0};
 
-        for (int i = 2; i < mol.size(); ++i) {
-            CHECK(std::abs(mol.get_zmat().get_angle(i) - angles(i - 2)) <
+        for (std::size_t i = 2; i < mol.num_atoms(); ++i) {
+            CHECK(std::abs(mol.int_coord().get_angle(i) - angles(i - 2)) <
                   1.0e-12);
         }
     }
@@ -61,8 +61,8 @@ TEST_CASE("test_zmatrix")
         Vec<double> dihedrals = {180.0, 0.0,   120.0, -120.0, 120.0, -120.0,
                                  60.0,  -60.0, 0.0,   120.0,  -120.0};
 
-        for (int i = 3; i < mol.size(); ++i) {
-            CHECK(std::abs(mol.get_zmat().get_dihedral(i) - dihedrals(i - 3)) <
+        for (std::size_t i = 3; i < mol.num_atoms(); ++i) {
+            CHECK(std::abs(mol.int_coord().get_dihedral(i) - dihedrals(i - 3)) <
                   1.0e-12);
         }
     }
@@ -84,8 +84,8 @@ TEST_CASE("test_zmatrix")
                            {3.28860700e+00, 1.62228626e+00, 2.21072833e+00}};
 
         std::vector<int> moiety = {3, 9, 10};
-        mol.get_zmat().rotate_moiety(moiety, 90.0);
-        auto res = mol.get_xyz();
+        mol.int_coord().rotate_moiety(moiety, 90.0);
+        auto res = mol.cart_coord();
 
         CHECK(same_extents(res, ans));
 
@@ -95,5 +95,4 @@ TEST_CASE("test_zmatrix")
             }
         }
     }
-#endif
 }
