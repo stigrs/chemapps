@@ -16,6 +16,9 @@ set(
     SRC_FILES
     collision.cpp
     elec_state.cpp
+    energy_levels.cpp
+    gauss_data.cpp
+    gaussian.cpp
     geometry.cpp
     molecule.cpp
     molecule_io.cpp

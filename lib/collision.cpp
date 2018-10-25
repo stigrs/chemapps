@@ -19,7 +19,6 @@
 #include <chem/periodic_table.h>
 #include <stdutils/stdutils.h>
 #include <stdexcept>
-#include <cassert>
 
 Chem::Collision::Collision(std::istream& from, const std::string& key)
 {
@@ -58,12 +57,12 @@ Chem::Collision::Collision(std::istream& from, const std::string& key)
     else {
         throw std::runtime_error("bad coll_integral: " + coll_int_str);
     }
-    assert(mass_bath > 0.0);
-    assert(mass_mol > 0.0);
-    assert(epsilon_bath > 0.0);
-    assert(epsilon_mol > 0.0);
-    assert(sigma_bath > 0.0);
-    assert(sigma_mol > 0.0);
+    Assert::dynamic(mass_bath > 0.0, "bad mass_bath");
+    Assert::dynamic(mass_mol > 0.0, "bad mass_mol");
+    Assert::dynamic(epsilon_bath > 0.0, "bad epsilon_bath");
+    Assert::dynamic(epsilon_mol > 0.0, "bad epsilon_mol");
+    Assert::dynamic(sigma_bath > 0.0, "bad sigma_bath");
+    Assert::dynamic(sigma_mol > 0.0, "bad sigma_mol");
 }
 
 void Chem::Collision::biased_random_walk(double temp, std::ostream& to) const

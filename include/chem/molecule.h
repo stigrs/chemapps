@@ -47,6 +47,9 @@ public:
 
     ~Molecule() = default;
 
+    // Get information string for molecule.
+    std::string info() const { return geom.info(); }
+
     // Get number of atoms.
     auto num_atoms() const { return geom.atoms().size(); }
 
@@ -56,11 +59,20 @@ public:
     // Get net electronic charge.
     auto net_charge() const { return elec.net_charge(); }
 
+    // Set net electronic charge.
+    void set_net_charge(int charge) { elec.set_net_charge(charge); }
+
     // Get spin multiplicity.
     auto spin_mult() const { return elec.spin_mult(); }
 
+    // Set spin multiplicity.
+    void set_spin_mult(int spin) { elec.set_spin_mult(spin); }
+
     // Get electronic energy.
     auto elec_energy() const { return elec.elec_energy(); }
+
+    // Set electronic energy.
+    void set_elec_energy(double energy) { elec.set_elec_energy(energy); }
 
     // Get degeneracies of spin-orbit states.
     const auto& spin_orbit_degen() const { return elec.spin_orbit_degen(); }
@@ -125,14 +137,14 @@ public:
     const auto& tor_frequencies() const { return tor.frequencies(); }
 
 private:
-    Impl::Elec_state elec;  // molecular electronic states
-    Impl::Geometry geom;    // molecular geometry
-    Impl::Rotation rot;     // molecular rotations
-    Impl::Vibration vib;    // molecular vibrations
-    Impl::Torsion tor;      // internal torsional modes
+    Impl::Elec_state elec; // molecular electronic states
+    Impl::Geometry geom;   // molecular geometry
+    Impl::Rotation rot;    // molecular rotations
+    Impl::Vibration vib;   // molecular vibrations
+    Impl::Torsion tor;     // internal torsional modes
 };
 
-}  // namespace Chem
+} // namespace Chem
 
-#endif  // CHEM_MOLECULE_H
+#endif // CHEM_MOLECULE_H
 

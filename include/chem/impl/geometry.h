@@ -48,6 +48,8 @@ namespace Impl {
 
         // Get properties:
 
+        std::string info() const { return title; }
+
         double tot_mass() const;
 
         const auto& atoms() const { return atms; }
@@ -65,8 +67,8 @@ namespace Impl {
         std::string title;
     };
 
-}  // namespace Impl
+} // namespace Impl
 
-}  // namespace Chem
+} // namespace Chem
 
-#endif  // CHEM_GEOMETRY_H
+#endif // CHEM_GEOMETRY_H

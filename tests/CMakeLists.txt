@@ -70,6 +70,9 @@ function(add_chemapps_test name)
 endfunction()
 
 set(PROGRAMS 
+    test_collision
+    test_gauss_data
+    test_gaussnmr
     test_molecule
     test_periodic_table
     test_rotation

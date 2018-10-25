@@ -16,7 +16,6 @@
 
 #include <chem/impl/elec_state.h>
 #include <stdutils/stdutils.h>
-#include <cassert>
 
 Chem::Impl::Elec_state::Elec_state(std::istream& from, const std::string& key)
 {
@@ -33,6 +32,6 @@ Chem::Impl::Elec_state::Elec_state(std::istream& from, const std::string& key)
         get_token_value(from, pos, "so_degen", so_degen, so_degen);
         get_token_value(from, pos, "so_energy", so_energy, so_energy);
     }
-    assert(same_extents(so_degen, so_energy));
+    Assert::dynamic(same_extents(so_degen, so_energy), "bad spin-orbit input");
 }
 

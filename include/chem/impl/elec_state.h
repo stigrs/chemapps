@@ -55,6 +55,12 @@ namespace Impl {
         const auto& spin_orbit_degen() const { return so_degen; }
         const auto& spin_orbit_energy() const { return so_energy; }
 
+        // Set properties:
+
+        void set_net_charge(int value) { charge = value; }
+        void set_spin_mult(int value) { spin = value; }
+        void set_elec_energy(double value) { energy = value; }
+
     private:
         int charge;    // net electronic charge
         int spin;      // spin multiplicity
@@ -64,8 +70,8 @@ namespace Impl {
         Numlib::Vec<double> so_energy; // energies of spin-orbit states
     };
 
-}  // namespace Impl
+} // namespace Impl
 
-}  // namespace Chem
+} // namespace Chem
 
-#endif  // CHEM_ELEC_STATE_H
+#endif // CHEM_ELEC_STATE_H
