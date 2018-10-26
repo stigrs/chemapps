@@ -14,8 +14,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CHEM_MOLECULE_IO_H
-#define CHEM_MOLECULE_IO_H
+#ifndef CHEM_IO_SUPPORT_H
+#define CHEM_IO_SUPPORT_H
 
 #include <chem/element.h>
 #include <chem/traits.h>
@@ -77,9 +77,23 @@ namespace Impl {
     void print_atomic_masses(std::ostream& to,
                              const std::vector<Element>& atoms);
 
+    // Print center-of-mass coordinates.
+    void print_center_of_mass(std::ostream& to, const Numlib::Vec<double>& com);
+
+    // Print principal moments.
+    void print_principal_moments(std::ostream& to,
+                                 const Numlib::Vec<double>& pmom,
+                                 const Numlib::Mat<double>& paxis);
+
+    // Print rotational constants.
+    void print_rot_constants(std::ostream& to,
+                             int sigma,
+                             const std::string& symm,
+                             const Numlib::Vec<double>& rotc);
+
 } // namespace Impl
 
 } // namespace Chem
 
-#endif  // CHEM_MOLECULE_IO_H
+#endif // CHEM_IO_SUPPORT_H
 

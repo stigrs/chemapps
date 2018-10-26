@@ -18,8 +18,6 @@
 #include <numlib/constants.h>
 #include <numlib/math.h>
 #include <numlib/traits.h>
-#include <stdutils/stdutils.h>
-#include <cassert>
 #include <cmath>
 
 Chem::Impl::Vibration::Vibration(std::istream& from,
@@ -233,7 +231,7 @@ void Chem::Impl::Vibration::trans_rot_vec(Numlib::Cube<double>& dmat,
         }
     }
     if (natoms == 1) {
-        assert(n_tr_rot == 3);
+        Assert::dynamic(n_tr_rot == 3, "bad n_tr_rot");
     }
 }
 

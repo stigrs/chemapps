@@ -56,6 +56,109 @@ Chem::Impl::Torsion::Torsion(std::istream& from,
     validate();
 }
 
+void Chem::Impl::Torsion::analysis(std::ostream& to)
+{
+    using namespace Numlib::Constants;
+
+    Stdutils::Format<char> line;
+    line.width(24).fill('=');
+
+    Stdutils::Format<double> fix;
+    fix.fixed().width(10);
+
+    Stdutils::Format<int> ifix;
+    ifix.fixed().width(11);
+
+    Stdutils::Format<double> sci;
+    sci.scientific().precision(3);
+
+    if (perform_analysis) {
+        to << "\nTorsional Mode Analysis:\n" << line('=') << "\n\n";
+
+        line.width(28).fill('-');
+        to << "Atoms defining rotating top:\n"
+           << line('-') << '\n'
+           << "Center  Atomic  Atomic\n"
+           << "Number  Symbol  Mass\n"
+           << line('-') << '\n';
+        for (Index i = 0; i < rot_top.size(); ++i) {
+            to << i + 1 << '\t' << geom.atoms()[i].atomic_symbol << '\t'
+               << fix(geom.atoms()[i].atomic_mass) << '\n';
+        }
+        to << line('-') << "\n\n";
+
+        to << "Center " << rot_axis(0) + 1 << " and " << rot_axis(1) + 1
+           << " define axis of rotation\n\n";
+
+        fix.width(10).precision(6);
+        to << "Center of mass of top (x, y, z): " << fix(top_com(0)) << " "
+           << fix(top_com(1)) << " " << fix(top_com(2)) << '\n';
+
+        to << "Origin of coordinates (x, y, z): " << fix(top_origo(0)) << " "
+           << fix(top_origo(1)) << " " << fix(top_origo(2)) << "\n\n";
+
+        fix.width(9).precision(3);
+        to << "xz product of inertia: " << fix(bm) << " amu bohr^2\n"
+           << "yz product of inertia: " << fix(cm) << " amu bohr^2\n"
+           << "off-balance factor:    " << fix(um) << " amu bohr^2\n\n";
+
+        fix.width(0).precision(3);
+        to << "Moment of inertia of top:  " << fix(am) << " amu bohr^2, "
+           << sci(am * au_to_kgm2) << " kg m^2\n";
+
+        to << "Reduced moment of inertia: " << fix(rmi_tor(0))
+           << " amu bohr^2, " << sci(rmi_tor(0) * au_to_kgm2) << " kg m^2\n\n";
+
+        const double factor = giga / (c_0 * 100.0);
+
+        to << "Rotational constant: " << fix(constant()(0)) << " GHz, "
+           << fix(constant()(0) * factor) << " cm^-1\n";
+    }
+    else {
+        if (!sigma_tor.empty()) {
+            line.width(32 + 11 * sigma_tor.size()).fill('-');
+            to << "\nTorsional modes:\n" << line('-') << '\n';
+            line.width(32).fill(' ');
+            to << line(' ');
+            for (Index i = 0; i < sigma_tor.size(); ++i) {
+                to << "  Minimum " << i + 1;
+            }
+            line.width(32 + 11 * sigma_tor.size()).fill('-');
+            to << '\n' << line('-') << '\n';
+
+            to << "Symmetry number:                ";
+            for (auto si : sigma_tor) {
+                to << ifix(si);
+            }
+            to << '\n';
+
+            fix.width(11).precision(3);
+            to << "Moment of inertia [amu bohr^2]: ";
+            for (auto ri : rmi_tor) {
+                to << fix(ri);
+            }
+            to << '\n';
+
+            to << "Potential energy [cm^-1]:       ";
+            for (auto vi : pot_tor) {
+                to << fix(vi);
+            }
+            to << '\n';
+
+            to << "Vibrational frequency [cm^-1]:  ";
+            for (auto vi : freq_tor) {
+                to << fix(vi);
+            }
+            to << '\n' << line('-') << '\n';
+
+            to << "Total number of minima:      " << tot_minima() << '\n'
+               << "Effective symmetry number:   " << symmetry_number() << '\n'
+               << "Effective moment of inertia: " << eff_moment()
+               << " amu bohr^2\n";
+        }
+    }
+}
+
 double Chem::Impl::Torsion::red_moment()
 {
     // Rotate molecule to principal axes and compute principal moments:

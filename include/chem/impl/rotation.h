@@ -47,6 +47,9 @@ namespace Impl {
 
         ~Rotation() {}
 
+        // Perform rotational analysis.
+        void analysis(std::ostream& to);
+
         // Get rotational symmetry number.
         auto rot_sigma() const { return sigma; }
 
@@ -119,8 +122,8 @@ namespace Impl {
         return paxis;
     }
 
-}  // namespace Impl
+} // namespace Impl
 
-}  // namespace Chem
+} // namespace Chem
 
-#endif  // CHEM_ROTATION_H
+#endif // CHEM_ROTATION_H

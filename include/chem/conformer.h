@@ -29,17 +29,15 @@ struct Conformer {
     Conformer() = default;
 
     explicit Conformer(double e, const Numlib::Mat<double>& x)
-        : energy{e}, atoms{0} xyz(x)
+        : energy{e}, atoms{0}, xyz(x), iter{0}
     {
-        iter = 0;
     }
 
     Conformer(double e,
               const std::vector<Element>& at,
               const Numlib::Mat<double>& x)
-        : energy{e}, atoms(at), xyz(x)
+        : energy{e}, atoms(at), xyz(x), iter{0}
     {
-        iter = 0;
     }
 
     // Copy semantics:
@@ -58,10 +56,10 @@ struct Conformer {
     // Compare conformers by energy.
     bool operator>(const Conformer& c) const { return energy > c.energy; }
 
-    double energy;               // conformer energy
-    std::vector<Element> atoms;  // atoms
-    Numlib::Mat<double> xyz;     // Cartesian coordinates
-    int iter;                    // iterator to be used for counting
+    double energy;              // conformer energy
+    std::vector<Element> atoms; // atoms
+    Numlib::Mat<double> xyz;    // Cartesian coordinates
+    int iter;                   // iterator to be used for counting
 };
 
 } // namespace Chem

@@ -47,6 +47,10 @@ public:
 
     ~Molecule() = default;
 
+    //
+    // Molecular properties:
+    //
+
     // Get information string for molecule.
     std::string info() const { return geom.info(); }
 
@@ -55,6 +59,9 @@ public:
 
     // Get atoms in molecule.
     const auto& atoms() const { return geom.atoms(); }
+
+    // Get total molecular mass.
+    double tot_mass() const { return geom.tot_mass(); }
 
     // Get net electronic charge.
     auto net_charge() const { return elec.net_charge(); }
@@ -87,6 +94,9 @@ public:
     // Get internal coordinates.
     auto& int_coord() { return geom.int_coord(); }
     const auto& int_coord() const { return geom.int_coord(); }
+
+    // Get rotational symmetry number.
+    auto rot_sigma() const { return rot.rot_sigma(); }
 
     // Get rotational constants.
     auto rot_constants() { return rot.constants(); }
@@ -135,6 +145,19 @@ public:
 
     // Torsional frequencies.
     const auto& tor_frequencies() const { return tor.frequencies(); }
+
+    //
+    // Perform analysis of molecular properties.
+    //
+
+    // Rotational analysis.
+    void rot_analysis(std::ostream& to = std::cout) { return rot.analysis(to); }
+
+    // Vibrational analysis.
+    void vib_analysis(std::ostream& to = std::cout) { return vib.analysis(to); }
+
+    // Torsional analysis.
+    void tor_analysis(std::ostream& to = std::cout) { return tor.analysis(to); }
 
 private:
     Impl::Elec_state elec; // molecular electronic states

@@ -14,8 +14,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <chem/impl/molecule_io.h>
+#include <chem/impl/io_support.h>
 #include <chem/periodic_table.h>
+#include <numlib/constants.h>
 #include <stdutils/stdutils.h>
 #include <sstream>
 #include <stdexcept>
@@ -28,7 +29,7 @@ void Chem::Impl::read_xyz_format(std::istream& from,
     // Get number of atoms:
     int natoms;
     from >> natoms;
-    from.ignore();  // need to consume '\n' before reading title line
+    from.ignore(); // need to consume '\n' before reading title line
     from.clear();
 
     xyz.resize(natoms, 3);
@@ -70,7 +71,7 @@ void Chem::Impl::read_zmat_format(std::istream& from,
     std::string line;
     std::string symbol;
 
-    int natoms         = 0;
+    int natoms = 0;
     std::streamoff pos = 0;
 
     // Count number of atoms:
@@ -106,7 +107,7 @@ void Chem::Impl::read_zmat_format(std::istream& from,
     dihedral_connect.resize(natoms);
 
     if (natoms > 0) {
-        std::getline(from, line);  // first atom is already read
+        std::getline(from, line); // first atom is already read
     }
     int iat1;
     double distance;
@@ -114,7 +115,7 @@ void Chem::Impl::read_zmat_format(std::istream& from,
         std::getline(from, line);
         std::istringstream iss(line);
         iss >> symbol >> iat1 >> distance;
-        distances(1)    = distance;
+        distances(1) = distance;
         bond_connect(1) = iat1 - 1;
     }
     int iat2;
@@ -123,9 +124,9 @@ void Chem::Impl::read_zmat_format(std::istream& from,
         std::getline(from, line);
         std::istringstream iss(line);
         iss >> symbol >> iat1 >> distance >> iat2 >> angle;
-        distances(2)     = distance;
-        bond_connect(2)  = iat1 - 1;
-        angles(2)        = angle;
+        distances(2) = distance;
+        bond_connect(2) = iat1 - 1;
+        angles(2) = angle;
         angle_connect(2) = iat2 - 1;
     }
     int iat3;
@@ -140,11 +141,11 @@ void Chem::Impl::read_zmat_format(std::istream& from,
                 >> angle    >> iat3 
                 >> dihedral;
             // clang-format on
-            distances(i)        = distance;
-            bond_connect(i)     = iat1 - 1;
-            angles(i)           = angle;
-            angle_connect(i)    = iat2 - 1;
-            dihedrals(i)        = dihedral;
+            distances(i) = distance;
+            bond_connect(i) = iat1 - 1;
+            angles(i) = angle;
+            angle_connect(i) = iat2 - 1;
+            dihedrals(i) = dihedral;
             dihedral_connect(i) = iat3 - 1;
         }
     }
@@ -187,7 +188,7 @@ void Chem::Impl::read_mol_formula(std::istream& from,
             throw std::runtime_error("bad stoichiometry: " +
                                      Stdutils::to_string(stoich));
         }
-        formula[i].atom   = atom;
+        formula[i].atom = atom;
         formula[i].stoich = stoich;
     }
     from >> ch;
@@ -318,5 +319,87 @@ void Chem::Impl::print_atomic_masses(std::ostream& to,
         totmass += atoms[i].atomic_mass;
     }
     to << "Molecular mass:\t" << totmass << " amu\n";
+}
+
+void Chem::Impl::print_center_of_mass(std::ostream& to,
+                                      const Numlib::Vec<double>& com)
+{
+    Stdutils::Format<double> fix;
+    fix.fixed().width(8).precision(4);
+
+    to << "Center of mass (X, Y, Z):  " << fix(com(0)) << ", " << fix(com(1))
+       << ", " << fix(com(2)) << '\n';
+}
+
+void Chem::Impl::print_principal_moments(std::ostream& to,
+                                         const Numlib::Vec<double>& pmom,
+                                         const Numlib::Mat<double>& paxis)
+{
+    Stdutils::Format<char> line;
+    line.width(54).fill('-');
+
+    to << "\nPrincipal axes and moments of inertia in atomic units:\n"
+       << line('-') << '\n';
+
+    Stdutils::Format<double> fix;
+    fix.fixed().width(12);
+
+    to << "\t\tA\t     B\t\t  C\n"
+       << "Eigenvalue: " << fix(pmom(0)) << ' ' << fix(pmom(1)) << ' '
+       << fix(pmom(2)) << '\n';
+    to << "     X      ";
+    for (Index i = 0; i < pmom.size(); ++i) {
+        to << fix(paxis(0, i)) << ' ';
+    }
+    to << "\n     Y      ";
+    for (Index i = 0; i < pmom.size(); ++i) {
+        to << fix(paxis(1, i)) << ' ';
+    }
+    to << "\n     Z      ";
+    for (Index i = 0; i < pmom.size(); ++i) {
+        to << fix(paxis(2, i)) << ' ';
+    }
+    to << '\n';
+}
+
+void Chem::Impl::print_rot_constants(std::ostream& to,
+                                     int sigma,
+                                     const std::string& symm,
+                                     const Numlib::Vec<double>& rotc)
+{
+    using namespace Numlib::Constants;
+
+    const double gHz2icm = giga / (c_0 * 100.0);
+
+    Stdutils::Format<char> line;
+    line.width(21).fill('-');
+
+    Stdutils::Format<double> fix;
+    fix.fixed().width(14);
+
+    if (rotc(0) > 0.0) {
+        to << "\nRotational constants:\n" << line('-') << '\n';
+
+        if (symm.find("linear") == 0) {
+            to << fix(rotc(0)) << " GHz\n"
+               << fix(rotc(0) * gHz2icm) << " cm^-1\n\n";
+        }
+        else {
+            double ra = rotc(0);
+            double rb = rotc(1);
+            double rc = rotc(2);
+            to << "\tA\t\tB\t\tC\n"
+               << fix(ra) << '\t' << fix(rb) << '\t' << fix(rc) << " GHz\n"
+               << fix(ra * gHz2icm) << '\t' << fix(rb * gHz2icm) << '\t'
+               << fix(rc * gHz2icm) << " cm^-1\n\n";
+        }
+        to << "Rotational symmetry number: " << sigma << '\n';
+        if (symm.find("atom") == 0) {
+            to << "Rotational symmetry: This is an atom\n";
+        }
+        else {
+            to << "Rotational symmetry: " << symm << '\n';
+        }
+    }
 }
 

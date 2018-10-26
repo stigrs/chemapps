@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/collision.h>
-#include <chem/impl/molecule_io.h>
+#include <chem/impl/io_support.h>
 #include <chem/periodic_table.h>
 #include <stdutils/stdutils.h>
 #include <stdexcept>

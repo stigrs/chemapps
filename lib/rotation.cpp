@@ -15,6 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/impl/rotation.h>
+#include <chem/impl/io_support.h>
 #include <numlib/constants.h>
 #include <stdutils/stdutils.h>
 #include <cassert>
@@ -32,6 +33,18 @@ Chem::Impl::Rotation::Rotation(std::istream& from,
     auto pos = find_token(from, key);
     if (pos != -1) {
         get_token_value(from, pos, "sigma", sigma, 1);
+    }
+}
+
+void Chem::Impl::Rotation::analysis(std::ostream& to)
+{
+    if (geom.atoms().size() > 1) {
+        rotate_to_principal_axes();
+        to << "\nGeometry in principal axes coordinate system:\n";
+        Chem::Impl::print_geometry(to, geom.atoms(), geom.cart_coord());
+        Chem::Impl::print_center_of_mass(to, center_of_mass());
+        Chem::Impl::print_principal_moments(to, pmom, paxis);
+        Chem::Impl::print_rot_constants(to, sigma, symmetry(), constants());
     }
 }
 

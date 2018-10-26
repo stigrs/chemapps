@@ -21,6 +21,7 @@
 #include <chem/impl/rotation.h>
 #include <numlib/math.h>
 #include <numlib/matrix.h>
+#include <stdutils/stdutils.h>
 #include <iostream>
 #include <string>
 
@@ -51,6 +52,9 @@ namespace Impl {
 
         ~Vibration() = default;
 
+        // Perform vibrational analysis.
+        void analysis(std::ostream& to) const;
+
         // Get Hessians.
         const auto& hessians() const { return hess; }
 
@@ -67,7 +71,7 @@ namespace Impl {
         const auto& force_constants() const { return k_fc; }
 
         // Print vibrational modes.
-        void print(std::ostream& to = std::cout) const;
+        void print(std::ostream& to) const;
 
     private:
         // Calculate mass-weighted Hessians.
@@ -106,6 +110,15 @@ namespace Impl {
         Numlib::Vec<double> k_fc;     // force constants for vibrational modes
         Numlib::Cube<double> l_cart;  // Cartesian displacements
     };
+
+    inline void Vibration::analysis(std::ostream& to) const
+    {
+        Stdutils::Format<char> line;
+        line.width(21).fill('=');
+
+        to << "\nVibrational analysis:\n" << line('=') << "\n\n";
+        print(to);
+    }
 
 } // namespace Impl
 

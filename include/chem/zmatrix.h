@@ -18,7 +18,7 @@
 #define CHEM_ZMATRIX_H
 
 #include <chem/element.h>
-#include <chem/impl/molecule_io.h>
+#include <chem/impl/io_support.h>
 #include <numlib/matrix.h>
 #include <vector>
 
@@ -190,7 +190,7 @@ inline void Zmatrix::print(std::ostream& to) const
                             bond_connect, angle_connect, dihedral_connect);
 }
 
-}  // namespace Chem
+} // namespace Chem
 
-#endif  // CHEM_ZMATRIX_H
+#endif // CHEM_ZMATRIX_H
 

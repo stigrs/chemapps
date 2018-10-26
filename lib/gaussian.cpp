@@ -35,7 +35,7 @@ void Chem::Gaussian::init(std::istream& from, const std::string& key)
         get_token_value(from, pos, "jobname", jobname, std::string("gauss"));
         get_token_value(from, pos, "nprocshared", nprocshared, 1);
         get_token_value(from, pos, "nosave", nosave_tmp, nosave_tmp);
-        pos = find_token(from, "keywords");
+        pos = find_token(from, "keywords", pos);
         if (pos != -1) {
             std::string line;
             std::getline(from, line);

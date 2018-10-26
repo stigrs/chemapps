@@ -20,10 +20,14 @@ set(
     gauss_data.cpp
     gaussian.cpp
     geometry.cpp
+    io_support.cpp
+    mcmm.cpp
     molecule.cpp
-    molecule_io.cpp
+    mopac.cpp
     periodic_table.cpp
     rotation.cpp
+    thermochem.cpp
+    thermodata.cpp
     torsion.cpp
     vibration.cpp
     zmatrix.cpp
