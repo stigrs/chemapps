@@ -40,7 +40,6 @@ add_dependencies(chem Stdutils Numlib)
 target_link_libraries(
     chem 
     ${BLAS_LIBRARIES}
-    ${LAPACK_LIBRARIES}
     ${Numlib_LIBRARIES} 
 ) 
 

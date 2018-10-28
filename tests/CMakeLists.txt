@@ -62,7 +62,6 @@ function(add_chemapps_test name)
         test_catch2
         chem
 	${BLAS_LIBRARIES}
-        ${LAPACK_LIBRARIES}
         ${Numlib_LIBRARIES}
     ) 
     add_dependencies(${name} Catch2 Stdutils Numlib)
