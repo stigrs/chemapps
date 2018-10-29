@@ -25,6 +25,7 @@ matrix:
           packages:
             - g++-7
             - gfortran
+            - libgfortran
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
@@ -73,7 +74,7 @@ install:
       cd OpenBLAS
       travis_retry wget ${BLAS_URL} 
       unzip -q -o v0.3.3.zip
-      cd OpenBLAS-0.3.3 && make #> /dev/null 2>&1
+      cd OpenBLAS-0.3.3 && make > /dev/null 2>&1
       make install 
     else
       brew update
