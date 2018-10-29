@@ -31,9 +31,16 @@ Chem::Impl::Torsion::Torsion(std::istream& from,
 {
     using namespace Stdutils;
 
+    perform_analysis = false;
+
     alpha = Numlib::zeros<Numlib::Mat<double>>(3, 3);
     top_origo = Numlib::zeros<Numlib::Vec<double>>(3);
     top_com = Numlib::zeros<Numlib::Vec<double>>(3);
+
+    am = 0.0;
+    bm = 0.0;
+    cm = 0.0;
+    um = 0.0;
 
     auto pos = find_token(from, key);
     if (pos != -1) {
