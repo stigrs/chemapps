@@ -24,7 +24,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
-            - gfortran-7
+            - gfortran
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
@@ -44,7 +44,7 @@ matrix:
     - os: osx
       osx_image: xcode8
       env:
-        - MATRIX_EVAL="brew update && brew install gcc7 && CC=gcc-7 && CXX=g++-7"
+        - MATRIX_EVAL="brew update && brew install gcc6 && CC=gcc-6 && CXX=g++-6"
 
     # Clang on OSX
     - os: osx
@@ -73,7 +73,7 @@ install:
       cd OpenBLAS
       travis_retry wget ${BLAS_URL} 
       unzip -q -o v0.3.3.zip
-      cd OpenBLAS-0.3.3 && make > /dev/null 2>&1
+      cd OpenBLAS-0.3.3 && make #> /dev/null 2>&1
       make install 
     else
       brew install homebrew/core/openblas || brew link --overwrite gcc
