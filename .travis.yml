@@ -291,5 +291,5 @@ install:
   
 script:
   # build and run tests
-  - cmake --build . --config=$BUILD_TYPE -- -j${JOBS}
+  - cmake --build . --config $BUILD_TYPE -- -j${JOBS}
   - ctest -C $BUILD_TYPE --output-on-failure -j${JOBS}
