@@ -23,10 +23,10 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++
-            - gfortran
+            - g++-5
+            - gfortran-5
       env:
-        - MATRIX_EVAL="CC=gcc && CXX=g++ && BUILD_TYPE=Debug"
+        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5 && BUILD_TYPE=Debug"
 
     - os: linux
       addons: 
@@ -34,10 +34,10 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++
-            - gfortran
+            - g++-5
+            - gfortran-5
       env:
-        - MATRIX_EVAL="CC=gcc && CXX=g++ && BUILD_TYPE=Release"
+        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5 && BUILD_TYPE=Release"
 
     # Clang on Linux
     - os: linux
