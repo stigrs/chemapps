@@ -22,27 +22,14 @@ matrix:
     # so leave this first for the overall build to be faster
     ##########################################################################
 
-    # XCode 8.3
-    - env: COMPILER=clang++ BUILD_TYPE=Debug
+    # XCode 8 using GCC
+    - env: COMPILER=g++-7 BUILD_TYPE=Debug
       os: osx
-      osx_image: xcode8.3
-      compiler: clang
+      osx_image: xcode8
 
-    - env: COMPILER=clang++ BUILD_TYPE=Release
+    - env: COMPILER=g++-7 BUILD_TYPE=Release
       os: osx
-      osx_image: xcode8.3
-      compiler: clang
-
-    # XCode 9.1
-    - env: COMPILER=clang++ BUILD_TYPE=Debug
-      os: osx
-      osx_image: xcode9.1
-      compiler: clang
-
-    - env: COMPILER=clang++ BUILD_TYPE=Release
-      os: osx
-      osx_image: xcode9.1
-      compiler: clang
+      osx_image: xcode8
 
     # XCode 9.4
     - env: COMPILER=clang++ BUILD_TYPE=Debug
@@ -59,66 +46,6 @@ matrix:
     # Clang on Linux
     ##########################################################################
 
-    # Clang 3.6
-    - env: COMPILER=clang++-3.6 BUILD_TYPE=Debug
-      addons: &clang36
-        apt:
-          packages:
-            - clang-3.6
-            - g++-5
-            - gfortran
-              #- libblas-dev
-              #- liblapacke
-              #- liblapacke-dev
-              #- libopenblas-base
-              #- libopenblas-dev
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
-
-    - env: COMPILER=clang++-3.6 BUILD_TYPE=Release
-      addons: *clang36
-
-    # Clang 3.8
-    - env: COMPILER=clang++-3.8 BUILD_TYPE=Debug
-      addons: &clang38
-        apt:
-          packages:
-            - clang-3.8
-            - g++-5
-            - gfortran
-              #- libblas-dev
-              #- liblapacke
-              #- liblapacke-dev
-              #- libopenblas-base
-              #- libopenblas-dev
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.8
-
-    - env: COMPILER=clang++-3.8 BUILD_TYPE=Release
-      addons: *clang38
-
-    # Clang 3.9
-    - env: COMPILER=clang++-3.9 BUILD_TYPE=Debug
-      addons: &clang39
-        apt:
-          packages:
-            - clang-3.9
-            - g++-5
-            - gfortran
-              #- libblas-dev
-              #- liblapacke
-              #- liblapacke-dev
-              #- libopenblas-base
-              #- libopenblas-dev
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.9
-
-    - env: COMPILER=clang++-3.9 BUILD_TYPE=Release
-      addons: *clang39
-
     # Clang 4.0
     - env: COMPILER=clang++-4.0 BUILD_TYPE=Debug
       addons: &clang40
@@ -127,11 +54,6 @@ matrix:
             - clang-4.0
             - g++-5
             - gfortran
-              #- libblas-dev
-              #- liblapacke
-              #- liblapacke-dev
-              #- libopenblas-base
-              #- libopenblas-dev
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-4.0
@@ -139,67 +61,9 @@ matrix:
     - env: COMPILER=clang++-4.0 BUILD_TYPE=Release
       addons: *clang40
 
-    # Clang 5.0
-    - env: COMPILER=clang++-5.0 BUILD_TYPE=Debug
-      addons: &clang40
-        apt:
-          packages:
-            - clang-5.0
-            - g++-5
-            - gfortran
-              #- libblas-dev
-              #- liblapacke
-              #- liblapacke-dev
-              #- libopenblas-base
-              #- libopenblas-dev
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-            - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-4.0 main'
-              key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
-
-    - env: COMPILER=clang++-5.0 BUILD_TYPE=Release
-      addons: *clang40    
-
     ##########################################################################
     # GCC on Linux
     ##########################################################################
-
-    # GCC 5
-    - env: COMPILER=g++-5 BUILD_TYPE=Debug
-      addons: &gcc5
-        apt:
-          packages: 
-            - g++-5
-            - gfortran
-              #- libblas-dev
-              #- liblapacke
-              #- liblapacke-dev
-              #- libopenblas-base
-              #- libopenblas-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - env: COMPILER=g++-5 BUILD_TYPE=Release
-      addons: *gcc5
-
-    # GCC 6
-    - env: COMPILER=g++-6 BUILD_TYPE=Debug
-      addons: &gcc6
-        apt:
-          packages: 
-            - g++-6
-            - gfortran
-              #- libblas-dev
-              #- liblapacke
-              #- liblapacke-dev
-              #- libopenblas-base
-              #- libopenblas-dev
-          sources:
-            - ubuntu-toolchain-r-test
-
-    - env: COMPILER=g++-6 BUILD_TYPE=Release
-      addons: *gcc6
 
     # GCC 7
     - env: COMPILER=g++-7 BUILD_TYPE=Debug
@@ -243,6 +107,7 @@ install:
       export PATH=${DEPS_DIR}/cmake/bin:${PATH}
     else
       brew install cmake || brew upgrade cmake
+      brew install gcc
       brew install homebrew/core/openblas || brew link --overwrite gcc
     fi
   - cmake --version
