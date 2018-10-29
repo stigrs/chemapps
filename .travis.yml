@@ -36,7 +36,7 @@ matrix:
             - llvm-toolchain-trusty-5.0
           packages:
             - clang-5.0
-            - gfortran-7
+            - gfortran
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
@@ -44,7 +44,7 @@ matrix:
     - os: osx
       osx_image: xcode8
       env:
-        - MATRIX_EVAL="brew upgrade && brew install gcc && CC=gcc-7 && CXX=g++-7"
+        - MATRIX_EVAL="brew install gcc7 && CC=gcc-7 && CXX=g++-7"
 
     # Clang on OSX
     - os: osx
@@ -76,7 +76,7 @@ install:
       cd OpenBLAS-0.3.3 && make > /dev/null 2>&1
       make install 
     else
-      brew install homebrew/core/openblas || brew link --overwrite gcc
+      brew install homebrew/core/openblas 
     fi
    
   # Have CMake to generate build files
