@@ -32,7 +32,7 @@ TEST_CASE("test_molecule")
     Molecule mol(from, "Molecule", false);
 
     SECTION("num_atoms") { CHECK(mol.num_atoms() == 8); }
-#if 0
+
     SECTION("net_charge") { CHECK(mol.net_charge() == 0); }
 
     SECTION("spin_mult") { CHECK(mol.spin_mult() == 2); }
@@ -74,5 +74,4 @@ TEST_CASE("test_molecule")
             }
         }
     }
-#endif
 }
