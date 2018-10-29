@@ -8,6 +8,7 @@ notifications:
 # Use Linux unless specified otherwise
 os: linux
 dist: trusty
+ruby: 2.3
 
 cache:
   directories:
@@ -23,7 +24,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
-            - gfortran
+            - gfortran-7
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
@@ -35,7 +36,7 @@ matrix:
             - llvm-toolchain-trusty-5.0
           packages:
             - clang-5.0
-            - gfortran
+            - gfortran-7
       env:
         - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0"
 
