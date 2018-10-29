@@ -95,7 +95,9 @@ install:
       cd OpenBLAS
       travis_retry wget ${BLAS_URL} 
       unzip -q -o v0.3.3.zip
-      cd OpenBLAS-0.3.3 && make > /dev/null 2>&1
+      cd OpenBLAS-0.3.3 
+      make clean
+      make > /dev/null 2>&1
       make install 
     else
       brew update
