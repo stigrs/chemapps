@@ -117,7 +117,7 @@ Numlib::Vec<double> Chem::Impl::Rotation::center_of_mass() const
     }
     return com;
 }
-#if 0
+
 void Chem::Impl::Rotation::calc_principal_moments()
 {
     // Work on a local copy of the Cartesian coordinates:
@@ -160,4 +160,4 @@ void Chem::Impl::Rotation::calc_principal_moments()
         assert(std::abs(Numlib::det(paxis) - 1.0) < 1.0e-12);
     }
 }
-#endif
+

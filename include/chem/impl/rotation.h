@@ -101,7 +101,7 @@ namespace Impl {
     {
         if (!geom.atoms().empty() && !aligned) {
             move_to_com();
-            // calc_principal_moments();
+            calc_principal_moments();
             // aligned = true;
         }
     }
