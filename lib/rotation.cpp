@@ -127,14 +127,11 @@ void Chem::Impl::Rotation::calc_principal_moments()
     // Move geometry to center of mass:
     auto com = center_of_mass();
     Numlib::translate(xyz, -com(0), -com(1), -com(2));
-    std::cout << xyz << std::endl;
 
     // Compute principal moments:
 
     paxis = 0.0;
     pmom = 0.0;
-    std::cout << paxis << std::endl;
-    std::cout << pmom << std::endl;
 
     if (geom.atoms().size() > 1) {
         for (std::size_t i = 0; i < geom.atoms().size(); ++i) {
