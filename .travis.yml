@@ -91,6 +91,7 @@ install:
       BLAS_URL="https://anaconda.org/conda-forge/openblas/0.3.3/download/linux-64/openblas-0.3.3-ha44fe06_1.tar.bz2"
       mkdir /opt/openblas
       travis_retry wget -r ${BLAS_URL} 
+      ls
       tar -jxvf openblas-0.3.3-ha44fe06_1.tar.bz2 -C /opt/openblas
     else
       brew update
