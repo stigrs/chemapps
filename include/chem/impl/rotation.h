@@ -90,22 +90,22 @@ namespace Impl {
         Numlib::Vec<double> pmom = Numlib::zeros<Numlib::Vec<double>>(3);
         Numlib::Mat<double> paxis = Numlib::zeros<Numlib::Mat<double>>(3, 3);
     };
-#if 0
+
     inline void Rotation::move_to_com()
     {
         auto com = center_of_mass();
-        Numlib::translate(geom.cart_coord(), -com(0), -com(1), -com(2));
+        // Numlib::translate(geom.cart_coord(), -com(0), -com(1), -com(2));
     }
 
     inline void Rotation::rotate_to_principal_axes()
     {
         if (!geom.atoms().empty() && !aligned) {
             move_to_com();
-            calc_principal_moments();
-            aligned = true;
+            // calc_principal_moments();
+            // aligned = true;
         }
     }
-
+#if 0
     inline auto Rotation::principal_moments()
     {
         if (!aligned) {
