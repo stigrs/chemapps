@@ -55,8 +55,9 @@ Numlib::Vec<double> Chem::Impl::Rotation::constants()
     if (!aligned) {
         rotate_to_principal_axes();
     }
-    const double tol = 1.0e-3;
-    const double factor = h_bar / (4.0 * pi * giga * m_u * a_0 * a_0 * 1.0e-20);
+    // const double tol = 1.0e-3;
+    // const double factor = h_bar / (4.0 * pi * giga * m_u * a_0 * a_0
+    // * 1.0e-20);
 
     Numlib::Vec<double> res(3);
 #if 0
