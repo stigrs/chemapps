@@ -33,7 +33,10 @@ namespace Impl {
     public:
         Rotation() = delete;
 
-        Rotation(Geometry& g) : geom(g), sigma{1}, aligned{false} {}
+        Rotation(Geometry& g)
+            : geom(g), pmom(3), paxis(3, 3), aligned{false}, sigma{1}
+        {
+        }
 
         Rotation(std::istream& from, const std::string& key, Geometry& g);
 
@@ -55,16 +58,16 @@ namespace Impl {
 
         // Compute rotational constants.
         Numlib::Vec<double> constants();
-#if 0
+
         // Compute rotational symmetry.
-        std::string symmetry();
+        // std::string symmetry();
 
         // Get principal moments.
         auto principal_moments();
 
         // Get principal axes;
         auto principal_axes();
-#endif
+
         // Rotate to principal axes.
         //
         // Note: This coordinate system is not the same as Gaussian's
