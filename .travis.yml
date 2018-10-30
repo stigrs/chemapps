@@ -24,6 +24,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
+            - gfortran
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && BUILD_TYPE=Debug"
 
@@ -34,6 +35,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
+            - gfortran
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && BUILD_TYPE=Release"
 
