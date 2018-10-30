@@ -54,7 +54,7 @@ namespace Impl {
         // void analysis(std::ostream& to);
 
         // Get rotational symmetry number.
-        // auto rot_sigma() const { return sigma; }
+        auto rot_sigma() const { return sigma; }
 
         // Compute rotational constants.
         Numlib::Vec<double> constants();
