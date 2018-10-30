@@ -25,7 +25,7 @@ set(
     molecule.cpp
     #mopac.cpp
     periodic_table.cpp
-    #rotation.cpp
+    rotation.cpp
     #thermochem.cpp
     #thermodata.cpp
     #torsion.cpp

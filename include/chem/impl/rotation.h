@@ -46,7 +46,7 @@ namespace Impl {
         Rotation& operator=(Rotation&&) = default;
 
         ~Rotation() {}
-
+#if 0
         // Perform rotational analysis.
         void analysis(std::ostream& to);
 
@@ -71,7 +71,7 @@ namespace Impl {
         // standard orientation.
         //
         void rotate_to_principal_axes();
-
+#endif
     private:
         // Move geometry to center of mass.
         void move_to_com();
@@ -90,7 +90,7 @@ namespace Impl {
         Numlib::Vec<double> pmom = Numlib::zeros<Numlib::Vec<double>>(3);
         Numlib::Mat<double> paxis = Numlib::zeros<Numlib::Mat<double>>(3, 3);
     };
-
+#if 0
     inline void Rotation::move_to_com()
     {
         auto com = center_of_mass();
@@ -121,7 +121,7 @@ namespace Impl {
         }
         return paxis;
     }
-
+#endif
 } // namespace Impl
 
 } // namespace Chem

@@ -35,7 +35,7 @@ Chem::Impl::Rotation::Rotation(std::istream& from,
         get_token_value(from, pos, "sigma", sigma, 1);
     }
 }
-
+#if 0
 void Chem::Impl::Rotation::analysis(std::ostream& to)
 {
     if (geom.atoms().size() > 1) {
@@ -157,3 +157,4 @@ void Chem::Impl::Rotation::calc_principal_moments()
         assert(std::abs(Numlib::det(paxis) - 1.0) < 1.0e-12);
     }
 }
+#endif
