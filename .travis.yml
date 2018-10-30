@@ -1,5 +1,3 @@
-# Based on https://github.com/Microsoft/GSL
-
 language: cpp
 sudo: false
 notifications:
