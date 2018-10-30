@@ -162,7 +162,7 @@ public:
 private:
     Impl::Elec_state elec; // molecular electronic states
     Impl::Geometry geom;   // molecular geometry
-    // Impl::Rotation rot;    // molecular rotations
+    Impl::Rotation rot;    // molecular rotations
     // Impl::Vibration vib;   // molecular vibrations
     // Impl::Torsion tor;     // internal torsional modes
 };
