@@ -46,16 +46,16 @@ namespace Impl {
         Rotation& operator=(Rotation&&) = default;
 
         ~Rotation() {}
-#if 0
+
         // Perform rotational analysis.
-        void analysis(std::ostream& to);
+        // void analysis(std::ostream& to);
 
         // Get rotational symmetry number.
-        auto rot_sigma() const { return sigma; }
+        // auto rot_sigma() const { return sigma; }
 
         // Compute rotational constants.
         Numlib::Vec<double> constants();
-
+#if 0
         // Compute rotational symmetry.
         std::string symmetry();
 
@@ -64,14 +64,14 @@ namespace Impl {
 
         // Get principal axes;
         auto principal_axes();
-
+#endif
         // Rotate to principal axes.
         //
         // Note: This coordinate system is not the same as Gaussian's
         // standard orientation.
         //
         void rotate_to_principal_axes();
-#endif
+
     private:
         // Move geometry to center of mass.
         void move_to_com();
