@@ -84,11 +84,11 @@ namespace Impl {
 
         Geometry& geom;
 
-        int sigma;
-        bool aligned;
+        Numlib::Vec<double> pmom;
+        Numlib::Mat<double> paxis;
 
-        Numlib::Vec<double> pmom = Numlib::zeros<Numlib::Vec<double>>(3);
-        Numlib::Mat<double> paxis = Numlib::zeros<Numlib::Mat<double>>(3, 3);
+        bool aligned;
+        int sigma;
     };
 
     inline void Rotation::move_to_com()
@@ -102,10 +102,10 @@ namespace Impl {
         if (!geom.atoms().empty() && !aligned) {
             move_to_com();
             calc_principal_moments();
-            // aligned = true;
+            aligned = true;
         }
     }
-#if 0
+
     inline auto Rotation::principal_moments()
     {
         if (!aligned) {
@@ -121,7 +121,7 @@ namespace Impl {
         }
         return paxis;
     }
-#endif
+
 } // namespace Impl
 
 } // namespace Chem
