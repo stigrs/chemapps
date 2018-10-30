@@ -94,13 +94,13 @@ public:
     // Get internal coordinates.
     auto& int_coord() { return geom.int_coord(); }
     const auto& int_coord() const { return geom.int_coord(); }
-#if 0
+
     // Get rotational symmetry number.
     auto rot_sigma() const { return rot.rot_sigma(); }
 
     // Get rotational constants.
     auto rot_constants() { return rot.constants(); }
-
+#if 0
     // Get rotational symmetry.
     auto rot_symmetry() { return rot.symmetry(); }
 
