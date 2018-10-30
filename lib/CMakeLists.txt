@@ -14,22 +14,22 @@ endif()
 
 set(
     SRC_FILES
-    collision.cpp
+    #collision.cpp
     elec_state.cpp
-    energy_levels.cpp
-    gauss_data.cpp
-    gaussian.cpp
+    #energy_levels.cpp
+    #gauss_data.cpp
+    #gaussian.cpp
     geometry.cpp
     io_support.cpp
-    mcmm.cpp
+    #mcmm.cpp
     molecule.cpp
-    mopac.cpp
+    #mopac.cpp
     periodic_table.cpp
-    rotation.cpp
-    thermochem.cpp
-    thermodata.cpp
-    torsion.cpp
-    vibration.cpp
+    #rotation.cpp
+    #thermochem.cpp
+    #thermodata.cpp
+    #torsion.cpp
+    #vibration.cpp
     zmatrix.cpp
 )
 add_library(
