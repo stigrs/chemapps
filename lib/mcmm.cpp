@@ -198,16 +198,15 @@ bool Chem::Mcmm<Pot>::accept_geom_dist(const Chem::Molecule& m) const
 template <class Pot>
 bool Chem::Mcmm<Pot>::duplicate(const Chem::Molecule& m) const
 {
-    bool duplicate = false;
+    bool res = false;
     for (std::size_t i = 0; i < conformers.size(); ++i) { // check geometry
-        duplicate =
-            Numlib::kabsch_rmsd(conformers[i].xyz, m.cart_coord()) <= xtol;
-        if (duplicate) { // check energy
+        res = Numlib::kabsch_rmsd(conformers[i].xyz, m.cart_coord()) <= xtol;
+        if (res) { // duplicate geometry; check energy
             double ediff = std::abs(conformers[i].energy - m.elec_energy());
-            duplicate = ediff <= etol;
+            res = ediff <= etol;
         }
     }
-    return duplicate;
+    return res;
 }
 
 template <class Pot>
