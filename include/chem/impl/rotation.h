@@ -51,7 +51,7 @@ namespace Impl {
         ~Rotation() {}
 
         // Perform rotational analysis.
-        // void analysis(std::ostream& to);
+        void analysis(std::ostream& to);
 
         // Get rotational symmetry number.
         auto rot_sigma() const { return sigma; }
@@ -60,7 +60,7 @@ namespace Impl {
         Numlib::Vec<double> constants();
 
         // Compute rotational symmetry.
-        // std::string symmetry();
+        std::string symmetry();
 
         // Get principal moments.
         auto principal_moments();

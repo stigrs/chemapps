@@ -100,7 +100,7 @@ public:
 
     // Get rotational constants.
     auto rot_constants() { return rot.constants(); }
-#if 0
+
     // Get rotational symmetry.
     auto rot_symmetry() { return rot.symmetry(); }
 
@@ -158,13 +158,13 @@ public:
 
     // Torsional analysis.
     void tor_analysis(std::ostream& to = std::cout) { return tor.analysis(to); }
-#endif
+
 private:
     Impl::Elec_state elec; // molecular electronic states
     Impl::Geometry geom;   // molecular geometry
     Impl::Rotation rot;    // molecular rotations
-    // Impl::Vibration vib;   // molecular vibrations
-    // Impl::Torsion tor;     // internal torsional modes
+    Impl::Vibration vib;   // molecular vibrations
+    Impl::Torsion tor;     // internal torsional modes
 };
 
 } // namespace Chem

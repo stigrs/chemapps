@@ -35,7 +35,7 @@ Chem::Impl::Rotation::Rotation(std::istream& from,
         get_token_value(from, pos, "sigma", sigma, 1);
     }
 }
-#if 0
+
 void Chem::Impl::Rotation::analysis(std::ostream& to)
 {
     if (geom.atoms().size() > 1) {
@@ -47,7 +47,7 @@ void Chem::Impl::Rotation::analysis(std::ostream& to)
         Chem::Impl::print_rot_constants(to, sigma, symmetry(), constants());
     }
 }
-#endif
+
 Numlib::Vec<double> Chem::Impl::Rotation::constants()
 {
     using namespace Numlib::Constants;
@@ -72,7 +72,7 @@ Numlib::Vec<double> Chem::Impl::Rotation::constants()
     }
     return res;
 }
-#if 0
+
 std::string Chem::Impl::Rotation::symmetry()
 {
     if (!aligned) {
@@ -101,7 +101,7 @@ std::string Chem::Impl::Rotation::symmetry()
     }
     return symm;
 }
-#endif
+
 Numlib::Vec<double> Chem::Impl::Rotation::center_of_mass() const
 {
     Numlib::Vec<double> com(3);

@@ -19,9 +19,11 @@
 Chem::Molecule::Molecule(std::istream& from,
                          const std::string& key,
                          bool verbose)
-    : elec(from, key), geom(from, key), rot(from, key, geom)
-// vib(from, key, geom, rot),
-// tor(from, key, geom, rot)
+    : elec(from, key),
+      geom(from, key),
+      rot(from, key, geom),
+      vib(from, key, geom, rot),
+      tor(from, key, geom, rot)
 {
     if (verbose) {
         std::cout << "verbose\n";
