@@ -27,6 +27,7 @@ Chem::Impl::Geometry::Geometry(std::istream& from, const std::string& key)
         pos = find_token(from, "geometry", pos);
         if (pos != -1) {
             Impl::read_xyz_format(from, atms, xyz, title);
+            std::cout << xyz << std::endl;
         }
     }
     if (atms.empty()) {
