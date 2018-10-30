@@ -73,7 +73,7 @@ Numlib::Vec<double> Chem::Impl::Rotation::constants()
 #endif
     return res;
 }
-
+#if 0
 std::string Chem::Impl::Rotation::symmetry()
 {
     if (!aligned) {
