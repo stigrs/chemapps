@@ -94,7 +94,7 @@ public:
     // Get internal coordinates.
     auto& int_coord() { return geom.int_coord(); }
     const auto& int_coord() const { return geom.int_coord(); }
-
+#if 0
     // Get rotational symmetry number.
     auto rot_sigma() const { return rot.rot_sigma(); }
 
@@ -158,7 +158,7 @@ public:
 
     // Torsional analysis.
     void tor_analysis(std::ostream& to = std::cout) { return tor.analysis(to); }
-
+#endif
 private:
     Impl::Elec_state elec; // molecular electronic states
     Impl::Geometry geom;   // molecular geometry
