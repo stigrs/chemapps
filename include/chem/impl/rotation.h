@@ -94,7 +94,7 @@ namespace Impl {
     inline void Rotation::move_to_com()
     {
         auto com = center_of_mass();
-        // Numlib::translate(geom.cart_coord(), -com(0), -com(1), -com(2));
+        Numlib::translate(geom.cart_coord(), -com(0), -com(1), -com(2));
     }
 
     inline void Rotation::rotate_to_principal_axes()
