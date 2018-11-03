@@ -29,3 +29,14 @@ Molecule
     3 [ 3 4 5 ]
 End
 
+ThermoData 
+  zeroref 
+    BOT
+  incl_sigma 
+    1
+  pressure 
+    1 [ 101325.]
+  temperature 
+    3 [  200. 300. 2400. ]
+End
+

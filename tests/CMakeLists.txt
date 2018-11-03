@@ -75,6 +75,7 @@ set(PROGRAMS
     test_molecule
     test_periodic_table
     test_rotation
+    test_thermochem
     test_thermodata
     test_torsion
     test_vibration

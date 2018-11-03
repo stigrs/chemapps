@@ -387,11 +387,11 @@ double Chem::qctcw(const Chem::Molecule& mol, double temp)
         qtor = 1.0;
     }
     else {
-        if (mol.tot_tor_minima() > 0) {
+        if (tmp.tot_tor_minima() > 0) {
             Assert::dynamic<Assert::level(2)>(temp > 0.0);
             // Calculate free rotor partition function:
             double imom = tmp.tor_eff_moment();
-            imom *= Numlib::Constants::au_to_kgm2;
+            imom *= au_to_kgm2;
             double sig = tmp.tor_symmetry_number();
             double qfr = std::sqrt(2.0 * pi * imom * k * temp) / (h_bar * sig);
 

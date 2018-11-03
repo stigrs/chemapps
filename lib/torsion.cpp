@@ -46,7 +46,7 @@ Chem::Impl::Torsion::Torsion(std::istream& from,
     if (pos != -1) {
         get_token_value(from, pos, "rot_axis", rot_axis, rot_axis);
         get_token_value(from, pos, "rot_top", rot_top, rot_top);
-        get_token_value(from, pos, "sigma_top", sigma_tor, sigma_tor);
+        get_token_value(from, pos, "sigma_tor", sigma_tor, sigma_tor);
         get_token_value(from, pos, "rmi_tor", rmi_tor, rmi_tor);
         get_token_value(from, pos, "pot_tor", pot_tor, pot_tor);
         get_token_value(from, pos, "freq_tor", freq_tor, freq_tor);
