@@ -88,16 +88,10 @@
 # Rotational      0.314134D+04          3.497115          8.052404
 
 Molecule
-  elec_state
-    2 [ 1.0 0.0 ]
   elec_energy
     -115.685778
-  charge
-    0
-  sigma
+  sigma_rot
     1
-  geom_unit 
-    angstrom
   geometry
     6
     Methanol  
@@ -111,7 +105,8 @@ Molecule
     2 [ 1 2 ]
   rot_top
     1 [ 0 ]
-  vibr 
+  frequencies 
     12 [  338.337  1080.0355  1106.541   1195.6445  1385.1452  1507.166
         1528.1129  1542.7988  3033.9205  3091.4955  3165.4868  3860.851 ]
 End
+
