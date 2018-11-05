@@ -73,7 +73,7 @@ namespace Impl {
         ~Torsion() = default;
 
         // Perform torsional mode analysis.
-        void analysis(std::ostream& to);
+        void analysis(std::ostream& to) const;
 
         // Get total number of minima (eq 1 in C&T, 2000).
         int tot_minima() const { return Numlib::sum(sigma_tor); }

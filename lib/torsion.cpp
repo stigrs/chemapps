@@ -63,7 +63,7 @@ Chem::Impl::Torsion::Torsion(std::istream& from,
     validate();
 }
 
-void Chem::Impl::Torsion::analysis(std::ostream& to)
+void Chem::Impl::Torsion::analysis(std::ostream& to) const
 {
     using namespace Numlib::Constants;
 
@@ -168,10 +168,6 @@ void Chem::Impl::Torsion::analysis(std::ostream& to)
 
 double Chem::Impl::Torsion::red_moment()
 {
-    // Rotate molecule to principal axes and compute principal moments:
-
-    rot.rotate_to_principal_axes();
-
     // Work on a local copy of the XYZ and convert coordinates to bohr:
 
     xyz = geom.cart_coord();

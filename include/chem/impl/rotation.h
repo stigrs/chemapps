@@ -51,22 +51,26 @@ namespace Impl {
         ~Rotation() {}
 
         // Perform rotational analysis.
-        void analysis(std::ostream& to);
+        void analysis(std::ostream& to) const;
 
         // Get rotational symmetry number.
         auto rot_sigma() const { return sigma; }
 
         // Compute rotational constants.
-        Numlib::Vec<double> constants();
+        Numlib::Vec<double> constants() const;
 
         // Compute rotational symmetry.
-        std::string symmetry();
+        std::string symmetry() const;
 
         // Get principal moments.
-        auto principal_moments();
+        auto principal_moments() const { return pmom; }
 
         // Get principal axes;
-        auto principal_axes();
+        auto principal_axes() const { return paxis; }
+
+    private:
+        // Move geometry to center of mass.
+        void move_to_com();
 
         // Rotate to principal axes.
         //
@@ -74,10 +78,6 @@ namespace Impl {
         // standard orientation.
         //
         void rotate_to_principal_axes();
-
-    private:
-        // Move geometry to center of mass.
-        void move_to_com();
 
         // Compute center of mass coordinates.
         Numlib::Vec<double> center_of_mass() const;
@@ -107,22 +107,6 @@ namespace Impl {
             calc_principal_moments();
             aligned = true;
         }
-    }
-
-    inline auto Rotation::principal_moments()
-    {
-        if (!aligned) {
-            rotate_to_principal_axes();
-        }
-        return pmom;
-    }
-
-    inline auto Rotation::principal_axes()
-    {
-        if (!aligned) {
-            rotate_to_principal_axes();
-        }
-        return paxis;
     }
 
 } // namespace Impl

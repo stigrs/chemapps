@@ -186,8 +186,6 @@ void Chem::Impl::Vibration::trans_rot_vec(Numlib::Cube<double>& dmat,
 
     // Determine center of mass, moments of inertia and rotation generators:
 
-    rot.rotate_to_principal_axes();
-
     auto xyz = geom.cart_coord() / Numlib::Constants::a_0;
     auto paxis = rot.principal_axes();
 

@@ -22,6 +22,7 @@
 #include <chem/impl/rotation.h>
 #include <chem/impl/vibration.h>
 #include <chem/impl/torsion.h>
+#include <chem/traits.h>
 #include <iostream>
 #include <string>
 
@@ -53,6 +54,9 @@ public:
 
     // Get information string for molecule.
     std::string info() const { return geom.info(); }
+
+    // Get molecular structure.
+    Mol_type structure() const;
 
     // Get number of atoms.
     auto num_atoms() const { return geom.atoms().size(); }
@@ -99,16 +103,16 @@ public:
     auto rot_sigma() const { return rot.rot_sigma(); }
 
     // Get rotational constants.
-    auto rot_constants() { return rot.constants(); }
+    auto rot_constants() const { return rot.constants(); }
 
     // Get rotational symmetry.
-    auto rot_symmetry() { return rot.symmetry(); }
+    auto rot_symmetry() const { return rot.symmetry(); }
 
     // Get principal moments.
-    auto principal_moments() { return rot.principal_moments(); }
+    auto principal_moments() const { return rot.principal_moments(); }
 
     // Get principal axes.
-    auto principal_axes() { return rot.principal_axes(); }
+    auto principal_axes() const { return rot.principal_axes(); }
 
     // Get Hessians.
     const auto& hessians() const { return vib.hessians(); }
@@ -151,13 +155,22 @@ public:
     //
 
     // Rotational analysis.
-    void rot_analysis(std::ostream& to = std::cout) { return rot.analysis(to); }
+    void rot_analysis(std::ostream& to = std::cout) const
+    {
+        return rot.analysis(to);
+    }
 
     // Vibrational analysis.
-    void vib_analysis(std::ostream& to = std::cout) { return vib.analysis(to); }
+    void vib_analysis(std::ostream& to = std::cout) const
+    {
+        return vib.analysis(to);
+    }
 
     // Torsional analysis.
-    void tor_analysis(std::ostream& to = std::cout) { return tor.analysis(to); }
+    void tor_analysis(std::ostream& to = std::cout) const
+    {
+        return tor.analysis(to);
+    }
 
 private:
     Impl::Elec_state elec; // molecular electronic states
@@ -166,6 +179,21 @@ private:
     Impl::Vibration vib;   // molecular vibrations
     Impl::Torsion tor;     // internal torsional modes
 };
+
+inline Mol_type Molecule::structure() const
+{
+    Mol_type res;
+    if (num_atoms() == 1) {
+        res = atom;
+    }
+    else if (rot_constants().size() == 1) {
+        res = linear;
+    }
+    else {
+        res = nonlinear;
+    }
+    return res;
+}
 
 } // namespace Chem
 

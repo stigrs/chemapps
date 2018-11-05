@@ -34,12 +34,12 @@ Chem::Impl::Rotation::Rotation(std::istream& from,
     if (pos != -1) {
         get_token_value(from, pos, "sigma", sigma, 1);
     }
+    rotate_to_principal_axes();
 }
 
-void Chem::Impl::Rotation::analysis(std::ostream& to)
+void Chem::Impl::Rotation::analysis(std::ostream& to) const
 {
     if (geom.atoms().size() > 1) {
-        rotate_to_principal_axes();
         to << "\nGeometry in principal axes coordinate system:\n";
         Chem::Impl::print_geometry(to, geom.atoms(), geom.cart_coord());
         Chem::Impl::print_center_of_mass(to, center_of_mass());
@@ -48,13 +48,10 @@ void Chem::Impl::Rotation::analysis(std::ostream& to)
     }
 }
 
-Numlib::Vec<double> Chem::Impl::Rotation::constants()
+Numlib::Vec<double> Chem::Impl::Rotation::constants() const
 {
     using namespace Numlib::Constants;
 
-    if (!aligned) {
-        rotate_to_principal_axes();
-    }
     const double tol = 1.0e-3;
     const double factor = h_bar / (4.0 * pi * giga * m_u * a_0 * a_0 * 1.0e-20);
 
@@ -73,11 +70,8 @@ Numlib::Vec<double> Chem::Impl::Rotation::constants()
     return res;
 }
 
-std::string Chem::Impl::Rotation::symmetry()
+std::string Chem::Impl::Rotation::symmetry() const
 {
-    if (!aligned) {
-        rotate_to_principal_axes();
-    }
     const double tol = 1.0e-3;
 
     bool ab = std::abs(pmom(0) - pmom(1)) < tol;

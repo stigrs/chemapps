@@ -30,6 +30,7 @@ set(
     thermodata.cpp
     torsion.cpp
     vibration.cpp
+    whirab.cpp
     zmatrix.cpp
 )
 add_library(
