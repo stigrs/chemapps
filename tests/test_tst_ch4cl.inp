@@ -1,0 +1,82 @@
+# 
+# This is test case 'ch4cltr1' provided by Polyrate 2017.
+#
+TST 
+  method 
+    Conventional
+  reaction 
+    Bimolecular
+  en_barrier 
+    14.887 # kJ/mol 
+  sigma_rxn 
+    4
+End
+ReactantA 
+  geometry 
+    5
+    CH4 
+    C      0.00000000       0.00000000       0.00000000
+    H      0.62960010       0.62961015       0.62960010
+    H     -0.62960010      -0.62960010       0.62960010
+    H     -0.62960010       0.62960010      -0.62960010
+    H      0.62960010      -0.62960010      -0.62960010
+  sigma_rot 
+    1
+  spin_mult 
+    1
+  frequencies  
+    9 [ 3210.26   3210.26   3210.26   3065.39   1565.62
+        1565.62   1347.13   1347.13   1347.13 ]
+End
+ReactantB 
+  geometry
+    1
+    Cl atom 
+    Cl   0.000000    0.000000    0.000000
+  sigma_rot 
+    1
+  spin_mult
+    2
+  so_degen
+    2 [ 4 2 ]
+  so_energy
+    2 [ 0.0 881.0 ]
+End
+TransitionState 
+  geometry
+    6
+    CH4+Cl 
+    Cl       0.00000000       0.00000000       0.00000000
+    H        0.00000000       0.00000000       1.43139971
+    C        0.00000000       0.00000000       2.81950004
+    H        1.06519487       0.00000000       3.03002786
+    H       -0.53259717       0.92248586       3.03002786
+    H       -0.53259717      -0.92248586       3.03002786
+  sigma_rot 
+    1
+  spin_mult
+    2
+  so_degen
+    1 [ 2 ]
+  so_energy
+    1 [ 0.0 ]
+  frequencies  
+    11 [ 3295.40   3295.33   3118.02   1440.57   1440.48
+         1227.16    873.61    873.60    571.74    324.03
+          324.03 ]
+End
+Tunnel 
+  method 
+    Wigner
+  freq_im 
+    -949.33
+  en_barrier 
+    14.887  # kJ/mol 
+  en_rxn 
+    6.301  # kJ/mol 
+End
+ThermoData 
+  temperature 
+    4 [ 200.0 300.0 600.0 1500.0 ]
+End 
+

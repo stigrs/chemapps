@@ -1,0 +1,84 @@
+# 
+# This is test case 'ch4ohtr2' provided by Polyrate 2017.
+#
+TST 
+  method 
+    Conventional
+  reaction 
+    Bimolecular
+  en_barrier 
+    24.635 # kJ/mol 
+  sigma_rxn
+    12
+End
+ReactantA 
+  geometry 
+    5
+    CH4 
+    H           0.69445900       1.72430900      -0.85356400
+    C          -0.00000200       0.00000000      -0.00000200
+    H           0.90931400      -1.60898800      -0.87658000
+    H           0.41953900       0.01321800       2.00197100
+    H          -2.02328700      -0.12853700      -0.27180900
+  sigma_rot 
+    1
+  frequencies  
+    9 [ 3215.74   3215.68   3215.67   3093.39   1599.82
+        1599.78   1358.27   1358.23   1358.22 ]
+End
+ReactantB 
+  geometry
+    2
+    OH radical 
+    O           0.00000000       0.00000000       0.10859100
+    H           0.00000000       0.00000000      -1.72340900
+  sigma_rot 
+    1
+  spin_mult
+    2
+  so_degen
+    2 [ 2 2 ]
+  so_energy
+    2 [ 0.0 140.0 ]
+  frequencies
+    1 [ 3759.41 ]
+End
+TransitionState 
+  geometry
+    7
+    CH4+OH 
+    H       -2.78909400       2.06963800      -0.00001700
+    C       -2.43339100       0.05948900       0.00000000
+    H       -0.20628700      -0.25718800      -0.00000200
+    H       -3.11247000      -0.84447800      -1.69980200
+    H       -3.11246000      -0.84444600       1.69982200
+    O        2.25496300      -0.15756000       0.00000000
+    H        2.40642400       1.66873700      -0.00000200
+  sigma_rot 
+    1
+  spin_mult
+    2
+  so_degen 
+    1 [ 2 ]
+  so_energy
+    1 [ 0.0 ]
+  frequencies  
+    14 [ 3748.04   3259.22   3254.81   3129.96   1520.85
+         1493.84   1413.61   1298.35   1206.33    933.47
+          768.63    357.25    315.93     40.01 ]
+End
+Tunnel 
+  method 
+    Wigner
+  freq_im 
+    -1829.88
+  en_barrier 
+    24.635  # kJ/mol 
+  en_rxn 
+    -61.792  # kJ/mol 
+End
+ThermoData 
+  temperature 
+    5 [ 200.0 300.0 600.0 1500.0 2400.0 ]
+End 
+
