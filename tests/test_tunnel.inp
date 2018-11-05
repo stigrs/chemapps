@@ -1,0 +1,15 @@
+Tunnel
+  method
+    Eckart
+  freq_im
+    -1000.0
+  en_barrier
+    10.0
+  en_rxn
+    -20.0
+End
+ThermoData
+  temperature
+    5 [ 200.0 300.0 600.0 800.0 1000.0 ]
+End
+

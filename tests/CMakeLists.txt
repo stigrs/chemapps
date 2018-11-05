@@ -78,6 +78,7 @@ set(PROGRAMS
     test_thermochem
     test_thermodata
     test_torsion
+    test_tunnel
     test_vibration
     test_zmatrix
 )
