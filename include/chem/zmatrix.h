@@ -28,7 +28,7 @@ namespace Chem {
 //
 class Zmatrix {
 public:
-    Zmatrix() = default;
+    Zmatrix() = delete;
 
     // Construct Z matrix from atoms and Cartesian coordinates.
     Zmatrix(std::vector<Element>& atoms_, Numlib::Mat<double>& xyz_);
