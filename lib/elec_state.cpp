@@ -32,7 +32,6 @@ Chem::Impl::Elec_state::Elec_state(std::istream& from, const std::string& key)
         get_token_value(from, pos, "so_degen", so_degen, so_degen);
         get_token_value(from, pos, "so_energy", so_energy, so_energy);
     }
-    std::cout << so_degen << " " << so_energy << std::endl;
     Assert::dynamic(same_extents(so_degen, so_energy), "bad spin-orbit input");
 }
 
