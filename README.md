@@ -44,16 +44,16 @@ The user of this software needs to obtain separate licenses for [MOPAC](http://o
 ### Requirements
 
 * [CMake](https://cmake.org) 3.4.3
-* [LIBSRS](https://github.com/stigrs/libsrs.git)
-* [Boost](http://www.boost.org/) 1.65.0
-* [GSL](https://github.com/Microsoft/GSL)
+* [Numlib](https://github.com/stigrs/numlib.git)
+* [Stdutils](https://github.com/stigrs/stdutils.git)
+* [OpenBLAS](https://www.openblas.net/) 0.3.3 (Intel MKL is recommended)
 
 ### Supported Platforms
 
 The test suite that exercises ChemApps has been built and passes successfully 
 on the following platforms:
 * GNU/Linux using GCC 5.5.0, 6.4.0, 7.3.0
-* GNU/Linux using Clang 5.0
+* GNU/Linux using Clang 6.0
 * OS X El Capitan (10.11) using Apple Xcode 8.0
 * OS X Sierra (10.12) using Apple Xcode 9.2
 * OS X High Sierra (10.13) using Apple Xcode 9.4, 10.0 
