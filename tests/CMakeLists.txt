@@ -81,6 +81,7 @@ set(PROGRAMS
     test_troe
     test_tst
     test_tunnel
+    test_units
     test_vibration
     test_zmatrix
 )
