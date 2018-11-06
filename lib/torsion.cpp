@@ -33,9 +33,21 @@ Chem::Impl::Torsion::Torsion(std::istream& from,
 
     perform_analysis = false;
 
+    xyz = Numlib::Mat<double>(0, 3);
     alpha = Numlib::zeros<Numlib::Mat<double>>(3, 3);
+
+    rot_axis = Numlib::Vec<int>(0);
     rot_top = Numlib::Vec<int>(0);
+    sigma_tor = Numlib::Vec<int>(0);
+
     rmi_tor = Numlib::Vec<double>(0);
+    pot_tor = Numlib::Vec<double>(0);
+    freq_tor = Numlib::Vec<double>(0);
+
+    x_axis = Numlib::Vec<double>(0);
+    y_axis = Numlib::Vec<double>(0);
+    z_axis = Numlib::Vec<double>(0);
+
     top_origo = Numlib::zeros<Numlib::Vec<double>>(3);
     top_com = Numlib::zeros<Numlib::Vec<double>>(3);
 
