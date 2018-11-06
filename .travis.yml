@@ -15,11 +15,6 @@ cache:
 matrix:
   include:
     # GCC on Linux
-    #
-    # Note: Using GCC on Linux for Debug build type causes test_rotation 
-    # to fail on Travis. This behavior cannot be reproduced in Release mode
-    # or when using GCC on a regular Linux workstation.
-    #
     - os: linux
       addons: 
         apt:
@@ -30,6 +25,28 @@ matrix:
             - gfortran
       env:
         - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5 && BUILD_TYPE=Debug"
+
+    - os: linux
+      addons: 
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+            - gfortran
+      env:
+        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5 && BUILD_TYPE=Release"
+
+    - os: linux
+      addons: 
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+            - gfortran
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6 && BUILD_TYPE=Debug"
 
     - os: linux
       addons: 
@@ -51,9 +68,44 @@ matrix:
             - g++-7
             - gfortran
       env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && BUILD_TYPE=Debug"
+
+    - os: linux
+      addons: 
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+            - gfortran
+      env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && BUILD_TYPE=Release"
 
     # Clang on Linux
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+            - g++-5
+            - gfortran
+      env:
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && BUILD_TYPE=Debug"
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - clang-5.0
+            - g++-5
+            - gfortran
+      env:
+        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && BUILD_TYPE=Release"
+
     - os: linux
       addons:
         apt:

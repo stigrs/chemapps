@@ -117,8 +117,8 @@ namespace Impl {
 
         bool perform_analysis;
 
-        Numlib::Mat<double> alpha; // direction cosines
         Numlib::Mat<double> xyz;   // local copy of Cartesian coordinates
+        Numlib::Mat<double> alpha; // direction cosines
 
         Numlib::Vec<int> rot_axis;  // rotational axis
         Numlib::Vec<int> rot_top;   // rotating top moiety
