@@ -6,12 +6,7 @@ notifications:
 # Use Linux unless specified otherwise
 os: linux
 dist: trusty
-ruby: 2.3
-
-cache:
-  directories:
-    - /opt/openblas
-      #- ${TRAVIS_BUILD_DIR}/deps
+ruby: 2.3.4
 
 matrix:
   include:
@@ -195,10 +190,6 @@ before_install:
 
 install:
   - ${CXX} --version
-
-  # Dependencies required by the CI are installed in ${TRAVIS_BUILD_DIR}/deps/
-  #- DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
-  #- mkdir -p "${DEPS_DIR}"
 
   # Travis machines have 2 cores
   - JOBS=2
