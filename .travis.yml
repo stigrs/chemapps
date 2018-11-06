@@ -10,11 +10,65 @@ ruby: 2.3
 
 cache:
   directories:
-    - ${TRAVIS_BUILD_DIR}/deps
+    - /opt/openblas
+      #- ${TRAVIS_BUILD_DIR}/deps
 
 matrix:
   include:
-    # GCC on Linux
+    ############################################################################
+    # Clang on Mac OSX
+    ############################################################################
+    - os: osx
+      osx_image: xcode8
+      compiler: clang
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Debug"
+
+    - os: osx
+      osx_image: xcode8
+      compiler: clang
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
+
+    - os: osx
+      osx_image: xcode9.2
+      compiler: clang
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Debug"
+
+    - os: osx
+      osx_image: xcode9.2
+      compiler: clang
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
+
+    - os: osx
+      osx_image: xcode9.4
+      compiler: clang
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Debug"
+
+    - os: osx
+      osx_image: xcode9.4
+      compiler: clang
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
+
+    - os: osx
+      osx_image: xcode10
+      compiler: clang
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Debug"
+
+    - os: osx
+      osx_image: xcode10
+      compiler: clang
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
+
+    ############################################################################
+    # GCC on GNU/Linux
+    ############################################################################
     - os: linux
       addons: 
         apt:
@@ -81,7 +135,9 @@ matrix:
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && BUILD_TYPE=Release"
 
-    # Clang on Linux
+    ############################################################################
+    # Clang on GNU/Linux
+    ############################################################################
     - os: linux
       addons:
         apt:
@@ -134,55 +190,6 @@ matrix:
       env:
         - MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0 && BUILD_TYPE=Release"
 
-    # Clang on OSX
-    - os: osx
-      osx_image: xcode8
-      compiler: clang
-      env:
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Debug"
-
-    - os: osx
-      osx_image: xcode8
-      compiler: clang
-      env:
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
-
-    - os: osx
-      osx_image: xcode9.2
-      compiler: clang
-      env:
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Debug"
-
-    - os: osx
-      osx_image: xcode9.2
-      compiler: clang
-      env:
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
-
-    - os: osx
-      osx_image: xcode9.4
-      compiler: clang
-      env:
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Debug"
-
-    - os: osx
-      osx_image: xcode9.4
-      compiler: clang
-      env:
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
-
-    - os: osx
-      osx_image: xcode10
-      compiler: clang
-      env:
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Debug"
-
-    - os: osx
-      osx_image: xcode10
-      compiler: clang
-      env:
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && BUILD_TYPE=Release"
-
 before_install:
     - eval "${MATRIX_EVAL}"
 
@@ -190,9 +197,8 @@ install:
   - ${CXX} --version
 
   # Dependencies required by the CI are installed in ${TRAVIS_BUILD_DIR}/deps/
-  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
-  - mkdir -p "${DEPS_DIR}"
-  - cd "${DEPS_DIR}"
+  #- DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  #- mkdir -p "${DEPS_DIR}"
 
   # Travis machines have 2 cores
   - JOBS=2
