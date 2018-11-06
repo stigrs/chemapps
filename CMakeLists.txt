@@ -48,9 +48,9 @@ find_package(Git)
 # Boost is required.
 if(WIN32)
     set(Boost_USE_STATIC_LIBS ON)
-    find_package(Boost 1.59.0 REQUIRED)
+    find_package(Boost 1.54.0 REQUIRED)
 else()
-    find_package(Boost 1.59.0 COMPONENTS program_options REQUIRED)
+    find_package(Boost 1.54.0 COMPONENTS program_options REQUIRED)
 endif()
 
 # BLAS and LAPACK is required.

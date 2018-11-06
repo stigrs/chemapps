@@ -216,7 +216,6 @@ install:
     else
       brew update
       brew install homebrew/core/openblas || brew link --overwrite gcc
-      brew install boost
     fi
    
   # Have CMake to generate build files
