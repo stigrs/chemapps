@@ -6,6 +6,7 @@ include_directories(${Stdutils_INCLUDE_DIRS})
 include_directories(${Numlib_INCLUDE_DIRS})
 include_directories(${BLAS_INCLUDE_DIRS})
 include_directories(${LAPACKE_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${ChemApps_BINARY_DIR})
 link_directories(${Numlib_LIBRARY_DIRS})
 if(MKL_FOUND)
@@ -26,6 +27,7 @@ set(
     mopac.cpp
     periodic_table.cpp
     rotation.cpp
+    statecount.cpp
     thermochem.cpp
     thermodata.cpp
     torsion.cpp

@@ -29,7 +29,6 @@ namespace Energy_levels {
     // Calculate free rotor energy levels up to a maximum energy.
     std::vector<double> free_rotor(double rotc, double emax);
 
-    //
     // Calculate hindered rotor energy levels up to a maximum energy.
     //
     // For energies less than 1.5 times the barrier height the hindered rotor
