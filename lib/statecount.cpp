@@ -18,8 +18,6 @@
 #include <chem/energy_levels.h>
 #include <numlib/constants.h>
 #include <numlib/math.h>
-#include <boost/math/special_functions/ellint_1.hpp>
-#include <boost/math/special_functions/ellint_2.hpp>
 #include <vector>
 #include <cmath>
 
@@ -155,8 +153,9 @@ Numlib::Vec<double> Chem::Statecount::hindered_rotor(double sigma,
                                                      double egrain,
                                                      bool sum)
 {
-    using namespace boost::math;
     using namespace Numlib::Constants;
+    using Numlib::comp_ellint_1;
+    using Numlib::comp_ellint_2;
 
     auto res = Numlib::zeros<Numlib::Vec<double>>(ngrains);
 
@@ -170,28 +169,28 @@ Numlib::Vec<double> Chem::Statecount::hindered_rotor(double sigma,
         for (int i = 0; i < iv0; ++i) {
             ei = i * egrain;
             res(i) = (4.0 * q1f * std::sqrt(v0) / std::pow(pi, 1.5)) *
-                     (ellint_2(ei / v0) - (1.0 - ei / v0) * ellint_1(ei / v0));
+                     (comp_ellint_2(ei / v0) -
+                      (1.0 - ei / v0) * comp_ellint_1(ei / v0));
         }
         // Ugly hack for E/V0 = 1 in order to avoid NaN:
         ei = iv0 * egrain;
-        res(iv0) =
-            (4.0 * q1f * std::sqrt(v0) / std::pow(pi, 1.5)) * ellint_2(ei / v0);
+        res(iv0) = (4.0 * q1f * std::sqrt(v0) / std::pow(pi, 1.5));
         for (int i = iv0 + 1; i < ngrains; ++i) {
             ei = i * egrain;
             res(i) = (4.0 * q1f * std::sqrt(ei) / std::pow(pi, 1.5)) *
-                     ellint_2(v0 / ei);
+                     comp_ellint_2(v0 / ei);
         }
     }
     else {
         for (int i = 0; i < iv0; ++i) {
             ei = i * egrain;
             res(i) = (2.0 * q1f / (std::pow(pi, 1.5) * std::sqrt(v0))) *
-                     ellint_1(ei / v0);
+                     comp_ellint_1(ei / v0);
         }
         for (int i = iv0 + 1; i < ngrains; ++i) {
             ei = i * egrain;
             res(i) = (2.0 * q1f / (std::pow(pi, 1.5) * std::sqrt(ei))) *
-                     ellint_1(v0 / ei);
+                     comp_ellint_1(v0 / ei);
         }
         // Ugly hack for E/V0 = 1 in order to avoid Inf:
         res(iv0) = 0.5 * (res(iv0 + 1) + res(iv0 - 1));
