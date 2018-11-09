@@ -54,7 +54,7 @@ endfunction()
 
 set(PROGRAMS 
     brw
-#    cambi
+    cambi
 #    caprate
 #    cartoxyz
 #    fchktoxyz
