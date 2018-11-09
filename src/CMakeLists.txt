@@ -55,7 +55,7 @@ endfunction()
 set(PROGRAMS 
     brw
     cambi
-#    caprate
+    caprate
 #    cartoxyz
 #    fchktoxyz
 #    gausscan

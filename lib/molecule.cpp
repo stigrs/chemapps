@@ -15,6 +15,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/molecule.h>
+#include <chem/impl/io_support.h>
+#include <stdutils/stdutils.h>
 
 Chem::Molecule::Molecule(std::istream& from,
                          const std::string& key,
@@ -26,7 +28,23 @@ Chem::Molecule::Molecule(std::istream& from,
       tor(from, key, geom, rot)
 {
     if (verbose) {
-        std::cout << "verbose\n";
+        Stdutils::Format<char> line;
+        line.width(15 + key.size()).fill('=');
+
+        Stdutils::Format<double> fix;
+        fix.fixed().precision(6);
+
+        std::cout << "Input data on " << key << ":\n" << line('=') << '\n';
+        std::cout << "Electronic energy: " << fix(elec.elec_energy())
+                  << " Hartree\n"
+                  << "Charge: " << elec.net_charge() << '\n'
+                  << "Spin multiplicity: " << elec.spin_mult() << '\n';
+        Chem::Impl::print_spin_orbit_states(std::cout, elec.spin_orbit_degen(),
+                                            elec.spin_orbit_energy());
+        std::cout << "\nInput orientation:\n";
+        Chem::Impl::print_geometry(std::cout, geom.atoms(), geom.cart_coord());
+        Chem::Impl::print_atomic_masses(std::cout, geom.atoms());
+        vib.print(std::cout);
     }
 }
 

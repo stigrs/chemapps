@@ -254,24 +254,25 @@ void Chem::Impl::print_zmat_format(std::ostream& to,
     }
 }
 
-void Chem::Impl::print_elec_states(std::ostream& to,
-                                   const Numlib::Vec<double>& elec_state)
+void Chem::Impl::print_spin_orbit_states(std::ostream& to,
+                                         const Numlib::Vec<int>& so_degen,
+                                         const Numlib::Vec<double>& so_energy)
 {
+    Assert::dynamic(same_extents(so_degen, so_energy));
+
     Stdutils::Format<char> line;
     line.width(34).fill('-');
 
     Stdutils::Format<double> fix;
     fix.fixed().width(6).precision(2);
 
-    to << "Electronic states:\n"
+    to << "Spin-orbit states:\n"
        << line('-') << '\n'
        << " #\tEnergy/cm^-1\tDegeneracy\n"
        << line('-') << '\n';
-    int it = 1;
-    for (Index i = 0; i < elec_state.size(); i += 2) {
-        to << " " << it << '\t' << fix(elec_state(i + 1)) << "\t\t"
-           << elec_state(i) << '\n';
-        it += 1;
+    for (Index i = 0; i < so_degen.size(); ++i) {
+        to << " " << i + 1 << '\t' << fix(so_energy(i)) << "\t\t" << so_degen(i)
+           << '\n';
     }
     to << line('-') << '\n';
 }

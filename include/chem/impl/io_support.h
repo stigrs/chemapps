@@ -64,8 +64,9 @@ namespace Impl {
                            const Numlib::Vec<int>& dihedral_connect);
 
     // Print molecular electronic states.
-    void print_elec_states(std::ostream& to,
-                           const Numlib::Vec<double>& elec_state);
+    void print_spin_orbit_states(std::ostream& to,
+                                 const Numlib::Vec<int>& so_degen,
+                                 const Numlib::Vec<double>& so_energy);
 
     // Print molecular geometry.
     void print_geometry(std::ostream& to,
