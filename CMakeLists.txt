@@ -108,8 +108,8 @@ endif()
 #
 # Build the software:
 
-# Create chemlib library.
 add_subdirectory(lib)
+add_subdirectory(src)
 
 # Enable testing.
 option(BUILD_TESTS "Build tests." ON)

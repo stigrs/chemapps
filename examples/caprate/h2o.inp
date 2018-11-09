@@ -1,0 +1,39 @@
+# H + OH --> H2O
+# Rotational dynamics, VRC-TST
+# CASPT2/aug-cc-pVTZ
+
+EnergyGrid
+ min    50
+ max    32500
+ step   50
+End
+
+AngMomGrid
+ min    2
+ max    200
+ step   2
+End
+
+TemprsGrid
+ min    300
+ max    3000
+ step   50
+End
+
+Fragment1
+ geometry
+ 2
+ OH radical
+ O  0.0000000  0.0000000  0.1077390
+ H  0.0000000  0.0000000 -0.8619150
+ sigma     
+ 1
+End
+
+Fragment2
+ geometry
+ 1
+ Hydrogen
+ H 0.0 0.0 0.0
+End 
+

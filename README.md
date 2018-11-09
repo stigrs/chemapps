@@ -32,9 +32,10 @@ ChemApps is released under the [MIT](LICENSE) license.
 ## Usage of Third Party Libraries
 
 This project makes use of the [Catch](https://https://github.com/philsquared/catch) 
-testing library and code from the [qcl](https://github.com/ben-albrecht/qcl) 
-project. Please see the [ThirdPartyNotices.txt](ThirdPartyNotices.txt) file 
-for details regarding the licensing of Catch and qcl.
+testing library, code from the [qcl](https://github.com/ben-albrecht/qcl) 
+project, and the [cxxopts](https://github.com/jarro2783/cxxopts) library. 
+Please see the [ThirdPartyNotices.txt](ThirdPartyNotices.txt) file for details 
+regarding the licensing of Catch, qcl, and cxxopts, and cxxopts.
 
 The user of this software needs to obtain separate licenses for [MOPAC](http://openmopac.net/index.html), 
 [MOPAC 5.022mn](https://comp.chem.umn.edu/mopac/) or [Gaussian](http://gaussian.com/). 

@@ -1,0 +1,14 @@
+SpeciesA 
+    name            Ar
+    type            atom
+    polarizability  2.49
+    n_el_int        18   # number of internal electrons
+    n_el_ext        18   # number of external electrons
+End 
+SpeciesB 
+    name            H2O
+    type            molecule
+    polarizability  1.46
+    n_el_int        4    # number of non-bonding electrons
+    n_el_ext        4    # number of bonding electrons
+End 

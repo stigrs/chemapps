@@ -1,0 +1,657 @@
+ Entering Gaussian System, ...
+ 
+ ...
+ 
+ Default route:  MP2=Direct MaxDisk=2000MB
+ -------------------------------
+ # mp2/6-31++g(d) counterpoise=2
+ -------------------------------
+ 1/38=1,62=2/1;
+ 2/17=6,18=5,40=1/2;
+ 1/38=1,53=5172,62=2/22;
+ 3/5=1,6=6,7=1011,11=9,16=1,25=1,30=1/1,2,3;
+ 4//1;
+ 5/5=2,38=5/2;
+ 8/10=2/1;
+ 9//6;
+ 6/7=2,8=2,9=2,10=2/1;
+ 1/53=4052,62=2,63=1/22;
+ 3/5=7,6=11,7=1011,11=9,16=1,25=1,30=1,82=7/1,2,3;
+ 4//1;
+ 5/5=2,38=5/2;
+ 8/10=2/1;
+ 9//6;
+ 6/7=2,8=2,9=2,10=2/1;
+ 1/53=3042,62=2,63=2/22;
+ 3/5=7,6=11,7=1011,11=9,16=1,25=1,30=1,82=7/1,2,3;
+ 4//1;
+ 5/5=2,38=5/2;
+ 8/10=2/1;
+ 9//6;
+ 6/7=2,8=2,9=2,10=2/1;
+ 1/53=2032,62=2,63=3/22;
+ 3/5=7,6=11,7=1011,11=9,16=1,25=1,30=1,82=7/1,2,3;
+ 4//1;
+ 5/5=2,38=5/2;
+ 8/10=2/1;
+ 9//6;
+ 6/7=2,8=2,9=2,10=2/1;
+ 1/53=1022,62=2,63=4/22;
+ 3/5=7,6=11,7=1011,11=9,16=1,25=1,30=1,82=7/1,2,3;
+ 4//1;
+ 5/5=2,38=5/2;
+ 8/10=2/1;
+ 9//6;
+ 6/7=2,8=2,9=2,10=2/1;
+ 1/53=5014,62=2,63=5/22;
+ 99/5=1,9=1/99;
+ ---------------------------
+ H2O + Na+ complex with BSSE
+ ---------------------------
+ Symbolic Z-matrix:
+ Charge =  1 Multiplicity = 1 in supermolecule
+ Charge =  0 Multiplicity = 1 in fragment  1.
+ Charge =  1 Multiplicity = 1 in fragment  2.
+ O                     0.00002   1.12829   0.         
+ H                    -0.7774    1.72776   0.         
+ H                     0.77708   1.72822   0.         
+ Na                    0.00002  -1.13475   0.         
+ 
+ ...
+ 
+ 
+                          Input orientation:                          
+ ---------------------------------------------------------------------
+ Center     Atomic     Atomic              Coordinates (Angstroms)
+ Number     Number      Type              X           Y           Z
+ ---------------------------------------------------------------------
+    1          8             0        0.000017    1.128289    0.000000
+    2          1             0       -0.777403    1.727759    0.000000
+    3          1             0        0.777079    1.728221    0.000000
+    4         11             0        0.000017   -1.134754    0.000000
+ ---------------------------------------------------------------------
+                    Distance matrix (angstroms):
+                    1          2          3          4
+     1  O    0.000000
+     2  H    0.981706   0.000000
+     3  H    0.981705   1.554482   0.000000
+     4  Na   2.263043   2.966203   2.966555   0.000000
+ Stoichiometry    H2NaO(1+)
+ Framework group  CS[SG(H2NaO)]
+ Deg. of freedom     5
+ Full point group                 CS
+ Largest Abelian subgroup         CS      NOp   2
+ Largest concise Abelian subgroup C1      NOp   1
+                         Standard orientation:                         
+ ---------------------------------------------------------------------
+ Center     Atomic     Atomic              Coordinates (Angstroms)
+ Number     Number      Type              X           Y           Z
+ ---------------------------------------------------------------------
+    1          8             0        0.000017   -1.128289    0.000000
+    2          1             0       -0.777403   -1.727759    0.000000
+    3          1             0        0.777079   -1.728221    0.000000
+    4         11             0        0.000017    1.134754    0.000000
+ ---------------------------------------------------------------------
+ Rotational constants (GHZ):    415.0406482      9.1096672      8.9140148
+ Standard basis: 6-31++G(d) (6D, 7F)
+ There are    37 symmetry adapted basis functions of A'  symmetry.
+ There are    11 symmetry adapted basis functions of A"  symmetry.
+ Integral buffers will be    131072 words long.
+ Raffenetti 1 integral format.
+ Two-electron integral symmetry is turned on.
+    48 basis functions,    98 primitive gaussians,    48 cartesian basis functions
+    10 alpha electrons       10 beta electrons
+       nuclear repulsion energy        33.4670810559 Hartrees.
+ NAtoms=    4 NActive=    4 NUniq=    4 SFac= 7.50D-01 NAtFMM=   80 NAOKFM=F Big=F
+ One-electron integrals computed using PRISM.
+ NBasis=    48 RedAO= T  NBF=    37    11
+ NBsUse=    48 1.00D-06 NBFU=    37    11
+ Harris functional with IExCor=  205 diagonalized for initial guess.
+ ExpMin= 7.60D-03 ExpMax= 9.99D+03 ExpMxC= 1.50D+03 IAcc=3 IRadAn=         5 AccDes= 0.00D+00
+ HarFok:  IExCor= 205 AccDes= 0.00D+00 IRadAn=         5 IDoV=1
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000
+ Initial guess orbital symmetries:
+       Occupied  (A') (A') (A') (A') (A') (A") (A') (A') (A') (A")
+       Virtual   (A') (A') (A') (A") (A') (A') (A') (A") (A') (A')
+                 (A') (A') (A") (A") (A') (A') (A') (A') (A') (A')
+                 (A") (A') (A") (A') (A') (A') (A') (A') (A") (A')
+                 (A') (A') (A") (A") (A') (A') (A') (A')
+ The electronic state of the initial guess is 1-A'.
+ Requested convergence on RMS density matrix=1.00D-08 within 128 cycles.
+ Requested convergence on MAX density matrix=1.00D-06.
+ Requested convergence on             energy=1.00D-06.
+ No special actions if energy rises.
+ Keep R1 integrals in memory in canonical form, NReq=     1596656.
+ SCF Done:  E(RHF) =  -237.717079519     A.U. after   10 cycles
+             Convg  =    0.3890D-08             -V/T =  2.0022
+             S**2   =   0.0000
+ ExpMin= 7.60D-03 ExpMax= 9.99D+03 ExpMxC= 1.50D+03 IAcc=3 IRadAn=         5 AccDes= 0.00D+00
+ HarFok:  IExCor= 205 AccDes= 0.00D+00 IRadAn=         5 IDoV=1
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000
+ Range of M.O.s used for correlation:     7    48
+ NBasis=    48 NAE=    10 NBE=    10 NFC=     6 NFV=     0
+ NROrb=     42 NOA=     4 NOB=     4 NVA=    38 NVB=    38
+ Fully in-core method, ICMem=     7604160.
+ JobTyp=1 Pass  1 fully in-core, NPsUse=  1.
+ Spin components of T(2) and E(2):
+     alpha-alpha T2 =       0.6868174144D-02 E2=     -0.2506032064D-01
+     alpha-beta  T2 =       0.3944641817D-01 E2=     -0.1439137787D+00
+     beta-beta   T2 =       0.6868174144D-02 E2=     -0.2506032064D-01
+ ANorm=    0.1026246932D+01 
+ E2 =    -0.1940344200D+00 EUMP2 =    -0.23791111393888D+03
+
+ **********************************************************************
+
+            Population analysis using the SCF density.
+
+ **********************************************************************
+
+ Orbital symmetries:
+       Occupied  (A') (A') (A') (A') (A") (A') (A') (A') (A') (A")
+       Virtual   (A') (A') (A') (A") (A') (A') (A') (A") (A') (A')
+                 (A') (A') (A") (A") (A') (A') (A') (A') (A') (A')
+                 (A") (A') (A") (A') (A') (A') (A') (A') (A") (A')
+                 (A') (A') (A") (A") (A') (A') (A') (A')
+ The electronic state is 1-A'.
+ Alpha  occ. eigenvalues --  -40.71870 -20.79160  -3.02702  -1.75006  -1.74968
+ Alpha  occ. eigenvalues --   -1.74910  -1.55262  -0.91577  -0.81102  -0.71875
+ Alpha virt. eigenvalues --   -0.14803  -0.09387  -0.09310  -0.08969  -0.06112
+ Alpha virt. eigenvalues --   -0.04718  -0.04430  -0.04367  -0.03929  -0.03432
+ Alpha virt. eigenvalues --    0.03730   0.06717   0.07167   0.10799   0.11320
+ Alpha virt. eigenvalues --    0.15325   0.15527   0.18544   0.21024   0.26952
+ Alpha virt. eigenvalues --    0.27505   0.29299   0.33128   0.43628   0.46704
+ Alpha virt. eigenvalues --    0.55300   1.06664   1.13777   1.22653   1.28767
+ Alpha virt. eigenvalues --    1.35338   1.49432   1.81310   1.88961   1.96504
+ Alpha virt. eigenvalues --    2.40170   2.79488   4.08598
+          Condensed to atoms (all electrons):
+              1          2          3          4
+     1  O    8.586848   0.242468   0.242471   0.004852
+     2  H    0.242468   0.230360  -0.015984  -0.000215
+     3  H    0.242471  -0.015984   0.230307  -0.000208
+     4  Na   0.004852  -0.000215  -0.000208  10.005718
+ Mulliken atomic charges:
+              1
+     1  O   -1.076639
+     2  H    0.543370
+     3  H    0.543415
+     4  Na   0.989853
+ Sum of Mulliken charges=   1.00000
+ Atomic charges with hydrogens summed into heavy atoms:
+              1
+     1  O    0.010147
+     2  H    0.000000
+     3  H    0.000000
+     4  Na   0.989853
+ Sum of Mulliken charges=   1.00000
+ Electronic spatial extent (au):  =   122.2698
+ Charge=     1.0000 electrons
+ Dipole moment (field-independent basis, Debye):
+    X=    -0.0006    Y=     2.4724    Z=     0.0000  Tot=     2.4724
+ Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=    -6.7714   YY=     4.3288   ZZ=   -10.5755
+   XY=     0.0003   XZ=     0.0000   YZ=     0.0000
+ Traceless Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=    -2.4321   YY=     8.6682   ZZ=    -6.2362
+   XY=     0.0003   XZ=     0.0000   YZ=     0.0000
+ Octapole moment (field-independent basis, Debye-Ang**2):
+  XXX=    -0.0014  YYY=     4.3304  ZZZ=     0.0000  XYY=     0.0013
+  XXY=    -0.4247  XXZ=     0.0000  XZZ=     0.0000  YZZ=     5.6157
+  YYZ=     0.0000  XYZ=     0.0000
+ Hexadecapole moment (field-independent basis, Debye-Ang**3):
+ XXXX=    -6.2067 YYYY=   -46.7042 ZZZZ=    -7.5787 XXXY=     0.0016
+ XXXZ=     0.0000 YYYX=    -0.0050 YYYZ=     0.0000 ZZZX=     0.0000
+ ZZZY=     0.0000 XXYY=    -6.8525 XXZZ=    -2.6372 YYZZ=   -16.7371
+ XXYZ=     0.0000 YYXZ=     0.0000 ZZXY=    -0.0001
+ N-N= 3.346708105592D+01 E-N=-6.319836588568D+02  KE= 2.371840076607D+02
+ Symmetry A'   KE= 2.209619541334D+02
+ Symmetry A"   KE= 1.622205352734D+01
+ Counterpoise: doing DCBS calculation for fragment   1 NewBq=T
+ Basis read from rwf:  (6D, 7F)
+ There are    37 symmetry adapted basis functions of A'  symmetry.
+ There are    11 symmetry adapted basis functions of A"  symmetry.
+ Integral buffers will be    131072 words long.
+ Raffenetti 1 integral format.
+ Two-electron integral symmetry is turned on.
+    48 basis functions,    98 primitive gaussians,    48 cartesian basis functions
+     5 alpha electrons        5 beta electrons
+       nuclear repulsion energy         8.9650420056 Hartrees.
+ NAtoms=    4 NActive=    4 NUniq=    4 SFac= 7.50D-01 NAtFMM=   80 NAOKFM=F Big=F
+ One-electron integrals computed using PRISM.
+ NBasis=    48 RedAO= T  NBF=    37    11
+ NBsUse=    48 1.00D-06 NBFU=    37    11
+ Harris functional with IExCor=  205 diagonalized for initial guess.
+ ExpMin= 7.60D-03 ExpMax= 9.99D+03 ExpMxC= 1.50D+03 IAcc=3 IRadAn=         5 AccDes= 0.00D+00
+ HarFok:  IExCor= 205 AccDes= 0.00D+00 IRadAn=         5 IDoV=1
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000
+ Initial guess orbital symmetries:
+       Occupied  (A') (A') (A') (A') (A")
+       Virtual   (A') (A') (A') (A") (A') (A') (A') (A") (A') (A')
+                 (A') (A') (A") (A') (A') (A') (A") (A') (A') (A')
+                 (A") (A') (A") (A') (A') (A') (A') (A') (A") (A')
+                 (A') (A') (A") (A") (A') (A') (A') (A') (A') (A")
+                 (A') (A') (A')
+ The electronic state of the initial guess is 1-A'.
+ Requested convergence on RMS density matrix=1.00D-08 within 128 cycles.
+ Requested convergence on MAX density matrix=1.00D-06.
+ Requested convergence on             energy=1.00D-06.
+ No special actions if energy rises.
+ Keep R1 integrals in memory in canonical form, NReq=     1596656.
+ SCF Done:  E(RHF) =  -76.0172343225     A.U. after   10 cycles
+             Convg  =    0.6922D-08             -V/T =  2.0048
+             S**2   =   0.0000
+ ExpMin= 7.60D-03 ExpMax= 9.99D+03 ExpMxC= 1.50D+03 IAcc=3 IRadAn=         5 AccDes= 0.00D+00
+ HarFok:  IExCor= 205 AccDes= 0.00D+00 IRadAn=         5 IDoV=1
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000
+ Range of M.O.s used for correlation:     2    48
+ NBasis=    48 NAE=     5 NBE=     5 NFC=     1 NFV=     0
+ NROrb=     47 NOA=     4 NOB=     4 NVA=    43 NVB=    43
+ Fully in-core method, ICMem=     7605120.
+ JobTyp=1 Pass  1 fully in-core, NPsUse=  1.
+ Spin components of T(2) and E(2):
+     alpha-alpha T2 =       0.7070160964D-02 E2=     -0.2521548613D-01
+     alpha-beta  T2 =       0.4075763703D-01 E2=     -0.1454175398D+00
+     beta-beta   T2 =       0.7070160964D-02 E2=     -0.2521548613D-01
+ ANorm=    0.1027082255D+01
+ E2 =    -0.1958485120D+00 EUMP2 =    -0.76213082834562D+02
+
+ **********************************************************************
+
+            Population analysis using the SCF density.
+
+ **********************************************************************
+
+ Orbital symmetries:
+       Occupied  (A') (A') (A') (A') (A")
+       Virtual   (A') (A') (A') (A") (A') (A') (A') (A") (A') (A')
+                 (A') (A") (A') (A') (A") (A') (A') (A') (A') (A')
+                 (A") (A') (A') (A") (A') (A') (A') (A') (A") (A')
+                 (A') (A') (A") (A') (A") (A') (A') (A') (A') (A")
+                 (A') (A') (A')
+ The electronic state is 1-A'.
+ Alpha  occ. eigenvalues --  -20.58664  -1.34451  -0.70931  -0.58082  -0.50731
+ Alpha virt. eigenvalues --    0.01052   0.01799   0.01836   0.01948   0.06394
+ Alpha virt. eigenvalues --    0.07550   0.08161   0.09011   0.09095   0.09849
+ Alpha virt. eigenvalues --    0.22458   0.27907   0.29279   0.29986   0.31230
+ Alpha virt. eigenvalues --    0.33726   0.36078   0.39253   0.39669   0.47845
+ Alpha virt. eigenvalues --    0.63867   0.64533   0.67086   0.69194   0.77981
+ Alpha virt. eigenvalues --    0.91673   1.25822   1.32131   1.43196   1.50776
+ Alpha virt. eigenvalues --    1.55597   1.69566   2.02741   2.07466   2.11801
+ Alpha virt. eigenvalues --    2.24159   2.61158   3.01022   4.29648   6.19936
+ Alpha virt. eigenvalues --    6.20521   6.24889  61.68219
+          Condensed to atoms (all electrons):
+              1          2          3          4
+     1  O    8.721655   0.228548   0.228548  -0.123293
+     2  H    0.228548   0.305294  -0.026462   0.008537
+     3  H    0.228548  -0.026462   0.305271   0.008541
+     4  Na  -0.123293   0.008537   0.008541   0.018942
+ Mulliken atomic charges:
+              1
+     1  O   -1.055457
+     2  H    0.484083
+     3  H    0.484102
+     4  Na   0.087273
+ Sum of Mulliken charges=   0.00000
+ Atomic charges with hydrogens summed into heavy atoms:
+              1
+     1  O   -0.087273
+     2  H    0.000000
+     3  H    0.000000
+     4  Na   0.087273
+ Sum of Mulliken charges=   0.00000
+ Electronic spatial extent (au):  =    71.4370
+ Charge=     0.0000 electrons
+ Dipole moment (field-independent basis, Debye):
+    X=    -0.0007    Y=    -2.2197    Z=     0.0000  Tot=     2.2197
+ Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=    -4.1568   YY=    -0.7497   ZZ=    -7.7739
+   XY=     0.0002   XZ=     0.0000   YZ=     0.0000
+ Traceless Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=     0.0700   YY=     3.4771   ZZ=    -3.5471
+   XY=     0.0002   XZ=     0.0000   YZ=     0.0000
+ Octapole moment (field-independent basis, Debye-Ang**2):
+  XXX=    -0.0011  YYY=    11.6537  ZZZ=     0.0000  XYY=     0.0010
+  XXY=     3.6618  XXZ=     0.0000  XZZ=     0.0000  YZZ=     9.3119
+  YYZ=     0.0000  XYZ=     0.0000
+ Hexadecapole moment (field-independent basis, Debye-Ang**3):
+ XXXX=    -6.1329 YYYY=   -42.1729 ZZZZ=    -7.1726 XXXY=     0.0016
+ XXXZ=     0.0000 YYYX=    -0.0042 YYYZ=     0.0000 ZZZX=     0.0000
+ ZZZY=     0.0000 XXYY=    -4.6244 XXZZ=    -2.5223 YYZZ=   -13.6448
+ XXYZ=     0.0000 YYXZ=     0.0000 ZZXY=     0.0000
+ N-N= 8.965042005590D+00 E-N=-1.981578218227D+02  KE= 7.565046734275D+01
+ Symmetry A'   KE= 7.118103675955D+01
+ Symmetry A"   KE= 4.469430583200D+00
+ Counterpoise: doing DCBS calculation for fragment   2 NewBq=T
+ Basis read from rwf:  (6D, 7F)
+ There are    37 symmetry adapted basis functions of A'  symmetry.
+ There are    11 symmetry adapted basis functions of A"  symmetry.
+ Integral buffers will be    131072 words long.
+ Raffenetti 1 integral format.
+ Two-electron integral symmetry is turned on.
+    48 basis functions,    98 primitive gaussians,    48 cartesian basis functions
+     5 alpha electrons        5 beta electrons
+       nuclear repulsion energy         0.0000000000 Hartrees.
+ NAtoms=    4 NActive=    4 NUniq=    4 SFac= 7.50D-01 NAtFMM=   80 NAOKFM=F Big=F
+ One-electron integrals computed using PRISM.
+ NBasis=    48 RedAO= T  NBF=    37    11
+ NBsUse=    48 1.00D-06 NBFU=    37    11
+ Harris functional with IExCor=  205 diagonalized for initial guess.
+ ExpMin= 7.60D-03 ExpMax= 9.99D+03 ExpMxC= 1.50D+03 IAcc=3 IRadAn=         5 AccDes= 0.00D+00
+ HarFok:  IExCor= 205 AccDes= 0.00D+00 IRadAn=         5 IDoV=1
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000
+ Initial guess orbital symmetries:
+       Occupied  (A') (A') (A') (A') (A")
+       Virtual   (A') (A') (A') (A") (A') (A') (A') (A") (A') (A')
+                 (A') (A') (A") (A') (A") (A') (A') (A') (A') (A")
+                 (A") (A') (A') (A') (A') (A') (A') (A") (A') (A')
+                 (A') (A') (A') (A") (A") (A') (A') (A') (A') (A")
+                 (A') (A') (A')
+ The electronic state of the initial guess is 1-A'.
+ Requested convergence on RMS density matrix=1.00D-08 within 128 cycles.
+ Requested convergence on MAX density matrix=1.00D-06.
+ Requested convergence on             energy=1.00D-06.
+ No special actions if energy rises.
+ Keep R1 integrals in memory in canonical form, NReq=     1596656.
+ SCF Done:  E(RHF) =  -161.659346199     A.U. after    6 cycles
+             Convg  =    0.1374D-08             -V/T =  2.0012
+             S**2   =   0.0000
+ Range of M.O.s used for correlation:     6    48
+ NBasis=    48 NAE=     5 NBE=     5 NFC=     5 NFV=     0
+ NROrb=     43 NOA=     0 NOB=     0 NVA=    43 NVB=    43
+ *** There is no correlation energy for this system ***
+ Not enough disk for semidirect, minimum=************
+ Fully in-core method, ICMem=     7596864.
+ No occupied orbitals for this spin space.
+ Spin components of T(2) and E(2):
+     alpha-alpha T2 =       0.0000000000D+00 E2=      0.0000000000D+00
+     alpha-beta  T2 =       0.0000000000D+00 E2=      0.0000000000D+00
+     beta-beta   T2 =       0.0000000000D+00 E2=      0.0000000000D+00
+ ANorm=    0.1000000000D+01
+ E2 =     0.0000000000D+00 EUMP2 =    -0.16165934619852D+03
+
+ **********************************************************************
+
+            Population analysis using the SCF density.
+
+ **********************************************************************
+
+ Orbital symmetries:
+       Occupied  (A') (A') (A') (A') (A")
+       Virtual   (A') (A') (A') (A") (A') (A') (A') (A") (A') (A')
+                 (A') (A') (A") (A') (A") (A') (A') (A') (A') (A")
+                 (A') (A") (A') (A') (A') (A') (A') (A") (A') (A')
+                 (A') (A') (A') (A") (A") (A') (A') (A') (A') (A")
+                 (A') (A') (A')
+ The electronic state is 1-A'.
+ Alpha  occ. eigenvalues --  -40.78019  -3.08446  -1.80690  -1.80686  -1.80685
+ Alpha virt. eigenvalues --   -0.18200  -0.10941  -0.10940  -0.10940  -0.06989
+ Alpha virt. eigenvalues --   -0.04976  -0.04975  -0.04975  -0.03960  -0.02748
+ Alpha virt. eigenvalues --    0.01649   0.03964   0.04081   0.04727   0.05655
+ Alpha virt. eigenvalues --    0.10698   0.11156   0.21517   0.23462   0.23940
+ Alpha virt. eigenvalues --    0.30201   0.30440   0.34967   0.45829   0.45865
+ Alpha virt. eigenvalues --    0.48871   0.59332   0.68931   0.79722   0.85451
+ Alpha virt. eigenvalues --    2.18207   2.27726   2.37825   2.57627   2.61790
+ Alpha virt. eigenvalues --    2.71725   3.36073   3.85234   4.35487   5.23742
+ Alpha virt. eigenvalues --    5.36757   5.41729  38.04815
+          Condensed to atoms (all electrons):
+              1          2          3          4
+     1  O    0.000115  -0.000012  -0.000012   0.002484
+     2  H   -0.000012   0.000008   0.000001  -0.000136
+     3  H   -0.000012   0.000001   0.000008  -0.000136
+     4  Na   0.002484  -0.000136  -0.000136   9.995489
+ Mulliken atomic charges:
+              1
+     1  O   -0.002575
+     2  H    0.000139
+     3  H    0.000139
+     4  Na   1.002298
+ Sum of Mulliken charges=   1.00000
+ Atomic charges with hydrogens summed into heavy atoms:
+              1
+     1  O   -0.002298
+     2  H    0.000000
+     3  H    0.000000
+     4  Na   1.002298
+ Sum of Mulliken charges=   1.00000
+ Electronic spatial extent (au):  =    52.4453
+ Charge=     1.0000 electrons
+ Dipole moment (field-independent basis, Debye):
+    X=     0.0001    Y=     5.4483    Z=     0.0000  Tot=     5.4483
+ Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=    -2.8952   YY=     3.2839   ZZ=    -2.8953
+   XY=     0.0001   XZ=     0.0000   YZ=     0.0000
+ Traceless Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=    -2.0597   YY=     4.1195   ZZ=    -2.0598
+   XY=     0.0001   XZ=     0.0000   YZ=     0.0000
+ Octapole moment (field-independent basis, Debye-Ang**2):
+  XXX=    -0.0001  YYY=    -2.8492  ZZZ=     0.0000  XYY=     0.0001
+  XXY=    -3.2859  XXZ=     0.0000  XZZ=     0.0000  YZZ=    -3.2860
+  YYZ=     0.0000  XYZ=     0.0000
+ Hexadecapole moment (field-independent basis, Debye-Ang**3):
+ XXXX=    -0.8773 YYYY=   -15.3071 ZZZZ=    -0.8775 XXXY=    -0.0002
+ XXXZ=     0.0000 YYYX=     0.0000 YYYZ=     0.0000 ZZZX=     0.0000
+ ZZZY=     0.0000 XXYY=    -4.0220 XXZZ=    -0.2925 YYZZ=    -4.0220
+ XXYZ=     0.0000 YYXZ=     0.0000 ZZXY=    -0.0001
+ N-N= 0.000000000000D+00 E-N=-3.862187199198D+02  KE= 1.614705306648D+02
+ Symmetry A'   KE= 1.497178174704D+02
+ Symmetry A"   KE= 1.175271319439D+01
+ Counterpoise: doing MCBS calculation for fragment   1
+ Basis read from rwf:  (6D, 7F)
+ There are    20 symmetry adapted basis functions of A'  symmetry.
+ There are     5 symmetry adapted basis functions of A"  symmetry.
+ Integral buffers will be    131072 words long.
+ Raffenetti 1 integral format.
+ Two-electron integral symmetry is turned on.
+    25 basis functions,    42 primitive gaussians,    25 cartesian basis functions
+     5 alpha electrons        5 beta electrons
+       nuclear repulsion energy         8.9650420056 Hartrees.
+ NAtoms=    4 NActive=    3 NUniq=    3 SFac= 7.50D-01 NAtFMM=   80 NAOKFM=F Big=F
+ One-electron integrals computed using PRISM.
+ NBasis=    25 RedAO= T  NBF=    20     5
+ NBsUse=    25 1.00D-06 NBFU=    20     5
+ Harris functional with IExCor=  205 diagonalized for initial guess.
+ ExpMin= 3.60D-02 ExpMax= 5.48D+03 ExpMxC= 8.25D+02 IAcc=3 IRadAn=         5 AccDes= 0.00D+00
+ HarFok:  IExCor= 205 AccDes= 0.00D+00 IRadAn=         5 IDoV=1
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000
+ Initial guess orbital symmetries:
+       Occupied  (A') (A') (A') (A') (A")
+       Virtual   (A') (A') (A') (A") (A') (A') (A') (A') (A') (A')
+                 (A") (A') (A') (A') (A') (A") (A") (A') (A') (A')
+ The electronic state of the initial guess is 1-A'.
+ Requested convergence on RMS density matrix=1.00D-08 within 128 cycles.
+ Requested convergence on MAX density matrix=1.00D-06.
+ Requested convergence on             energy=1.00D-06.
+ No special actions if energy rises.
+ Keep R1 integrals in memory in canonical form, NReq=      901377.
+ SCF Done:  E(RHF) =  -76.0156035652     A.U. after   11 cycles
+             Convg  =    0.1309D-08             -V/T =  2.0047
+             S**2   =   0.0000
+ ExpMin= 3.60D-02 ExpMax= 5.48D+03 ExpMxC= 8.25D+02 IAcc=3 IRadAn=         5 AccDes= 0.00D+00
+ HarFok:  IExCor= 205 AccDes= 0.00D+00 IRadAn=         5 IDoV=1
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000
+ Range of M.O.s used for correlation:     2    25
+ NBasis=    25 NAE=     5 NBE=     5 NFC=     1 NFV=     0
+ NROrb=     24 NOA=     4 NOB=     4 NVA=    20 NVB=    20
+ Fully in-core method, ICMem=     6142039.
+ JobTyp=1 Pass  1 fully in-core, NPsUse=  1.
+ Spin components of T(2) and E(2):
+     alpha-alpha T2 =       0.6934211462D-02 E2=     -0.2495874132D-01
+     alpha-beta  T2 =       0.4031760637D-01 E2=     -0.1444124625D+00
+     beta-beta   T2 =       0.6934211462D-02 E2=     -0.2495874132D-01
+ ANorm=    0.1026735618D+01
+ E2 =    -0.1943299452D+00 EUMP2 =    -0.76209933510410D+02
+
+ **********************************************************************
+
+            Population analysis using the SCF density.
+
+ **********************************************************************
+
+ Orbital symmetries:
+       Occupied  (A') (A') (A') (A') (A")
+       Virtual   (A') (A') (A') (A") (A') (A') (A') (A') (A') (A')
+                 (A") (A') (A') (A') (A') (A") (A") (A') (A') (A')
+ The electronic state is 1-A'.
+ Alpha  occ. eigenvalues --  -20.58579  -1.34489  -0.70964  -0.58011  -0.50750
+ Alpha virt. eigenvalues --    0.04126   0.07186   0.24122   0.25294   0.27768
+ Alpha virt. eigenvalues --    0.31485   0.34703   0.39977   1.21256   1.31136
+ Alpha virt. eigenvalues --    1.40466   1.42347   1.48233   1.63092   2.01376
+ Alpha virt. eigenvalues --    2.02462   2.05803   2.60306   2.98401   4.20831
+          Condensed to atoms (all electrons):
+              1          2          3
+     1  O    8.469629   0.241520   0.241520
+     2  H    0.241520   0.320781  -0.038635
+     3  H    0.241520  -0.038635   0.320780
+ Mulliken atomic charges:
+              1
+     1  O   -0.952669
+     2  H    0.476334
+     3  H    0.476335
+     4  Na   0.000000
+ Sum of Mulliken charges=   0.00000
+ Atomic charges with hydrogens summed into heavy atoms:
+              1
+     1  O    0.000000
+     2  H    0.000000
+     3  H    0.000000
+     4  Na   0.000000
+ Sum of Mulliken charges=   0.00000
+ Electronic spatial extent (au):  =    71.1936
+ Charge=     0.0000 electrons
+ Dipole moment (field-independent basis, Debye):
+    X=    -0.0007    Y=    -2.3400    Z=     0.0000  Tot=     2.3400
+ Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=    -4.1611   YY=    -0.4577   ZZ=    -7.7343
+   XY=     0.0003   XZ=     0.0000   YZ=     0.0000
+ Traceless Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=    -0.0434   YY=     3.6600   ZZ=    -3.6166
+   XY=     0.0003   XZ=     0.0000   YZ=     0.0000
+ Octapole moment (field-independent basis, Debye-Ang**2):
+  XXX=    -0.0011  YYY=    10.9829  ZZZ=     0.0000  XYY=     0.0009
+  XXY=     3.6500  XXZ=     0.0000  XZZ=     0.0000  YZZ=     9.1931
+  YYZ=     0.0000  XYZ=     0.0000
+ Hexadecapole moment (field-independent basis, Debye-Ang**3):
+ XXXX=    -6.0072 YYYY=   -39.7034 ZZZZ=    -6.8915 XXXY=     0.0016
+ XXXZ=     0.0000 YYYX=    -0.0039 YYYZ=     0.0000 ZZZX=     0.0000
+ ZZZY=     0.0000 XXYY=    -4.4902 XXZZ=    -2.4491 YYZZ=   -13.3295
+ XXYZ=     0.0000 YYXZ=     0.0000 ZZXY=     0.0000
+ N-N= 8.965042005590D+00 E-N=-1.981649259185D+02  KE= 7.565951172763D+01
+ Symmetry A'   KE= 7.118588192494D+01
+ Symmetry A"   KE= 4.473629802697D+00
+ Counterpoise: doing MCBS calculation for fragment   2
+ Basis read from rwf:  (6D, 7F)
+ There are    17 symmetry adapted basis functions of A'  symmetry.
+ There are     6 symmetry adapted basis functions of A"  symmetry.
+ Integral buffers will be    131072 words long.
+ Raffenetti 1 integral format.
+ Two-electron integral symmetry is turned on.
+    23 basis functions,    56 primitive gaussians,    23 cartesian basis functions
+     5 alpha electrons        5 beta electrons
+       nuclear repulsion energy         0.0000000000 Hartrees.
+ NAtoms=    4 NActive=    1 NUniq=    1 SFac= 7.50D-01 NAtFMM=   80 NAOKFM=F Big=F
+ One-electron integrals computed using PRISM.
+ NBasis=    23 RedAO= T  NBF=    17     6
+ NBsUse=    23 1.00D-06 NBFU=    17     6
+ Harris functional with IExCor=  205 diagonalized for initial guess.
+ ExpMin= 7.60D-03 ExpMax= 9.99D+03 ExpMxC= 1.50D+03 IAcc=3 IRadAn=         5 AccDes= 0.00D+00
+ HarFok:  IExCor= 205 AccDes= 0.00D+00 IRadAn=         5 IDoV=1
+ ScaDFX=  1.000000  1.000000  1.000000  1.000000
+ Initial guess orbital symmetries:
+       Occupied  (A') (A') (A') (A") (A')
+       Virtual   (A') (A') (A") (A') (A') (A") (A') (A') (A') (A")
+                 (A') (A') (A') (A") (A") (A') (A') (A')
+ The electronic state of the initial guess is 1-A'.
+ Requested convergence on RMS density matrix=1.00D-08 within 128 cycles.
+ Requested convergence on MAX density matrix=1.00D-06.
+ Requested convergence on             energy=1.00D-06.
+ No special actions if energy rises.
+ Keep R1 integrals in memory in canonical form, NReq=      884384.
+ SCF Done:  E(RHF) =  -161.659289462     A.U. after    5 cycles
+             Convg  =    0.7681D-08             -V/T =  2.0011
+             S**2   =   0.0000
+ Range of M.O.s used for correlation:     6    23
+ NBasis=    23 NAE=     5 NBE=     5 NFC=     5 NFV=     0
+ NROrb=     18 NOA=     0 NOB=     0 NVA=    18 NVB=    18
+ *** There is no correlation energy for this system ***
+ Not enough disk for semidirect, minimum=************
+ Fully in-core method, ICMem=     6109460.
+ No occupied orbitals for this spin space.
+ Spin components of T(2) and E(2):
+     alpha-alpha T2 =       0.0000000000D+00 E2=      0.0000000000D+00
+     alpha-beta  T2 =       0.0000000000D+00 E2=      0.0000000000D+00
+     beta-beta   T2 =       0.0000000000D+00 E2=      0.0000000000D+00
+ ANorm=    0.1000000000D+01
+ E2 =     0.0000000000D+00 EUMP2 =    -0.16165928946173D+03
+
+ **********************************************************************
+
+            Population analysis using the SCF density.
+
+ **********************************************************************
+
+ Orbital symmetries:
+       Occupied  (A') (A') (A') (A") (A')
+       Virtual   (A') (A') (A') (A") (A') (A") (A') (A') (A') (A')
+                 (A") (A') (A') (A') (A") (A') (A") (A')
+ The electronic state is 1-A'.
+ Alpha  occ. eigenvalues --  -40.78026  -3.08460  -1.80696  -1.80696  -1.80696
+ Alpha virt. eigenvalues --   -0.18200  -0.10940  -0.10940  -0.10940  -0.06982
+ Alpha virt. eigenvalues --   -0.04975  -0.04975  -0.04975   0.03058   0.05061
+ Alpha virt. eigenvalues --    0.05061   0.05061   0.23942   0.23942   0.23942
+ Alpha virt. eigenvalues --    0.23942   0.23942   0.44387
+          Condensed to atoms (all electrons):
+              1
+     1  Na  10.000000
+ Mulliken atomic charges:
+              1
+     1  O    0.000000
+     2  H    0.000000
+     3  H    0.000000
+     4  Na   1.000000
+ Sum of Mulliken charges=   1.00000
+ Atomic charges with hydrogens summed into heavy atoms:
+              1
+     1  O    0.000000
+     2  H    0.000000
+     3  H    0.000000
+     4  Na   1.000000
+ Sum of Mulliken charges=   1.00000
+ Electronic spatial extent (au):  =    52.4422
+ Charge=     1.0000 electrons
+ Dipole moment (field-independent basis, Debye):
+    X=     0.0001    Y=     5.4505    Z=     0.0000  Tot=     5.4505
+ Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=    -2.8958   YY=     3.2892   ZZ=    -2.8958
+   XY=     0.0001   XZ=     0.0000   YZ=     0.0000
+ Traceless Quadrupole moment (field-independent basis, Debye-Ang):
+   XX=    -2.0616   YY=     4.1233   ZZ=    -2.0616
+   XY=     0.0001   XZ=     0.0000   YZ=     0.0000
+ Octapole moment (field-independent basis, Debye-Ang**2):
+  XXX=    -0.0001  YYY=    -2.8395  ZZZ=     0.0000  XYY=     0.0001
+  XXY=    -3.2860  XXZ=     0.0000  XZZ=     0.0000  YZZ=    -3.2860
+  YYZ=     0.0000  XYZ=     0.0000
+ Hexadecapole moment (field-independent basis, Debye-Ang**3):
+ XXXX=    -0.8782 YYYY=   -15.2867 ZZZZ=    -0.8782 XXXY=    -0.0002
+ XXXZ=     0.0000 YYYX=     0.0000 YYYZ=     0.0000 ZZZX=     0.0000
+ ZZZY=     0.0000 XXYY=    -4.0215 XXZZ=    -0.2927 YYZZ=    -4.0215
+ XXYZ=     0.0000 YYXZ=     0.0000 ZZXY=    -0.0001
+ N-N= 0.000000000000D+00 E-N=-3.862243664087D+02  KE= 1.614772533138D+02
+ Symmetry A'   KE= 1.497247013387D+02
+ Symmetry A"   KE= 1.175255197519D+01
+ Counterpoise: corrected energy =    -237.907907877938
+ Counterpoise: BSSE energy =       0.003206060946
+ 1\1\GINC-S7\SP\RMP2-FC\6-31++G(d)\H2Na1O1(1+)\TIMN\28-Jul-2011\0\\# mp
+ 2/6-31++g(d) counterpoise=2\\H2O + Na+ complex with BSSE\\1,1\O,0,0.00
+ 0017,1.128289,0.\H,0,-0.777403,1.727759,0.\H,0,0.777079,1.728221,0.\Na
+ ,0,0.000017,-1.134754,0.\\Version=EM64T-G03RevE.01\State=1-A'\HF=-161.
+ 6592895\MP2=-161.6592895\RMSD=7.681e-09\Thermal=0.\PG=CS [SG(H2Na1O1)]
+ \\@
+
+
+ IT IS DOUBTED WHETHER A MAN EVER BRINGS HIS FACULTIES TO BEAR WITH THEIR FULL FORCE
+ ON A SUBJECT UNTIL HE WRITES UPON IT.
+
+                          -- CICERO
+ Job cpu time:  0 days  0 hours  0 minutes 10.5 seconds.
+ File lengths (MBytes):  RWF=     18 Int=      0 D2E=      0 Chk=     10 Scr=      1
+ Normal termination of Gaussian 03 at Thu Jul 28 16:06:49 2011. 
+
