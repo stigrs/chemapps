@@ -69,13 +69,14 @@ std::unique_ptr<Chem::Molecule> frag2; // input data on fragment 2
 //
 int main(int argc, char* argv[])
 {
-    if (argc != 3) {
-        std::cerr << "usage: " << argv[0] << " input_file nej_file\n";
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 3) {
+        std::cerr << "usage: " << args[0] << " input_file nej_file\n";
         return 1;
     }
     try {
-        read_input(argv[1]);
-        read_nej(argv[2]);
+        read_input(args[1]);
+        read_nej(args[2]);
         integrate();
     }
     catch (std::exception& e) {

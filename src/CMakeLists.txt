@@ -56,8 +56,8 @@ set(PROGRAMS
     brw
     cambi
     caprate
-#    cartoxyz
-#    fchktoxyz
+    cartoxyz
+    fchktoxyz
 #    gausscan
 #    gausscp
 #    gaussfreq
