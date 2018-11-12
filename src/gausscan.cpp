@@ -15,42 +15,40 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/gauss_data.h>
-#include <srs/array.h>
-#include <srs/utils.h>
+#include <stdutils/stdutils.h>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <string>
+#include <vector>
 
-//
 // Program for extracting data from a Gaussian relaxed PES scan.
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 2) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 2) {
         std::cerr << "usage: " << args[0] << " gaussian.log\n";
         return 1;
     }
 
     try {
         std::ifstream from;
-        srs::fopen(from, args[1]);
+        Stdutils::fopen(from, args[1]);
 
         std::string scan_coord;
-        srs::dvector coord;
-        srs::dvector energy;
+        std::vector<double> coord;
+        std::vector<double> energy;
 
-        Gauss_data gauss(from, out);
+        Chem::Gauss_data gauss(from, Chem::out);
         gauss.get_pes_scan_data(scan_coord, coord, energy);
 
-        srs::Format<double> fix6;
+        Stdutils::Format<double> fix6;
         fix6.fixed();
 
         std::cout << "#\t" << scan_coord << "\t\t"
                   << "Eigenvalues\n";
-        for (srs::size_t i = 0; i < energy.size(); ++i) {
+        for (std::size_t i = 0; i < energy.size(); ++i) {
             std::cout << i + 1 << '\t' << fix6(coord[i]) << '\t'
                       << fix6(energy[i]) << '\n';
         }
@@ -60,3 +58,4 @@ int main(int argc, char* argv[])
         return 1;
     }
 }
+
