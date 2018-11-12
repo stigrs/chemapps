@@ -15,21 +15,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/gauss_data.h>
-#include <srs/array.h>
-#include <srs/math.h>
-#include <srs/utils.h>
+#include <stdutils/stdutils.h>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
+#include <algorithm>
+#include <vector>
 
-
-//
 //  Extracts optimized energies and geometry from Gaussian output file.
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 2) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 2) {
         std::cerr << "usage: " << args[0] << " gaussian.log\n";
         return 1;
     }
@@ -40,17 +37,18 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    Gauss_data gauss(from, out);
-    srs::dvector en = gauss.get_scf_zpe_energy();
+    Chem::Gauss_data gauss(from, Chem::out);
+    auto en = gauss.get_scf_zpe_energy();
+    double en_sum = std::accumulate(en.begin(), en.end(), 0.0);
 
-    Gauss_coord coord;
+    Chem::Gauss_coord coord;
     gauss.get_opt_cart_coord(coord);
 
-    srs::Format<double> fix;
+    Stdutils::Format<double> fix;
     fix.fixed().width(15).precision(8);
-    std::cout << "SCF: " << fix(en(0)) << " Hartree\n"
-              << "ZPE: " << fix(en(1)) << " Hartree\n"
-              << "Tot: " << fix(srs::sum(en)) << " Hartree\n\n";
+    std::cout << "SCF: " << fix(en[0]) << " Hartree\n"
+              << "ZPE: " << fix(en[1]) << " Hartree\n"
+              << "Tot: " << fix(en_sum) << " Hartree\n\n";
 
     gauss.print_opt_geom();
 }

@@ -14,16 +14,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <srs/utils.h>
+#include <stdutils/stdutils.h>
 #include <cstring>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-
 
 //------------------------------------------------------------------------------
 
@@ -37,12 +35,11 @@ struct IO_error : std::runtime_error {
 
 // Forward declarations:
 
-std::string get_theory(const char* filename);
-void bsse_se(const std::string& theory, const char* filename);
+std::string get_theory(const std::string& filename);
+void bsse_se(const std::string& theory, const std::string& filename);
 
 //------------------------------------------------------------------------------
 
-//
 // Program for calculating the BSSE corrected stabilization energy from a
 // G03/G09 counterpoise calculation.
 //
@@ -51,8 +48,8 @@ void bsse_se(const std::string& theory, const char* filename);
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 2) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 2) {
         std::cerr << "Usage: " << args[0] << " gaussian_file.out\n";
         return 1;
     }
@@ -70,10 +67,10 @@ int main(int argc, char* argv[])
 //------------------------------------------------------------------------------
 
 /// Get theoretical method.
-std::string get_theory(const char* filename)
+std::string get_theory(const std::string& filename)
 {
     std::ifstream from;
-    srs::fopen(from, filename);
+    Stdutils::fopen(from, filename);
 
     std::string line;
     std::string word;
@@ -93,7 +90,7 @@ std::string get_theory(const char* filename)
             }
         }
     }
-    if (srs::stricmp(theory, "MP2") || srs::stricmp(theory, "UMP2")) {
+    if (theory == "MP2" || theory == "UMP2") {
         return "EUMP2";
     }
     else {
@@ -102,24 +99,24 @@ std::string get_theory(const char* filename)
 }
 
 // Function for extracting counterpoise BSSE data.
-void bsse_se(const std::string& theory, const char* filename)
+void bsse_se(const std::string& theory, const std::string& filename)
 {
     std::ifstream from;
-    srs::fopen(from, filename);
+    Stdutils::fopen(from, filename);
 
-    const std::string s_cp_mcbs
-        = "Counterpoise: doing MCBS calculation for fragment";
-    const std::string s_cp_en   = "Counterpoise: corrected energy";
+    const std::string s_cp_mcbs =
+        "Counterpoise: doing MCBS calculation for fragment";
+    const std::string s_cp_en = "Counterpoise: corrected energy";
     const std::string s_cp_bsse = "Counterpoise: BSSE energy";
 
     std::string line;
     std::string ignore;
     std::string word;
 
-    double e_cp    = 0.0;  // BSSE corrected energy
-    double e_bsse  = 0.0;  // BSSE energy
-    double e1_mcbs = 0.0;  // Energy of fragment 1 using monomer centered basis
-    double e2_mcbs = 0.0;  // Energy of fragment 2 using momomer centered basis
+    double e_cp = 0.0;    // BSSE corrected energy
+    double e_bsse = 0.0;  // BSSE energy
+    double e1_mcbs = 0.0; // Energy of fragment 1 using monomer centered basis
+    double e2_mcbs = 0.0; // Energy of fragment 2 using momomer centered basis
 
     while (std::getline(from, line)) {
         std::istringstream iss;
@@ -134,12 +131,12 @@ void bsse_se(const std::string& theory, const char* filename)
                     iss.str(line.substr(pos + theory.size()));
                     if (frag == 1) {
                         iss >> ignore >> word;
-                        e1_mcbs = srs::from_fortran_sci_fmt(word);
+                        e1_mcbs = Stdutils::from_fortran_sci_fmt(word);
                         break;
                     }
                     else if (frag == 2) {
                         iss >> ignore >> word;
-                        e2_mcbs = srs::from_fortran_sci_fmt(word);
+                        e2_mcbs = Stdutils::from_fortran_sci_fmt(word);
                         break;
                     }
                     else {
@@ -159,8 +156,8 @@ void bsse_se(const std::string& theory, const char* filename)
             iss >> ignore >> e_bsse;
         }
     }
-    srs::Format<double> fix8(8);
-    srs::Format<double> fix2(2);
+    Stdutils::Format<double> fix8(8);
+    Stdutils::Format<double> fix2(2);
     fix8.fixed();
     fix2.fixed();
     std::cout << "\nResults from counterpoise calculation:\n"
@@ -173,3 +170,4 @@ void bsse_se(const std::string& theory, const char* filename)
               << fix2((e_cp - e1_mcbs - e2_mcbs) * 2625.5) << " kJ/mol\n\n"
               << "Data read from " << filename << '\n';
 }
+

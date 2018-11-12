@@ -14,20 +14,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <stdutils/stdutils.h>
 #include <fstream>
-#include <gsl/gsl>
 #include <iomanip>
 #include <iostream>
 #include <string>
 
-
-//
 //  Extracts Cartesian force constants from Gaussian fchk file.
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 2) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 2) {
         std::cerr << "usage: " << args[0] << " gaussian.fchk\n";
         return 1;
     }
@@ -44,13 +42,13 @@ int main(int argc, char* argv[])
     std::string line;
     while (std::getline(from, line)) {
         if (line.find(pattern, 0) != std::string::npos) {
-            found     = true;
+            found = true;
             int count = 0;
             std::cout << " HESSIAN\n";
             while (from >> fc) {
                 std::cout << std::setw(16) << std::setprecision(8)
-                          << std::setiosflags(std::ios_base::scientific
-                                              | std::ios_base::uppercase)
+                          << std::setiosflags(std::ios_base::scientific |
+                                              std::ios_base::uppercase)
                           << fc;
                 count++;
                 if (count == 5) {
@@ -69,3 +67,4 @@ int main(int argc, char* argv[])
         return 1;
     }
 }
+

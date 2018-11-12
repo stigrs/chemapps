@@ -59,12 +59,12 @@ set(PROGRAMS
     cartoxyz
     fchktoxyz
     gausscan
-#    gausscp
-#    gaussfreq
-#    gausshess
-#    gausshess2
+    gausscp
+    gaussfreq
+    gausshess
+    gausshess2
 #    gaussnmr
-#    gaussopt
+    gaussopt
 #    gausstopoly
 #    gmsget
 #    gmsgetxyz

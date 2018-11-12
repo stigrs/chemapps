@@ -15,22 +15,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/gauss_data.h>
-#include <srs/array.h>
+#include <stdutils/stdutils.h>
 #include <fstream>
-#include <gsl/gsl>
 #include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>
 
-
-//
 //  Extracts vibrational frequencies from Gaussian output file.
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 2) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 2) {
         std::cerr << "usage: " << args[0] << " gaussian.log\n";
         return 1;
     }
@@ -41,9 +38,9 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    srs::dvector freqs;
+    std::vector<double> freqs;
 
-    Gauss_data gauss(from, out);
+    Chem::Gauss_data gauss(from, Chem::out);
     gauss.get_freqs(freqs);
 
     for (auto vi : freqs) {
