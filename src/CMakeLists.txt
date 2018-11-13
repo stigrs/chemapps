@@ -63,7 +63,7 @@ set(PROGRAMS
     gaussfreq
     gausshess
     gausshess2
-#    gaussnmr
+    gaussnmr
     gaussopt
 #    gausstopoly
 #    gmsget

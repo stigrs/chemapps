@@ -78,16 +78,16 @@ int main(int argc, char* argv[])
         ("f,file", "input file", cxxopts::value<std::string>());
     // clang-format on
 
-    auto result = options.parse(argc, argv);
+    auto args = options.parse(argc, argv);
 
     std::string input_file;
 
-    if (result.count("help")) {
+    if (args.count("help")) {
         std::cout << options.help({"", "Group"}) << '\n';
         return 0;
     }
-    if (result.count("file")) {
-        input_file = result["file"].as<std::string>();
+    if (args.count("file")) {
+        input_file = args["file"].as<std::string>();
     }
     else {
         std::cerr << options.help({"", "Group"}) << '\n';

@@ -14,15 +14,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4505)  // caused by boost/program_options.hpp>
-#endif                           // _MSC_VER
-
 #include <chem/gauss_data.h>
-#include <srs/utils.h>
+#include <stdutils/stdutils.h>
+#include <cxxopts.hpp>
 #include <algorithm>
-#include <boost/program_options.hpp>
 #include <exception>
 #include <fstream>
 #include <iostream>
@@ -30,68 +25,57 @@
 #include <string>
 #include <vector>
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
-
-
-//
 //  Summarize NMR shieldings from a Gaussian calculation.
 //  The program produces the same output as GaussView.
 //
 int main(int argc, char* argv[])
 {
-    // Parse command line arguments:
-
-    namespace po = boost::program_options;
-
-    po::options_description options("Allowed options");
     // clang-format off
+    cxxopts::Options options(argv[0], "Summarize Gaussian NMR calculation");
     options.add_options()
-        ("help,h", "display help message")
-        ("file,f", po::value<std::string>(), "input file")
-        ("method,m", po::value<std::string>(), "NMR method (default is GIAO)")
-        ("tol,t", po::value<double>(), "degeneracy tolerance (default is 0.05)");
+        ("h,help", "display help message")
+        ("f,file", "input file", cxxopts::value<std::string>())
+        ("m,method", "NMR method (default is GIAO)", cxxopts::value<std::string>())
+        ("t,tol", "degeneracy tolerance (default is 0.05)", cxxopts::value<double>());
     // clang-format on
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, options), vm);
-    po::notify(vm);
+
+    auto args = options.parse(argc, argv);
 
     std::string input_file;
-    std::string nmr_method = "SCF GIAO";  // default NMR method
-    double degen_tol       = 0.05;        // default degeneracy tolerance
+    std::string nmr_method = "SCF GIAO"; // default NMR method
+    double degen_tol = 0.05;             // default degeneracy tolerance
 
-    if (vm.find("help") != vm.end()) {
-        std::cout << options << '\n';
+    if (args.count("help")) {
+        std::cout << options.help({"", "Group"}) << '\n';
         return 0;
     }
-    if (vm.find("file") != vm.end()) {
-        input_file = vm["file"].as<std::string>();
+    if (args.count("file")) {
+        input_file = args["file"].as<std::string>();
     }
     else {
-        std::cerr << options << '\n';
+        std::cerr << options.help({"", "Group"}) << '\n';
         return 1;
     }
-    if (vm.find("method") != vm.end()) {
-        nmr_method = vm["method"].as<std::string>();
+    if (args.count("method")) {
+        nmr_method = args["method"].as<std::string>();
     }
-    if (vm.find("tol") != vm.end()) {
-        degen_tol = vm["tol"].as<double>();
+    if (args.count("tol")) {
+        degen_tol = args["tol"].as<double>();
     }
 
     std::ifstream from;
-    srs::fopen(from, input_file);
+    Stdutils::fopen(from, input_file);
 
     // Get NMR data:
 
-    std::vector<Gauss_NMR> nmr;
+    std::vector<Chem::Gauss_NMR> nmr;
 
-    Gauss_data gauss(from, out);
+    Chem::Gauss_data gauss(from, Chem::out);
     gauss.get_nmr_data(nmr, nmr_method, degen_tol);
 
     // Output results:
 
-    srs::Format<char> hline;
+    Stdutils::Format<char> hline;
     hline.width(37).fill('-');
 
     std::cout << "\nSummary of NMR spectrum (" << nmr_method
@@ -104,19 +88,20 @@ int main(int argc, char* argv[])
               << "Atoms\n"
               << hline('-') << '\n';
 
-    srs::Format<double> fix8;
+    Stdutils::Format<double> fix8;
     fix8.fixed().width(9).precision(4);
 
     for (auto& ni : nmr) {
-        double shield = std::accumulate(ni.shield.begin(), ni.shield.end(), 0.0)
-                        / static_cast<double>(ni.shield.size());
+        double shield =
+            std::accumulate(ni.shield.begin(), ni.shield.end(), 0.0) /
+            static_cast<double>(ni.shield.size());
 
         std::cout << fix8(shield) << '\t' << ni.shield.size() << '\t' << ni.atom
                   << '\t';
 
         std::sort(ni.number.begin(), ni.number.end());
 
-        for (srs::size_t j = 0; j < ni.number.size(); ++j) {
+        for (std::size_t j = 0; j < ni.number.size(); ++j) {
             std::cout << ni.number[j];
             if ((ni.number.size() > 1) && (j < ni.number.size() - 1)) {
                 std::cout << ',';
@@ -125,3 +110,4 @@ int main(int argc, char* argv[])
         std::cout << '\n';
     }
 }
+
