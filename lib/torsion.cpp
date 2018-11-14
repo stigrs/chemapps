@@ -356,6 +356,9 @@ void Chem::Impl::Torsion::direction_cosines()
         alpha(1, i) = Numlib::dot(y_axis, rot.principal_axes().column(i));
         alpha(2, i) = Numlib::dot(z_axis, rot.principal_axes().column(i));
     }
+    if (Numlib::det(alpha) < 0.0) {
+        alpha *= -1.0;
+    }
     assert(std::abs(Numlib::det(alpha) - 1.0) < 1.0e-12);
 }
 
