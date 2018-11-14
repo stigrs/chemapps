@@ -14,14 +14,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <stdutils/stdutils.h>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-
 
 //------------------------------------------------------------------------------
 
@@ -53,7 +52,7 @@ void extract_zpe(std::istream& from);
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
+    auto args = Stdutils::arguments(argc, argv);
     if (argc < 2) {
         std::cout << "Usage: " << args[0] << " file.inp file.log\n";
         return 1;
@@ -91,7 +90,7 @@ void parse_inp(const std::string& inpfile, std::string& runtyp)
             while (iss >> token) {
                 if (token.find("RUNTYP=", 0) != std::string::npos) {
                     runtyp = token.substr(7);
-                    found  = true;
+                    found = true;
                 }
             }
         }
@@ -123,11 +122,11 @@ void parse_log(const std::string& logfile, const std::string& runtyp)
 void extract_optimized_energy(std::istream& from)
 {
     const std::string pat_opt = "***** EQUILIBRIUM GEOMETRY LOCATED *****";
-    const std::string pat_e   = "TOTAL ENERGY";
+    const std::string pat_e = "TOTAL ENERGY";
 
     std::string line;
     std::string tmp;
-    std::string energy;  // a bit dangerous, but easy (avoids loss of decimals)
+    std::string energy; // a bit dangerous, but easy (avoids loss of decimals)
 
     while (std::getline(from, line)) {
         if (line.find(pat_opt, 0) != std::string::npos) {
@@ -136,7 +135,7 @@ void extract_optimized_energy(std::istream& from)
                     std::istringstream iss(line);
                     iss >> tmp >> tmp >> tmp >> energy;
                     std::cout << "  " << pat_e << " = " << energy << '\n';
-                    return;  // success
+                    return; // success
                 }
             }
         }
@@ -150,7 +149,7 @@ void extract_zpe(std::istream& from)
     const std::string pat_zpe = "THE HARMONIC ZERO POINT ENERGY IS";
 
     std::string line;
-    std::string zpe;  // a bit dangerous, but easy (avoids loss of decimals)
+    std::string zpe; // a bit dangerous, but easy (avoids loss of decimals)
 
     while (std::getline(from, line)) {
         if (line.find(pat_zpe, 0) != std::string::npos) {
@@ -158,7 +157,7 @@ void extract_zpe(std::istream& from)
             std::istringstream iss(line);
             iss >> zpe;
             std::cout << "  ZERO POINT ENERGY = " << zpe << '\n';
-            return;  // success
+            return; // success
         }
     }
     throw IO_error("extracting zero-point energy failed");

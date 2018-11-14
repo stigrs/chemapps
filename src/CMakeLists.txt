@@ -66,7 +66,7 @@ set(PROGRAMS
     gaussnmr
     gaussopt
 #    gausstopoly
-#    gmsget
+    gmsget
 #    gmsgetxyz
 #    gmsscan
 #    mcmm 
