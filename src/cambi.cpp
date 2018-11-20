@@ -14,6 +14,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4018 4267) // caused by cxxopts.hpp
+#endif
+
 #include <stdutils/stdutils.h>
 #include <cxxopts.hpp>
 #include <cmath>
@@ -22,6 +27,10 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 //------------------------------------------------------------------------------
 

@@ -16,15 +16,15 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4100 4505)  // caused by boost/program_options.hpp
-#endif                                // _MSC_VER
+#pragma warning(disable : 4018 4267) // caused by cxxopts.hpp
+#endif
 
 #include <chem/gaussian.h>
 #include <chem/mcmm.h>
 #include <chem/molecule.h>
 #include <chem/mopac.h>
-#include <srs/utils.h>
-#include <boost/program_options.hpp>
+#include <stdutils/stdutils.h>
+#include <cxxopts.hpp>
 #include <exception>
 #include <fstream>
 #include <iostream>
@@ -32,64 +32,52 @@
 
 #ifdef _MSC_VER
 #pragma warning(pop)
-#endif  // _MSC_VER
+#endif
 
-
-//
 // Program providing Monte Carlo Multiple Minima (MCMM) solver.
 //
 int main(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
-
-    po::options_description options("Allowed options");
     // clang-format off
+    cxxopts::Options options(argv[0], "Monte Carlo Multiple Minima (MCMM) solver");
     options.add_options()
-        ("help,h", "display help message")
-        ("file,f", po::value<std::string>(), "input file") 
-		("pot,p", po::value<std::string>(), "potential (Gaussian or Mopac)");
+        ("h,help", "display help message")
+        ("f,file", "input file", cxxopts::value<std::string>()) 
+		("p,pot", "potential (Gaussian or Mopac)", cxxopts::value<std::string>());
     // clang-format on
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, options), vm);
-    po::notify(vm);
+
+    auto args = options.parse(argc, argv);
 
     std::string input_file;
     std::string pot = "Mopac";
 
-    if (vm.find("help") != vm.end()) {
-        std::cout << options << '\n';
+    if (args.count("help")) {
+        std::cout << options.help({"", "Group"}) << '\n';
         return 0;
     }
-    if (vm.find("pot") != vm.end()) {
-        pot = vm["pot"].as<std::string>();
+    if (args.count("pot")) {
+        pot = args["pot"].as<std::string>();
     }
-    if (vm.find("file") != vm.end()) {
-        input_file = vm["file"].as<std::string>();
+    if (args.count("file")) {
+        input_file = args["file"].as<std::string>();
     }
     else {
-        std::cerr << options << '\n';
+        std::cerr << options.help({"", "Group"}) << '\n';
         return 1;
     }
 
     try {
         std::ifstream from;
-        std::ofstream to;
+        Stdutils::fopen(from, input_file);
 
-        std::string output_file;
-        output_file = srs::strip_suffix(input_file, ".inp");
-        output_file = output_file + ".out";
-
-        srs::fopen(from, input_file);
-        srs::fopen(to, output_file);
-
-        Molecule mol(from, to);
+        Chem::Molecule mol(from);
         if (pot == "Gaussian" || pot == "gaussian") {
-            Mcmm<Gaussian> mc(from, mol, "Mcmm", true);
-            mc.solve(to);
+            Chem::Mcmm<Chem::Gaussian> mc(from, mol, "Mcmm", true);
+            mc.solve();
         }
         else {
-            Mcmm<Mopac> mc(from, mol, "Mcmm", true);
-            mc.solve(to);
+            Chem::Mcmm<Chem::Mopac> mc(from, mol, "Mcmm", true);
+            mc.solve();
         }
     }
     catch (std::exception& e) {
@@ -97,3 +85,4 @@ int main(int argc, char* argv[])
         return 1;
     }
 }
+

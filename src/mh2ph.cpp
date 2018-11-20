@@ -14,47 +14,52 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <srs/utils.h>
-#include <boost/program_options.hpp>
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4018 4267) // caused by cxxopts.hpp
+#endif
+
+#include <stdutils/stdutils.h>
+#include <cxxopts.hpp>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 
-//
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 // Convert MOLPRO force constants to Polyrate format.
 //
 int main(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
-
-    po::options_description options("Allowed options");
     // clang-format off
+    cxxopts::Options options(argv[0], "Convert MOLPRO force constants to Polyrate format");
     options.add_options()
-        ("help,h", "display help message")
-        ("file,f", po::value<std::string>(), "input file");
+        ("h,help", "display help message")
+        ("f,file", "input file", cxxopts::value<std::string>());
     // clang-format on
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, options), vm);
-    po::notify(vm);
+
+    auto args = options.parse(argc, argv);
 
     std::string input_file;
 
-    if (vm.find("help") != vm.end()) {
-        std::cout << options << '\n';
+    if (args.count("help")) {
+        std::cout << options.help({"", "Group"}) << '\n';
         return 0;
     }
-    if (vm.find("file") != vm.end()) {
-        input_file = vm["file"].as<std::string>();
+    if (args.count("file")) {
+        input_file = args["file"].as<std::string>();
     }
     else {
-        std::cerr << options << '\n';
+        std::cerr << options.help({"", "Group"}) << '\n';
         return 1;
     }
 
     try {
         std::ifstream from;
-        srs::fopen(from, input_file);
+        Stdutils::fopen(from, input_file);
 
         std::vector<std::string> names;
         std::vector<std::string> lines;
@@ -84,3 +89,4 @@ int main(int argc, char* argv[])
         return 1;
     }
 }
+

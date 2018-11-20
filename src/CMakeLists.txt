@@ -67,14 +67,13 @@ set(PROGRAMS
     gaussopt
 #    gausstopoly
     gmsget
-#    gmsgetxyz
+    gmsgetxyz
 #    gmsscan
-#    mcmm 
-#    mcmmtocom
-#    mcmmtoxyz
-#    mergeirc
-#    mh2ph
-#    molrot 
+    mcmm 
+    mcmmtocom
+    mcmmtoxyz
+    mergeirc
+    mh2ph
 #    moptonw
 #    moptoxyz
 #    nejconv
@@ -89,6 +88,7 @@ set(PROGRAMS
 #    tst
 #    unitsconv
 #    vflxget
+    vibrot 
 #	xyztocom
 #    xyztogms
 #    xyztomop

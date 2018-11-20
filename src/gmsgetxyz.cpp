@@ -14,15 +14,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <srs/utils.h>
+#include <stdutils/stdutils.h>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-
 
 //------------------------------------------------------------------------------
 
@@ -45,8 +43,8 @@ void extract_geometry(const std::string& logfile);
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc < 2) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() < 2) {
         std::cout << "Usage: " << args[0] << " file.log\n";
         return 1;
     }
@@ -70,7 +68,7 @@ void extract_geometry(const std::string& logfile)
         throw IO_error("cannot open " + logfile);
     }
 
-    const std::string pat_opt  = "***** EQUILIBRIUM GEOMETRY LOCATED *****";
+    const std::string pat_opt = "***** EQUILIBRIUM GEOMETRY LOCATED *****";
     const std::string pat_geom = "COORDINATES OF ALL ATOMS ARE";
 
     std::string line;
@@ -82,8 +80,8 @@ void extract_geometry(const std::string& logfile)
 
     bool found = false;
 
-    srs::Format<double> fix1;
-    srs::Format<double> fix10;
+    Stdutils::Format<double> fix1;
+    Stdutils::Format<double> fix10;
     fix1.fixed().width(5).precision(1);
     fix10.fixed().width(15).precision(10);
 
@@ -92,7 +90,7 @@ void extract_geometry(const std::string& logfile)
             while (std::getline(from, line)) {
                 if (line.find(pat_geom, 0) != std::string::npos) {
                     found = true;
-                    std::getline(from, line);  // ignore two lines
+                    std::getline(from, line); // ignore two lines
                     std::getline(from, line);
                     while (from >> atom >> charge >> x >> y >> z) {
                         std::cout << atom << '\t' << fix1(charge) << " "
@@ -107,3 +105,4 @@ void extract_geometry(const std::string& logfile)
         throw IO_error("could not find optimized geometry");
     }
 }
+

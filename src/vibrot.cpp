@@ -14,42 +14,47 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4018 4267) // caused by cxxopts.hpp
+#endif
+
 #include <chem/molecule.h>
-#include <srs/utils.h>
-#include <boost/program_options.hpp>
+#include <stdutils/stdutils.h>
+#include <cxxopts.hpp>
 #include <exception>
 #include <fstream>
 #include <iostream>
 #include <string>
 
-//
-// Program for rotational analysis of molecules.
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+// Program for rovibrational analysis of molecules.
 //
 int main(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
-
-    po::options_description options("Allowed options");
     // clang-format off
+    cxxopts::Options options(argv[0], "Rovibrational analysis of molecules");
     options.add_options()
-        ("help,h", "display help message")
-        ("file,f", po::value<std::string>(), "input file");
+        ("h,help", "display help message")
+        ("f,file", "input file", cxxopts::value<std::string>());
     // clang-format on
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, options), vm);
-    po::notify(vm);
+
+    auto args = options.parse(argc, argv);
 
     std::string input_file;
 
-    if (vm.find("help") != vm.end()) {
-        std::cout << options << '\n';
+    if (args.count("help")) {
+        std::cout << options.help({"", "Group"}) << '\n';
         return 0;
     }
-    if (vm.find("file") != vm.end()) {
-        input_file = vm["file"].as<std::string>();
+    if (args.count("file")) {
+        input_file = args["file"].as<std::string>();
     }
     else {
-        std::cerr << options << '\n';
+        std::cerr << options.help({"", "Group"}) << '\n';
         return 1;
     }
 
@@ -57,19 +62,16 @@ int main(int argc, char* argv[])
         std::ifstream from;
         std::ofstream to;
 
-        std::string output_file;
-        output_file = srs::strip_suffix(input_file, ".inp");
-        output_file = output_file + ".out";
+        Stdutils::fopen(from, input_file);
 
-        srs::fopen(from, input_file);
-        srs::fopen(to, output_file.c_str());
-
-        Molecule mol(from, to, "Molecule");
-        mol.get_rot().analysis(to);
-        mol.get_tor().analysis(to);
+        Chem::Molecule mol(from, "Molecule", true);
+        mol.rot_analysis();
+        mol.tor_analysis();
+        mol.vib_analysis();
     }
     catch (std::exception& e) {
         std::cerr << "what: " << e.what() << '\n';
         return 1;
     }
 }
+

@@ -16,11 +16,11 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4100 4505)  // caused by boost/program_options.hpp
-#endif                                // _MSC_VER
+#pragma warning(disable : 4018 4267) // caused by cxxopts.hpp
+#endif
 
-#include <srs/utils.h>
-#include <boost/program_options.hpp>
+#include <stdutils/stdutils.h>
+#include <cxxopts.hpp>
 #include <exception>
 #include <fstream>
 #include <iostream>
@@ -29,57 +29,52 @@
 
 #ifdef _MSC_VER
 #pragma warning(pop)
-#endif  // _MSC_VER
+#endif
 
-
-//
 // Program for generating XYZ files from MCMM solver output.
 //
 int main(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
-
-    po::options_description options("Allowed options");
     // clang-format off
+    cxxopts::Options options(argv[0], "Generate XYZ files from MCMM solver output");
     options.add_options()
-        ("help,h", "display help message")
-        ("file,f", po::value<std::string>(), "input file") 
-		("atoms,N", po::value<int>(), "number of atoms") 
-        ("title,t", po::value<std::string>(), "title line");
+        ("h,help", "display help message")
+        ("f,file", "input file", cxxopts::value<std::string>()) 
+		("N,atoms", "number of atoms", cxxopts::value<int>()) 
+        ("t,title", "title line", cxxopts::value<std::string>());
     // clang-format on
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, options), vm);
-    po::notify(vm);
+
+    auto args = options.parse(argc, argv);
 
     std::string input_file;
     std::string title = "Title";
-    int natoms        = 0;
+    int natoms = 0;
 
-    if (vm.find("help") != vm.end()) {
-        std::cout << options << '\n';
+    if (args.count("help")) {
+        std::cout << options.help({"", "Group"}) << '\n';
         return 0;
     }
-    if (vm.find("title") != vm.end()) {
-        title = vm["title"].as<std::string>();
+    if (args.count("title")) {
+        title = args["title"].as<std::string>();
     }
-    if (vm.find("atoms") != vm.end()) {
-        natoms = vm["atoms"].as<int>();
+    if (args.count("atoms")) {
+        natoms = args["atoms"].as<int>();
     }
     else {
-        std::cerr << options << '\n';
+        std::cerr << options.help({"", "Group"}) << '\n';
         return 1;
     }
-    if (vm.find("file") != vm.end()) {
-        input_file = vm["file"].as<std::string>();
+    if (args.count("file")) {
+        input_file = args["file"].as<std::string>();
     }
     else {
-        std::cerr << options << '\n';
+        std::cerr << options.help({"", "Group"}) << '\n';
         return 1;
     }
 
     try {
         std::ifstream from;
-        srs::fopen(from, input_file);
+        Stdutils::fopen(from, input_file);
         std::string line;
         while (std::getline(from, line)) {
             if (line.find("Conformer:") != std::string::npos) {
@@ -89,15 +84,15 @@ int main(int argc, char* argv[])
                 iss >> token >> nc;
 
                 std::ofstream to;
-                std::string base = srs::strip_suffix(input_file, ".out");
-                base += "_c" + srs::to_string(nc);
+                std::string base = Stdutils::strip_suffix(input_file, ".out");
+                base += "_c" + std::to_string(nc);
                 std::string com = base + ".xyz";
-                srs::fopen(to, com.c_str());
+                Stdutils::fopen(to, com.c_str());
 
                 to << natoms << '\n' << title << '\n';
 
                 for (int it = 0; it < 5; ++it) {
-                    std::getline(from, line);  // ignore
+                    std::getline(from, line); // ignore
                 }
                 int center;
                 std::string atom;
@@ -110,7 +105,7 @@ int main(int argc, char* argv[])
                         break;
                     }
                     if (iss >> center >> atom >> x >> y >> z) {
-                        srs::Format<double> fix;
+                        Stdutils::Format<double> fix;
                         fix.fixed().width(10).precision(6);
                         to << atom << '\t' << fix(x) << "  " << fix(y) << "  "
                            << fix(z) << '\n';
@@ -125,3 +120,4 @@ int main(int argc, char* argv[])
         return 1;
     }
 }
+

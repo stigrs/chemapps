@@ -15,63 +15,60 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/gauss_data.h>
-#include <srs/array.h>
-#include <srs/utils.h>
+#include <stdutils/stdutils.h>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <string>
-
-
-//-----------------------------------------------------------------------------
-
-void print_array(std::ostream& to, srs::dvector& array);
+#include <vector>
 
 //-----------------------------------------------------------------------------
 
-const std::string pattern_irc_data
-    = "IRC point       1 Results for each geome   R   N=";
-
-const std::string pattern_irc_geom
-    = "IRC point       1 Geometries               R   N=";
-
-const std::string pattern_irc_grad
-    = "IRC point       1 Gradient at each geome   R   N=";
+void print_array(std::ostream& to, const std::vector<double>& array);
 
 //-----------------------------------------------------------------------------
 
-//
+const std::string pattern_irc_data =
+    "IRC point       1 Results for each geome   R   N=";
+
+const std::string pattern_irc_geom =
+    "IRC point       1 Geometries               R   N=";
+
+const std::string pattern_irc_grad =
+    "IRC point       1 Gradient at each geome   R   N=";
+
+//-----------------------------------------------------------------------------
+
 // Merge a set of files with Gaussian 98/03 IRC data which have been sorted.
 //
 // Note: The input files must be in correct order.
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc < 2) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() < 2) {
         std::cerr << "usage: " << args[0] << " file1 file2 ... fileN\n";
         return 1;
     }
 
     try {
-        srs::dvector mep;
-        srs::dvector geom;
-        srs::dvector grad;
+        std::vector<double> mep;
+        std::vector<double> geom;
+        std::vector<double> grad;
 
         std::ifstream from;
         std::ofstream to;
 
         const char* output_file = "mergeirc.out";
-        srs::fopen(to, output_file);
+        Stdutils::fopen(to, output_file);
 
         int count = 1;
         while (count < argc) {
             auto input_file = args[count];
             std::cout << "Reading " << input_file << " ...\n";
-            srs::fopen(from, input_file);
+            Stdutils::fopen(from, input_file);
 
-            Gauss_data gauss(from, fchk);
+            Chem::Gauss_data gauss(from, Chem::fchk);
 
             gauss.get_irc_data(mep);
             gauss.get_irc_geom(geom);
@@ -81,7 +78,7 @@ int main(int argc, char* argv[])
             count++;
         }
 
-        srs::Format<unsigned> fmt;
+        Stdutils::Format<std::size_t> fmt;
         fmt.width(12);
 
         to << pattern_irc_data << fmt(mep.size()) << '\n';
@@ -103,21 +100,21 @@ int main(int argc, char* argv[])
 
 //------------------------------------------------------------------------------
 
-void print_array(std::ostream& to, srs::dvector& array)
+void print_array(std::ostream& to, const std::vector<double>& array)
 {
-    srs::Format<double> sci;
+    Stdutils::Format<double> sci;
     sci.scientific_E().width(16).precision(8);
 
-    int count       = 0;
+    int count = 0;
     bool wrote_endl = false;
 
-    for (auto vi : array) {
+    for (const auto& vi : array) {
         to << sci(vi);
         count++;
         wrote_endl = false;
         if (count == 5) {
             to << '\n';
-            count      = 0;
+            count = 0;
             wrote_endl = true;
         }
     }
@@ -125,3 +122,4 @@ void print_array(std::ostream& to, srs::dvector& array)
         to << '\n';
     }
 }
+

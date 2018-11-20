@@ -14,13 +14,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <chem/ptable.h>
-#include <srs/array.h>
-#include <srs/utils.h>
+#include <chem/periodic_table.h>
+#include <numlib/matrix.h>
+#include <stdutils/stdutils.h>
 #include <cstdlib>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -81,12 +80,12 @@ double gms_final_energy(const std::string& filename);
 
 // Global variables:
 
-srs::Array<int, 1> fragment;
+Numlib::Vec<int> fragment;
 std::vector<double> at_num;
 std::vector<std::string> at_sym;
 std::vector<std::string> orbitals;
 std::vector<std::string> log_files;
-srs::Array<double, 2> geom;
+Numlib::Mat<double> geom;
 
 std::string progname;
 std::string tmlfile;
@@ -105,15 +104,15 @@ int nstep;
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 2) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 2) {
         std::cerr << "usage: " << args[0] << " setup_file\n";
         return 1;
     }
 
     try {
         std::ifstream from;
-        srs::fopen(from, args[1]);
+        Stdutils::fopen(from, args[1]);
 
         parse_setup(from);
         init_geom();
@@ -133,19 +132,19 @@ int main(int argc, char* argv[])
 
             create_input(inp_file.c_str(), dat_file.c_str());
 
-            cmd    = progname + " " + inp_file;
-            status = std::system(cmd.c_str());  // run GAMESS
+            cmd = progname + " " + inp_file;
+            status = std::system(cmd.c_str()); // run GAMESS
             if (status != 0) {
                 throw Gms_run_error("running " + cmd + " failed");
             }
             if (!gms_normal_exit(log_files[i].c_str())) {
-                throw Gms_run_error("execution of GAMESS failed, check "
-                                    + log_files[i]);
+                throw Gms_run_error("execution of GAMESS failed, check " +
+                                    log_files[i]);
             }
             if ((runtype == optimize) && (coord == cart)) {
                 get_opt_geom(log_files[i].c_str());
             }
-            dat_file = oss.str() + ".dat";  // use orbitals from previous calc.
+            dat_file = oss.str() + ".dat"; // use orbitals from previous calc.
         }
 
         // Summarize results:
@@ -172,14 +171,14 @@ void parse_setup(std::ifstream& from)
 
     std::map<std::string, srs::Input> input_data;
     input_data["progname"] = srs::Input(progname, "gmss");
-    input_data["tmlfile"]  = srs::Input(tmlfile);
-    input_data["runtype"]  = srs::Input(runtype_tmp);
-    input_data["jobname"]  = srs::Input(jobname);
-    input_data["coord"]    = srs::Input(coord_tmp);
+    input_data["tmlfile"] = srs::Input(tmlfile);
+    input_data["runtype"] = srs::Input(runtype_tmp);
+    input_data["jobname"] = srs::Input(jobname);
+    input_data["coord"] = srs::Input(coord_tmp);
     input_data["orbstart"] = srs::Input(orbstart_tmp, "guess");
-    input_data["axis"]     = srs::Input(axis_tmp, "x_axis");
+    input_data["axis"] = srs::Input(axis_tmp, "x_axis");
     input_data["fragment"] = srs::Input(fragment, fragment_def);
-    input_data["nstep"]    = srs::Input(nstep);
+    input_data["nstep"] = srs::Input(nstep);
     input_data["stepsize"] = srs::Input(stepsize);
 
     // Read input data:
@@ -257,10 +256,10 @@ void parse_setup(std::ifstream& from)
 void init_geom()
 {
     std::ifstream from;
-    srs::fopen(from, tmlfile.c_str());
+    Stdutils::fopen(from, tmlfile.c_str());
 
     std::string key = "Geometry";
-    bool found      = srs::find_section(from, key);
+    bool found = srs::find_section(from, key);
 
     if (found) {
         std::string token;
@@ -305,7 +304,7 @@ void init_geom()
 void get_opt_geom(const std::string& filename)
 {
     std::ifstream from;
-    srs::fopen(from, filename);
+    Stdutils::fopen(from, filename);
 
     std::string key1;
     switch (runtype) {
@@ -328,12 +327,12 @@ void get_opt_geom(const std::string& filename)
 
     while (std::getline(from, line)) {
         std::string::size_type pos = line.find(key1);
-        if (pos != std::string::npos) {  // geometry found
+        if (pos != std::string::npos) { // geometry found
             while (std::getline(from, line)) {
                 pos = line.find(key2);
-                if (pos != std::string::npos) {  // coord. of all atoms found
+                if (pos != std::string::npos) { // coord. of all atoms found
                     found = true;
-                    std::getline(from, line);  // ignore two lines
+                    std::getline(from, line); // ignore two lines
                     std::getline(from, line);
                     for (unsigned i = 0; i < at_num.size(); i++) {
                         std::getline(from, line);
@@ -365,8 +364,8 @@ void get_opt_geom(const std::string& filename)
 // Print geometry to output stream.
 void print_geom(std::ostream& to)
 {
-    srs::Format<double> fix1;
-    srs::Format<double> fix10;
+    Stdutils::Format<double> fix1;
+    Stdutils::Format<double> fix10;
     fix1.fixed().width(3).precision(1);
     fix10.fixed().width(15).precision(10);
 
@@ -400,11 +399,11 @@ void create_input(const std::string& new_inp_file,
     std::ifstream from;
     std::ofstream to;
 
-    srs::fopen(from, tmlfile);
-    srs::fopen(to, new_inp_file);
+    Stdutils::fopen(from, tmlfile);
+    Stdutils::fopen(to, new_inp_file);
 
     std::string key = "Input";
-    bool found      = srs::find_section(from, key);
+    bool found = srs::find_section(from, key);
 
     if (found) {
         std::string line;
@@ -441,7 +440,7 @@ void create_input(const std::string& new_inp_file,
 void get_orbitals(const std::string& filename)
 {
     std::ifstream from;
-    srs::fopen(from, filename);
+    Stdutils::fopen(from, filename);
 
     std::string pattern;
     switch (orbstart) {
@@ -456,7 +455,7 @@ void get_orbitals(const std::string& filename)
     std::string line;
     while (std::getline(from, line)) {
         std::string::size_type pos = line.find(pattern);
-        if (pos != std::string::npos) {  // get final orbitals
+        if (pos != std::string::npos) { // get final orbitals
             orbitals.clear();
             orbitals.push_back(line);
             while (std::getline(from, line)) {
@@ -474,9 +473,9 @@ void get_orbitals(const std::string& filename)
 
 void summarize()
 {
-    srs::Format<char> line;
-    srs::Format<double> fix6;
-    srs::Format<double> fix10;
+    Stdutils::Format<char> line;
+    Stdutils::Format<double> fix6;
+    Stdutils::Format<double> fix10;
     line.width(40).fill('-');
     fix6.fixed();
     fix10.fixed().width(16).precision(10);
@@ -494,7 +493,7 @@ void summarize()
 bool gms_normal_exit(const std::string& filename)
 {
     std::ifstream from;
-    srs::fopen(from, filename);
+    Stdutils::fopen(from, filename);
 
     const std::string pattern = "EXECUTION OF GAMESS TERMINATED NORMALLY";
 
@@ -511,7 +510,7 @@ bool gms_normal_exit(const std::string& filename)
 double gms_final_energy(const std::string& filename)
 {
     std::ifstream from;
-    srs::fopen(from, filename);
+    Stdutils::fopen(from, filename);
 
     const std::string pattern = "TOTAL ENERGY =";
 
