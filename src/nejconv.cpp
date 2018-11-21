@@ -14,17 +14,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <srs/array.h>
-#include <srs/math.h>
-#include <srs/utils.h>
+#include <numlib/matrix.h>
+#include <numlib/math.h>
+#include <stdutils/stdutils.h>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
 
 //------------------------------------------------------------------------------
 
@@ -40,11 +38,11 @@ struct Conv_error : std::runtime_error {
 
 // Global declarations:
 
-Grid e_grid;  // energy grid
-Grid j_grid;  // angular momentum grid
+Numlib::Grid e_grid; // energy grid
+Numlib::Grid j_grid; // angular momentum grid
 
-std::vector<double> freq;        // vibrational frequencies in cm**-1
-srs::Array<double, 1> vibr_nos;  // vibrational number of states
+std::vector<double> freq;     // vibrational frequencies in cm**-1
+Numlib::Vec<double> vibr_nos; // vibrational number of states
 
 //------------------------------------------------------------------------------
 
@@ -67,8 +65,8 @@ void nej_conv(const std::string& filename);
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 3) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 3) {
         std::cerr << "Usage: " << args[0] << " inp_file nej_file\n";
         return 1;
     }
@@ -89,19 +87,19 @@ int main(int argc, char* argv[])
 void init(const std::string& filename)
 {
     std::ifstream from;
-    srs::fopen(from, filename);
+    Stdutils::fopen(from, filename);
 
     e_grid.set(from, "EnergyGrid");
     j_grid.set(from, "AngMomGrid");
 
-    if (srs::find_section(from, "Frequencies")) {
+    if (Stdutils::find_token(from, "Frequencies")) {
         double v;
         while (from >> v) {
             if (v > 0.0) {
                 freq.push_back(v);
             }
             else {
-                throw Init_error("bad frequency: " + srs::to_string(v));
+                throw Init_error("bad frequency: " + std::to_string(v));
             }
         }
     }
@@ -115,14 +113,13 @@ void vibr_count()
     int nsize = e_grid.size();
 
     vibr_nos.resize(nsize);
-    vibr_nos    = 0.0;
-    vibr_nos[0] = 1.0;
+    vibr_nos = 0.0;
+    vibr_nos(0) = 1.0;
 
-    std::size_t rj;
     for (auto fi : freq) {
-        rj = srs::nint(fi / e_grid.step());
-        for (std::size_t e = 0; e < vibr_nos.size() - rj; ++e) {
-            vibr_nos[rj + e] += vibr_nos[e];
+        auto rj = Numlib::round<Index>(fi / e_grid.step());
+        for (Index e = 0; e < vibr_nos.size() - rj; ++e) {
+            vibr_nos(rj + e) += vibr_nos(e);
         }
     }
 }
@@ -130,30 +127,31 @@ void vibr_count()
 void nej_conv(const std::string& filename)
 {
     std::ifstream from;
-    srs::fopen(from, filename);
+    Stdutils::fopen(from, filename);
 
     double ee = 0.0;
     double jj = 0.0;
-    srs::Array<double, 1> nej(e_grid.size());
+    Numlib::Vec<double> nej(e_grid.size());
 
-    for (srs::size_t j = 0; j < j_grid.size(); ++j) {
-        for (srs::size_t e = 0; e < e_grid.size(); ++e) {
-            from >> ee >> jj >> nej[e];
+    for (Index j = 0; j < j_grid.size(); ++j) {
+        for (Index e = 0; e < e_grid.size(); ++e) {
+            from >> ee >> jj >> nej(e);
             if (!from) {
                 throw Conv_error("cannot read N(E,J) data from " + filename);
             }
             if (ee != e_grid[e]) {
-                throw Conv_error("bad E grid: " + srs::to_string(ee) + ", "
-                                 + srs::to_string(e_grid[e]));
+                throw Conv_error("bad E grid: " + std::to_string(ee) + ", " +
+                                 std::to_string(e_grid[e]));
             }
             if (jj != j_grid[j]) {
-                throw Conv_error("bad J grid: " + srs::to_string(jj) + ", "
-                                 + srs::to_string(j_grid[j]));
+                throw Conv_error("bad J grid: " + std::to_string(jj) + ", " +
+                                 std::to_string(j_grid[j]));
             }
         }
-        nej = srs::conv(vibr_nos, nej);
-        for (srs::size_t e = 0; e < e_grid.size(); ++e) {
-            std::cout << e_grid[e] << ' ' << jj << ' ' << nej[e] << '\n';
+        nej = Numlib::conv(vibr_nos, nej);
+        for (Index e = 0; e < e_grid.size(); ++e) {
+            std::cout << e_grid[e] << ' ' << jj << ' ' << nej(e) << '\n';
         }
     }
 }
+

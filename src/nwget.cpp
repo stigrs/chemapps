@@ -14,16 +14,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <stdutils/stdutils.h>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
-
 
 //------------------------------------------------------------------------------
 
@@ -52,8 +51,8 @@ void extract_zpe(std::istream& from, const std::string& theory);
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 3) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 3) {
         std::cout << "Usage: " << args[0] << " file.nw file.out\n";
         return 1;
     }
@@ -95,7 +94,7 @@ void parse_nw(const std::string& nwfile,
             found = true;
             std::istringstream iss(line);
             iss >> token >> theory >> operation;
-            task_tmp.first  = theory;
+            task_tmp.first = theory;
             task_tmp.second = operation;
             task.push_back(task_tmp);
         }
@@ -136,16 +135,16 @@ void extract_energy(std::istream& from, const std::string& theory)
 
     if (theory == "scf") {
         pat_mod = "NWChem SCF Module";
-        pat_e   = "Total SCF energy";
+        pat_e = "Total SCF energy";
     }
     else if (theory == "dft") {
         pat_mod = "NWChem DFT Module";
-        pat_e   = "Total DFT energy";
+        pat_e = "Total DFT energy";
     }
 
     std::string line;
     std::string tmp;
-    std::string energy;  // a bit dangerous, but easy (avoids loss of decimals)
+    std::string energy; // a bit dangerous, but easy (avoids loss of decimals)
 
     while (std::getline(from, line)) {
         if (line.find(pat_mod, 0) != std::string::npos) {
@@ -154,7 +153,7 @@ void extract_energy(std::istream& from, const std::string& theory)
                     std::istringstream iss(line);
                     iss >> tmp >> tmp >> tmp >> tmp >> energy;
                     std::cout << "  " << pat_e << " = " << energy << '\n';
-                    return;  // success
+                    return; // success
                 }
             }
         }
@@ -170,21 +169,21 @@ void extract_optimized_energy(std::istream& from, const std::string& theory)
     std::string pat_conv;
     std::string pat_e;
 
-    pat_opt  = "NWChem Geometry Optimization";
+    pat_opt = "NWChem Geometry Optimization";
     pat_conv = "Optimization converged";
 
     if (theory == "scf") {
         pat_mod = "NWChem SCF Module";
-        pat_e   = "Total SCF energy";
+        pat_e = "Total SCF energy";
     }
     else if (theory == "dft") {
         pat_mod = "NWChem DFT Module";
-        pat_e   = "Total DFT energy";
+        pat_e = "Total DFT energy";
     }
 
     std::string line;
     std::string tmp;
-    std::string energy;  // a bit dangerous, but easy (avoids loss of decimals)
+    std::string energy; // a bit dangerous, but easy (avoids loss of decimals)
 
     while (std::getline(from, line)) {
         if (line.find(pat_opt, 0) != std::string::npos) {
@@ -198,7 +197,7 @@ void extract_optimized_energy(std::istream& from, const std::string& theory)
                         if (line.find(pat_conv, 0) != std::string::npos) {
                             std::cout << "  " << pat_e << " = " << energy
                                       << '\n';
-                            return;  // success
+                            return; // success
                         }
                     }
                 }
@@ -216,7 +215,7 @@ void extract_zpe(std::istream& from, const std::string& theory)
     std::string pat_mod;
 
     pat_freq = "NWChem Nuclear Hessian and Frequency Analysis";
-    pat_zpe  = "Zero-Point correction to Energy";
+    pat_zpe = "Zero-Point correction to Energy";
 
     if (theory == "scf") {
         pat_mod = "NWChem SCF Module";
@@ -227,7 +226,7 @@ void extract_zpe(std::istream& from, const std::string& theory)
 
     std::string line;
     std::string tmp;
-    std::string zpe;  // a bit dangerous, but easy (avoids loss of decimals)
+    std::string zpe; // a bit dangerous, but easy (avoids loss of decimals)
 
     while (std::getline(from, line)) {
         if (line.find(pat_freq, 0) != std::string::npos) {
@@ -236,11 +235,11 @@ void extract_zpe(std::istream& from, const std::string& theory)
                     while (std::getline(from, line)) {
                         if (line.find(pat_zpe, 0) != std::string::npos) {
                             std::istringstream iss(line);
-                            iss >> tmp >> tmp >> tmp >> tmp >> tmp >> tmp >> tmp
-                                >> tmp >> zpe;
+                            iss >> tmp >> tmp >> tmp >> tmp >> tmp >> tmp >>
+                                tmp >> tmp >> zpe;
                             std::cout << "  " << pat_zpe << " = " << zpe
                                       << '\n';
-                            return;  // success
+                            return; // success
                         }
                     }
                 }
@@ -249,3 +248,4 @@ void extract_zpe(std::istream& from, const std::string& theory)
     }
     throw IO_error("extracting zero-point energy failed");
 }
+

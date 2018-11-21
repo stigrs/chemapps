@@ -14,10 +14,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <srs/utils.h>
+#include <stdutils/stdutils.h>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -39,14 +38,13 @@ void get_xyz(const std::string& xyz_file);
 
 //------------------------------------------------------------------------------
 
-//
 // Program for generating MOPAC input file from a template input file and by
 // extracting Cartesian coordinates from a XYZ file.
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 3) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 3) {
         std::cerr << "Usage: " << args[0] << " mopac.tml file.xyz\n\n"
                   << "mopac.tml: Template file for MOPAC input file\n"
                   << "file.xyz:  File with XYZ coordinates\n";
@@ -102,7 +100,7 @@ void get_xyz(const std::string& xyz_file)
     int natoms;
     from >> natoms;
     if (natoms < 1) {
-        throw IO_error("bad number of atoms: " + srs::to_string(natoms));
+        throw IO_error("bad number of atoms: " + std::to_string(natoms));
     }
 
     std::string atom;
@@ -110,7 +108,7 @@ void get_xyz(const std::string& xyz_file)
     double y;
     double z;
 
-    srs::Format<double> fix8;
+    Stdutils::Format<double> fix8;
     fix8.fixed().width(15).precision(8);
 
     int iter = 0;
@@ -124,3 +122,4 @@ void get_xyz(const std::string& xyz_file)
         throw IO_error("error reading XYZ coordinates");
     }
 }
+

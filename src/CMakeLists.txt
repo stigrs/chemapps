@@ -74,24 +74,24 @@ set(PROGRAMS
     mcmmtoxyz
     mergeirc
     mh2ph
-#    moptonw
-#    moptoxyz
-#    nejconv
-#    nejeff
-#    nwget
-#    nwgetxyz
-#    nwzmap
-#    polyplot
-#    sortirc
+    moptonw
+    moptoxyz
+    nejconv
+    nejeff
+    nwget
+    nwgetxyz
+    nwzmap
+    polyplot
+    sortirc
 #    thermo
 #    troe
 #    tst
-#    unitsconv
-#    vflxget
+    unitsconv
+    vflxget
     vibrot 
 #	xyztocom
-#    xyztogms
-#    xyztomop
+    xyztogms
+    xyztomop
 #    zmatxyz
 )
 

@@ -15,20 +15,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/units.h>
-#include <srs/datum.h>
+#include <numlib/constants.h>
+#include <stdutils/stdutils.h>
 #include <exception>
-#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <string>
 
-
 //------------------------------------------------------------------------------
 
-enum Units::Type have;
-enum Units::Type want;
+enum Chem::Units::Type have;
+enum Chem::Units::Type want;
 
-void usage(const char* prog);
+void usage(const std::string& prog);
 double convert(const double value);
 
 //------------------------------------------------------------------------------
@@ -40,8 +39,8 @@ double convert(const double value);
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 4) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 4) {
         usage(args[0]);
         return 1;
     }
@@ -56,8 +55,8 @@ int main(int argc, char* argv[])
     }
 
     try {
-        have = Units::lexer(args[2]);
-        want = Units::lexer(args[3]);
+        have = Chem::Units::lexer(args[2]);
+        want = Chem::Units::lexer(args[3]);
 
         std::cout << "You have: " << value << " " << args[2] << '\n'
                   << "You want: " << convert(value) << " " << args[3] << '\n';
@@ -72,143 +71,146 @@ int main(int argc, char* argv[])
 
 //------------------------------------------------------------------------------
 
-void usage(const char* prog)
+void usage(const std::string& prog)
 {
     std::cerr << "Usage: " << prog << " value have_unit want_unit\n\n";
-    Units::print(std::cerr);
+    Chem::Units::print(std::cerr);
 }
 
 double convert(const double value)
 {
+    namespace Pc = Numlib::Constants;
+
     double ans = value;
     switch (have) {
-    case Units::kJ_mol:
+    case Chem::Units::kJ_mol:
         switch (want) {
-        case Units::kcal_mol:
-            ans /= datum::cal_to_J;
+        case Chem::Units::kcal_mol:
+            ans /= Pc::cal_to_J;
             break;
-        case Units::icm:
-            ans /= datum::icm_to_kJ;
+        case Chem::Units::icm:
+            ans /= Pc::icm_to_kJ;
             break;
-        case Units::hartree:
-            ans *= datum::E_h * 1.0e-3 / datum::N_A;
+        case Chem::Units::hartree:
+            ans *= Pc::E_h * 1.0e-3 / Pc::N_A;
             break;
-        case Units::kelvin:
-            ans /= datum::icm_to_kJ;
-            ans *= datum::icm_to_K;
+        case Chem::Units::kelvin:
+            ans /= Pc::icm_to_kJ;
+            ans *= Pc::icm_to_K;
             break;
-        case Units::eV:
-            ans /= 1.0e-3 * datum::eV * datum::N_A;
+        case Chem::Units::eV:
+            ans /= 1.0e-3 * Pc::eV * Pc::N_A;
             break;
-        case Units::kJ_mol:
+        case Chem::Units::kJ_mol:
             break;
         default:
-            throw Unit_error("bad unit conversion");
+            throw std::runtime_error("bad unit conversion");
         }
         break;
-    case Units::kcal_mol:
+    case Chem::Units::kcal_mol:
         switch (want) {
-        case Units::kJ_mol:
-            ans *= datum::cal_to_J;
+        case Chem::Units::kJ_mol:
+            ans *= Pc::cal_to_J;
             break;
-        case Units::icm:
-            ans *= datum::cal_to_J / datum::icm_to_kJ;
+        case Chem::Units::icm:
+            ans *= Pc::cal_to_J / Pc::icm_to_kJ;
             break;
-        case Units::hartree:
-            ans *= datum::cal_to_J;
-            ans *= datum::E_h * 1.0e-3 / datum::N_A;
+        case Chem::Units::hartree:
+            ans *= Pc::cal_to_J;
+            ans *= Pc::E_h * 1.0e-3 / Pc::N_A;
             break;
-        case Units::kelvin:
-            ans *= datum::cal_to_J / datum::icm_to_kJ;
-            ans *= datum::icm_to_K;
+        case Chem::Units::kelvin:
+            ans *= Pc::cal_to_J / Pc::icm_to_kJ;
+            ans *= Pc::icm_to_K;
             break;
-        case Units::eV:
-            ans *= datum::cal_to_J;
-            ans /= 1.0e-3 * datum::eV * datum::N_A;
+        case Chem::Units::eV:
+            ans *= Pc::cal_to_J;
+            ans /= 1.0e-3 * Pc::eV * Pc::N_A;
             break;
-        case Units::kcal_mol:
+        case Chem::Units::kcal_mol:
             break;
         default:
-            throw Unit_error("bad unit conversion");
+            throw std::runtime_error("bad unit conversion");
         }
         break;
-    case Units::icm:
+    case Chem::Units::icm:
         switch (want) {
-        case Units::kJ_mol:
-            ans *= datum::icm_to_kJ;
+        case Chem::Units::kJ_mol:
+            ans *= Pc::icm_to_kJ;
             break;
-        case Units::kcal_mol:
-            ans *= datum::icm_to_kJ / datum::cal_to_J;
+        case Chem::Units::kcal_mol:
+            ans *= Pc::icm_to_kJ / Pc::cal_to_J;
             break;
-        case Units::hartree:
-            ans /= datum::au_to_icm;
+        case Chem::Units::hartree:
+            ans /= Pc::au_to_icm;
             break;
-        case Units::kelvin:
-            ans *= datum::icm_to_K;
+        case Chem::Units::kelvin:
+            ans *= Pc::icm_to_K;
             break;
-        case Units::au:
-            ans /= datum::au_to_icm;
+        case Chem::Units::au:
+            ans /= Pc::au_to_icm;
             break;
-        case Units::icm:
+        case Chem::Units::icm:
             break;
         default:
-            throw Unit_error("bad unit conversion");
+            throw std::runtime_error("bad unit conversion");
         }
         break;
-    case Units::kelvin:
+    case Chem::Units::kelvin:
         switch (want) {
-        case Units::icm:
-            ans /= datum::icm_to_K;
+        case Chem::Units::icm:
+            ans /= Pc::icm_to_K;
             break;
-        case Units::au:
-            ans /= datum::au_to_K;
+        case Chem::Units::au:
+            ans /= Pc::au_to_K;
             break;
-        case Units::kelvin:
+        case Chem::Units::kelvin:
             break;
         default:
-            throw Unit_error("bad unit conversion");
+            throw std::runtime_error("bad unit conversion");
         }
         break;
-    case Units::au:
+    case Chem::Units::au:
         switch (want) {
-        case Units::icm:
-            ans *= datum::au_to_icm;
+        case Chem::Units::icm:
+            ans *= Pc::au_to_icm;
             break;
-        case Units::kelvin:
-            ans *= datum::au_to_K;
+        case Chem::Units::kelvin:
+            ans *= Pc::au_to_K;
             break;
-        case Units::kg:
-            ans *= datum::au_to_kg;
+        case Chem::Units::kg:
+            ans *= Pc::au_to_kg;
             break;
-        case Units::eV:
-            ans *= datum::E_h / datum::eV;
+        case Chem::Units::eV:
+            ans *= Pc::E_h / Pc::eV;
             break;
-        case Units::au:
+        case Chem::Units::au:
             break;
         default:
-            throw Unit_error("bad unit conversion");
+            throw std::runtime_error("bad unit conversion");
         }
         break;
-    case Units::eV:
+    case Chem::Units::eV:
         switch (want) {
-        case Units::kJ_mol:
-            ans *= 1.0e-3 * datum::eV * datum::N_A;
+        case Chem::Units::kJ_mol:
+            ans *= 1.0e-3 * Pc::eV * Pc::N_A;
             break;
-        case Units::kcal_mol:
-            ans *= 1.0e-3 * datum::eV * datum::N_A;
-            ans /= datum::cal_to_J;
+        case Chem::Units::kcal_mol:
+            ans *= 1.0e-3 * Pc::eV * Pc::N_A;
+            ans /= Pc::cal_to_J;
             break;
-        case Units::hartree:
-            ans *= datum::eV / datum::E_h;
+        case Chem::Units::hartree:
+            ans *= Pc::eV / Pc::E_h;
             break;
-        case Units::eV:
+        case Chem::Units::eV:
             break;
         default:
-            throw Unit_error("bad unit conversion");
+            throw std::runtime_error("bad unit conversion");
         }
         break;
     default:
-        throw Unit_error("unknown unit");
+        throw std::runtime_error("unknown unit");
     }
     return ans;
 }
+

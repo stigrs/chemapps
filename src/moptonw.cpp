@@ -14,14 +14,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <srs/utils.h>
+#include <stdutils/stdutils.h>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <stdexcept>
 #include <string>
-
 
 //------------------------------------------------------------------------------
 
@@ -40,14 +38,13 @@ void get_mopac_geom(const std::string& arc_file);
 
 //------------------------------------------------------------------------------
 
-//
 // Program for generating NWChem input file from a template input file and by
 // extracting Cartesian coordinates from a MOPAC calculation.
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 3) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 3) {
         std::cerr << "Usage: " << args[0] << " nwchem.tml mopac.arc\n\n"
                   << "nwchem.tml: Template file for NWChem input file\n"
                   << "mopac.arc:  Summary file from MOPAC calculation\n";
@@ -111,17 +108,17 @@ void get_mopac_geom(const std::string& arc_file)
     double charge;
     bool found = false;
 
-    srs::Format<double> fix8;
+    Stdutils::Format<double> fix8;
     fix8.fixed().width(15).precision(8);
 
     while (std::getline(from, line)) {
         if (line.find(pattern, 0) != std::string::npos) {
             found = true;
-            std::getline(from, line);  // ignore three lines
+            std::getline(from, line); // ignore three lines
             std::getline(from, line);
             std::getline(from, line);
-            while (from >> atom >> x >> flag >> y >> flag >> z >> flag
-                   >> charge) {
+            while (from >> atom >> x >> flag >> y >> flag >> z >> flag >>
+                   charge) {
                 std::cout << "   " << atom << " " << fix8(x) << " " << fix8(y)
                           << " " << fix8(z) << '\n';
             }
@@ -131,3 +128,4 @@ void get_mopac_geom(const std::string& arc_file)
         throw IO_error("could not find keyword " + pattern);
     }
 }
+

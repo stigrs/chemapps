@@ -14,10 +14,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <srs/utils.h>
+#include <stdutils/stdutils.h>
 #include <algorithm>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -35,13 +34,12 @@ bool found(const std::vector<int>& a, std::vector<int>& b);
 
 //------------------------------------------------------------------------------
 
-//
 // Program for mapping NWChem Z-matrix to different numbering of atoms.
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc < 4) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() < 4) {
         std::cerr << "usage: " << args[0] << " map_file tml_file zmat_file\n";
         return 1;
     }
@@ -71,7 +69,7 @@ int main(int argc, char* argv[])
 
     // Parse template file:
 
-    unsigned iatom = 0;
+    std::size_t iatom = 0;
 
     int j;
     int k;
@@ -87,7 +85,7 @@ int main(int argc, char* argv[])
     std::string dvar;
     std::string line;
 
-    srs::Format<double> fix5;
+    Stdutils::Format<double> fix5;
     fix5.fixed().precision(5);
 
     // Parse first atom:
@@ -141,8 +139,8 @@ int main(int argc, char* argv[])
             iatom++;
             r = stretch(zmat_file, map[iatom - 1], map[j - 1]);
             a = bend(zmat_file, map[iatom - 1], map[j - 1], map[k - 1]);
-            d = torsion(
-                zmat_file, map[iatom - 1], map[j - 1], map[k - 1], map[l - 1]);
+            d = torsion(zmat_file, map[iatom - 1], map[j - 1], map[k - 1],
+                        map[l - 1]);
             std::cout << "  " << rvar << "  " << fix5(r) << '\n'
                       << "  " << avar << "  " << fix5(a) << '\n'
                       << "  " << dvar << "  " << fix5(d) << '\n';
@@ -299,3 +297,4 @@ bool found(const std::vector<int>& a, std::vector<int>& b)
     std::sort(b.begin(), b.end());
     return std::equal(a.begin(), a.end(), b.begin());
 }
+

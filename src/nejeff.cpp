@@ -14,18 +14,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <stdutils/stdutils.h>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 
-
-//
 // Program for calculation of effective N(E,J) = N1 * N2 / (N1 + N2).
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 3) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 3) {
         std::cerr << "usage: " << args[0] << " flux_file_1 flux_file_2\n";
         return 1;
     }
@@ -76,3 +74,4 @@ int main(int argc, char* argv[])
         return 1;
     }
 }
+

@@ -14,16 +14,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <chem/ptable.h>
-#include <srs/utils.h>
+#include <chem/periodic_table.h>
+#include <stdutils/stdutils.h>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-
 
 //------------------------------------------------------------------------------
 
@@ -33,13 +31,12 @@ void convert(const std::string& input_file);
 
 //------------------------------------------------------------------------------
 
-//
 // Converts a XYZ file to GAMESS $DATA format.
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 2) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 2) {
         std::cerr << "usage: " << args[0] << " file.xyz\n";
         return 1;
     }
@@ -57,7 +54,7 @@ int main(int argc, char* argv[])
 void convert(const std::string& input_file)
 {
     std::ifstream from;
-    srs::fopen(from, input_file);
+    Stdutils::fopen(from, input_file);
 
     std::string line;
     std::string atsymb;
@@ -65,11 +62,14 @@ void convert(const std::string& input_file)
     double y;
     double z;
 
+    namespace Pt = Chem::Periodic_table;
+
     while (from >> atsymb >> x >> y >> z) {
-        srs::Format<double> fix(1);
+        Stdutils::Format<double> fix(1);
         fix.fixed();
-        double atnum = ptable::get_atomic_number(atsymb);
+        double atnum = Pt::get_atomic_number(atsymb);
         std::cout << atsymb << "  " << fix(atnum) << "  " << x << "  " << y
                   << "  " << z << '\n';
     }
 }
+

@@ -14,24 +14,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4505)  // caused by boost/program_options.hpp>
-#endif                           // _MSC_VER
-
 #include <chem/gauss_data.h>
-#include <srs/array.h>
-#include <srs/utils.h>
-#include <boost/program_options.hpp>
+#include <stdutils/stdutils.h>
+#include <cxxopts.hpp>
 #include <exception>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif  // _MSC_VER
+#include <vector>
 
 //------------------------------------------------------------------------------
 
@@ -41,73 +32,67 @@ struct Bad_file : std::runtime_error {
 
 //------------------------------------------------------------------------------
 
-const std::string pattern_irc_data
-    = "IRC point       1 Results for each geome   R   N=";
+const std::string pattern_irc_data =
+    "IRC point       1 Results for each geome   R   N=";
 
-const std::string pattern_irc_geom
-    = "IRC point       1 Geometries               R   N=";
+const std::string pattern_irc_geom =
+    "IRC point       1 Geometries               R   N=";
 
-const std::string pattern_irc_grad
-    = "IRC point       1 Gradient at each geome   R   N=";
-
-//------------------------------------------------------------------------------
-
-void print_array(std::ostream& to, const srs::dvector& array);
+const std::string pattern_irc_grad =
+    "IRC point       1 Gradient at each geome   R   N=";
 
 //------------------------------------------------------------------------------
 
-//
+void print_array(std::ostream& to, const std::vector<double>& array);
+
+//------------------------------------------------------------------------------
+
 // Sort output data from a Gaussian 98/03 IRC calculation for input to
 // GaussView so that it displays the IRC walk from reactants to products.
 //
 int main(int argc, char* argv[])
 {
-    // Parse command line options:
-
-    namespace po = boost::program_options;
-
-    po::options_description options("Allowed options");
     // clang-format off
+    cxxopts::Options options(argv[0], "Sort output from Gaussian IRC calculation");
     options.add_options()
-        ("help,h", "display help message")
-        ("file,f", po::value<std::string>(), "input file")
-        ("sign,cs", po::bool_switch()->default_value(false), "change sign of MEP values (false)")
-        ("rmep,rs", po::bool_switch()->default_value(false), "reverse MEP values (false)")
-        ("rgeom,rx", po::bool_switch()->default_value(false), "reverse geometries and gradients (false)")
-        ("corr,c", po::value<double>(), "correction to SMEP (0.0)");
+        ("h,help", "display help message")
+        ("f,file", "input file", cxxopts::value<std::string>())
+        ("s,sign", "change sign of MEP values (false)", cxxopts::value<bool>()->default_value("false"))
+        ("m,rmep", "reverse MEP values (false)", cxxopts::value<bool>()->default_value("false"))
+        ("g,rgeom", "reverse geometries and gradients (false)", cxxopts::value<bool>()->default_value("false"))
+        ("c,corr", "correction to SMEP (0.0)", cxxopts::value<double>());
     // clang-format on
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, options), vm);
-    po::notify(vm);
 
-    bool change_sign  = false;
-    bool reverse_mep  = false;
+    auto args = options.parse(argc, argv);
+
+    bool change_sign = false;
+    bool reverse_mep = false;
     bool reverse_geom = false;
-    double smep_corr  = 0.0;
+    double smep_corr = 0.0;
     std::string input_file;
 
-    if (vm.find("help") != vm.end()) {
-        std::cout << options << '\n';
+    if (args.count("help")) {
+        std::cout << options.help({"", "Group"}) << '\n';
         return 0;
     }
-    if (vm.find("file") != vm.end()) {
-        input_file = vm["file"].as<std::string>();
+    if (args.count("file")) {
+        input_file = args["file"].as<std::string>();
     }
     else {
-        std::cerr << options << '\n';
+        std::cerr << options.help({"", "Group"}) << '\n';
         return 1;
     }
-    if (vm.find("corr") != vm.end()) {
-        smep_corr = vm["corr"].as<double>();
+    if (args.count("corr")) {
+        smep_corr = args["corr"].as<double>();
     }
-    if (vm.find("sign") != vm.end()) {
-        change_sign = vm["sign"].as<bool>();
+    if (args.count("sign")) {
+        change_sign = args["sign"].as<bool>();
     }
-    if (vm.find("rmep") != vm.end()) {
-        reverse_mep = vm["rmep"].as<bool>();
+    if (args.count("rmep")) {
+        reverse_mep = args["rmep"].as<bool>();
     }
-    if (vm.find("rgeom") != vm.end()) {
-        reverse_geom = vm["rgeom"].as<bool>();
+    if (args.count("rgeom")) {
+        reverse_geom = args["rgeom"].as<bool>();
     }
 
     if (change_sign) {
@@ -130,52 +115,52 @@ int main(int argc, char* argv[])
     }
     std::cout << "SMEP correction:\t" << smep_corr << '\n';
 
-
     try {
         std::ifstream from;
         std::ofstream to;
 
-        Gauss_filetype filetype;
-        std::string suffix = srs::get_suffix(input_file);
+        Chem::Gauss_filetype filetype;
+        std::string suffix = Stdutils::get_suffix(input_file);
         if ((suffix == ".fch") || (suffix == ".fchk")) {
-            filetype = fchk;
+            filetype = Chem::fchk;
         }
         else {
             throw Bad_file("input file is not a fchk file");
         }
-        std::string output_file = srs::strip_suffix(input_file, suffix);
+        std::string output_file = Stdutils::strip_suffix(input_file, suffix);
         output_file += ".dat";
 
-        srs::fopen(from, input_file);
-        srs::fopen(to, output_file);
+        Stdutils::fopen(from, input_file);
+        Stdutils::fopen(to, output_file);
 
         // Correct SMEP data and write to output:
 
-        Gauss_data gauss(from, filetype);
+        Chem::Gauss_data gauss(from, filetype);
 
-        srs::dvector mep;
+        std::vector<double> mep;
         gauss.get_irc_data(mep);
 
         if (change_sign) {
-            for (srs::size_t i = 1; i < mep.size(); i += 2) {
+            for (std::size_t i = 1; i < mep.size(); i += 2) {
                 mep[i] = -1.0 * mep[i] + smep_corr;
             }
         }
         else {
-            for (srs::size_t i = 1; i < mep.size(); i += 2) {
+            for (std::size_t i = 1; i < mep.size(); i += 2) {
                 mep[i] += smep_corr;
             }
         }
 
-        srs::Format<srs::size_t> fmt;
+        Stdutils::Format<std::size_t> fmt;
         fmt.width(12);
 
         to << pattern_irc_data << fmt(mep.size()) << '\n';
 
         if (reverse_mep) {
-            srs::dvector mep_rev(mep.size());
-            const int npoints = mep.size() / 2;
-            int indx1, indx2;
+            std::vector<double> mep_rev(mep.size());
+            const int npoints = static_cast<int>(mep.size() / 2);
+            int indx1;
+            int indx2;
             for (int i = 0; i < npoints; i++) {
                 indx1 = (npoints - 1 - i) * 2;
                 indx2 = i * 2;
@@ -191,20 +176,21 @@ int main(int argc, char* argv[])
 
         // Correct geometries/gradients and write to output:
 
-        srs::dvector geom;
+        std::vector<double> geom;
         gauss.get_irc_geom(geom);
 
-        srs::dvector grad;
+        std::vector<double> grad;
         gauss.get_irc_grad(grad);
 
         if (reverse_geom) {
             const int natoms3 = 3 * gauss.get_natoms();
-            const int npoints = mep.size() / 2;
+            const int npoints = static_cast<int>(mep.size() / 2);
 
-            srs::dvector geom_rev(geom.size());
-            srs::dvector grad_rev(grad.size());
+            std::vector<double> geom_rev(geom.size());
+            std::vector<double> grad_rev(grad.size());
 
-            int indx1, indx2;
+            int indx1;
+            int indx2;
             for (int i = 0; i < npoints; i++) {
                 indx1 = (npoints - 1 - i) * natoms3;
                 indx2 = i * natoms3;
@@ -237,12 +223,12 @@ int main(int argc, char* argv[])
 
 //------------------------------------------------------------------------------
 
-void print_array(std::ostream& to, const srs::dvector& array)
+void print_array(std::ostream& to, const std::vector<double>& array)
 {
-    srs::Format<double> sci;
+    Stdutils::Format<double> sci;
     sci.scientific_E().width(16).precision(8);
 
-    int count       = 0;
+    int count = 0;
     bool wrote_endl = false;
 
     for (auto v : array) {
@@ -251,7 +237,7 @@ void print_array(std::ostream& to, const srs::dvector& array)
         wrote_endl = false;
         if (count == 5) {
             to << '\n';
-            count      = 0;
+            count = 0;
             wrote_endl = true;
         }
     }
@@ -259,3 +245,4 @@ void print_array(std::ostream& to, const srs::dvector& array)
         to << '\n';
     }
 }
+

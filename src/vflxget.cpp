@@ -14,17 +14,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <srs/utils.h>
+#include <stdutils/stdutils.h>
 #include <cstdlib>
 #include <cstring>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 //------------------------------------------------------------------------------
 
@@ -40,19 +40,18 @@ std::string pattern;
 
 //------------------------------------------------------------------------------
 
-void set_values(const gsl::multi_span<char*>& args);
+void set_values(const std::vector<std::string>& args);
 void get_data(std::ifstream& from);
 
 //------------------------------------------------------------------------------
 
-//
 // Program for extracting rate data from VARIFLEX output file at a given
 // temperature or pressure.
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc < 4) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() < 4) {
         std::cerr << "usage: " << args[0] << " variflex.out value unit [uni]\n";
         return 1;
     }
@@ -73,22 +72,22 @@ int main(int argc, char* argv[])
 
 //------------------------------------------------------------------------------
 
-void set_values(const gsl::multi_span<char*>& args)
+void set_values(const std::vector<std::string>& args)
 {
-    val = std::atof(args[2]);
+    val = std::stod(args[2]);
     if (val <= 0.0) {
-        throw Error("bad value for T/P: " + srs::to_string(val));
+        throw Error("bad value for T/P: " + std::to_string(val));
     }
 
     bool get_uni = false;
-    pattern      = "Pressure  Temp   k_bi-TST";
-    if ((args[4] != nullptr) && (std::strcmp(args[4], "uni") == 0)) {
+    pattern = "Pressure  Temp   k_bi-TST";
+    if ((args[4] != "") && (args[4] == "uni")) {
         pattern = "Pressure  Temp   k_uni-TST";
         get_uni = true;
     }
 
     std::string unit = args[3];
-    get_pressure     = false;
+    get_pressure = false;
     if ((unit == "Torr") || (unit == "torr")) {
         std::cout << "P = " << val << " " << unit << '\n';
         if (get_uni) {
@@ -119,14 +118,14 @@ void get_data(std::ifstream& from)
     double p, t, k, k0;
     while (std::getline(from, line)) {
         if (line.find(pattern, 0) != std::string::npos) {
-            std::getline(from, line);  // ignore one line
+            std::getline(from, line); // ignore one line
             while (std::getline(from, line)) {
                 std::istringstream iss(line);
                 iss >> p >> t >> k >> k0;
                 if (!iss) {
                     break;
                 }
-                if (get_pressure) {  // get data for given pressure
+                if (get_pressure) { // get data for given pressure
                     if (p == val) {
                         std::cout
                             << t << '\t'
@@ -135,7 +134,7 @@ void get_data(std::ifstream& from)
                             << std::resetiosflags(std::ios_base::scientific);
                     }
                 }
-                else {  // get data for given temperature
+                else { // get data for given temperature
                     if (t == val) {
                         std::cout
                             << p << '\t'
@@ -148,3 +147,4 @@ void get_data(std::ifstream& from)
         }
     }
 }
+

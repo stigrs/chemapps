@@ -14,11 +14,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <srs/utils.h>
+#include <stdutils/stdutils.h>
 #include <cstdlib>
 #include <exception>
 #include <fstream>
-#include <gsl/gsl>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -41,13 +40,12 @@ std::ifstream from;
 
 //------------------------------------------------------------------------------
 
-//
 // Prepares Polyrate path data for plotting.
 //
 int main(int argc, char* argv[])
 {
-    auto args = gsl::multi_span<char*>(argv, argc);
-    if (argc != 2) {
+    auto args = Stdutils::arguments(argc, argv);
+    if (args.size() != 2) {
         std::cout << "usage: " << args[0] << " poly.fu6\n";
         return 1;
     }
@@ -72,7 +70,7 @@ int main(int argc, char* argv[])
 bool ts_is_linear()
 {
     from.clear();
-    from.seekg(0, std::ios_base::beg);  // move to beginning of stream
+    from.seekg(0, std::ios_base::beg); // move to beginning of stream
 
     bool linear = false;
 
@@ -81,8 +79,8 @@ bool ts_is_linear()
     while (std::getline(from, line)) {
         if (line.find("Starting point Parameters:", 0) != std::string::npos) {
             while (std::getline(from, line)) {
-                if (line.find("SPECIES:  species type", 0)
-                    != std::string::npos) {
+                if (line.find("SPECIES:  species type", 0) !=
+                    std::string::npos) {
                     std::istringstream iss(line);
                     iss >> tmp1 >> tmp2 >> tmp3 >> word;
                     if (word == "nonlints") {
@@ -102,7 +100,7 @@ bool ts_is_linear()
 int get_ts_nmodes()
 {
     from.clear();
-    from.seekg(0, std::ios_base::beg);  // move to beginning of file
+    from.seekg(0, std::ios_base::beg); // move to beginning of file
 
     int nmodes = 0;
 
@@ -125,9 +123,9 @@ int get_ts_nmodes()
     else {
         nmodes -= 7;
     }
-    if (nmodes < 1) {  // something is wrong...
-        throw Error("bad number of generalized normal modes: "
-                    + srs::to_string(nmodes));
+    if (nmodes < 1) { // something is wrong...
+        throw Error("bad number of generalized normal modes: " +
+                    std::to_string(nmodes));
     }
     return nmodes;
 }
@@ -137,16 +135,16 @@ void punch_path_data()
     int nmodes = get_ts_nmodes();
 
     from.clear();
-    from.seekg(0, std::ios_base::beg);  // move to beginning of stream
+    from.seekg(0, std::ios_base::beg); // move to beginning of stream
 
     std::string line, word;
     float smep, vmep, vag, dummy;
-    std::vector<std::string> freq(nmodes);  // use string to handle imag. freqs.
+    std::vector<std::string> freq(nmodes); // use string to handle imag. freqs.
 
     while (std::getline(from, line)) {
-        if (line.find("Classical and adiabatic energies", 0)
-            != std::string::npos) {
-            std::getline(from, line);  // ignore two lines
+        if (line.find("Classical and adiabatic energies", 0) !=
+            std::string::npos) {
+            std::getline(from, line); // ignore two lines
             std::getline(from, line);
             std::cout << "# " << line << '\n';
             while (from >> smep >> vmep >> vag >> dummy) {
@@ -160,7 +158,7 @@ void punch_path_data()
                     // write imaginary frequencies as negative frequencies
                     if (word.find('i', 0) != std::string::npos) {
                         std::cout << "\t-";
-                        for (unsigned int j = 0; j < word.size() - 1; j++) {
+                        for (std::size_t j = 0; j < word.size() - 1; j++) {
                             std::cout << word[j];
                         }
                     }
@@ -170,8 +168,9 @@ void punch_path_data()
                 }
                 std::cout << '\n';
             }
-            from.clear();  // there could be several path data sections...
+            from.clear(); // there could be several path data sections...
             std::cout << '\n';
         }
     }
 }
+
