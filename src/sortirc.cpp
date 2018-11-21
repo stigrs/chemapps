@@ -14,6 +14,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4018 4267) // caused by cxxopts.hpp
+#endif
+
 #include <chem/gauss_data.h>
 #include <stdutils/stdutils.h>
 #include <cxxopts.hpp>
@@ -23,6 +28,10 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 //------------------------------------------------------------------------------
 
