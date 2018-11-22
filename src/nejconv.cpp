@@ -92,7 +92,8 @@ void init(const std::string& filename)
     e_grid.set(from, "EnergyGrid");
     j_grid.set(from, "AngMomGrid");
 
-    if (Stdutils::find_token(from, "Frequencies")) {
+    auto pos = Stdutils::find_token(from, "Frequencies");
+    if (pos != -1) {
         double v;
         while (from >> v) {
             if (v > 0.0) {

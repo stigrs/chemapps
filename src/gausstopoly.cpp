@@ -16,24 +16,23 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4505)  // caused by boost/program_options.hpp>
-#endif                           // _MSC_VER
+#pragma warning(disable : 4018 4267) // caused by cxxopts.hpp
+#endif
 
 #include <chem/gauss_data.h>
-#include <srs/array.h>
-#include <srs/datum.h>
-#include <srs/utils.h>
-#include <boost/program_options.hpp>
+#include <numlib/constants.h>
+#include <stdutils/stdutils.h>
+#include <cxxopts.hpp>
 #include <exception>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #ifdef _MSC_VER
 #pragma warning(pop)
-#endif  // _MSC_VER
-
+#endif
 
 //------------------------------------------------------------------------------
 
@@ -48,10 +47,10 @@ bool change_sign;
 bool reverse_mep;
 bool get_hess;
 
-srs::dvector mep;
-srs::dvector geom;
-srs::dvector grad;
-srs::dvector hess;
+std::vector<double> mep;
+std::vector<double> geom;
+std::vector<double> grad;
+std::vector<double> hess;
 
 //------------------------------------------------------------------------------
 
@@ -61,12 +60,11 @@ struct Error : std::runtime_error {
 
 //------------------------------------------------------------------------------
 
-void create_fu31(const Gauss_filetype filetype);
-Gauss_filetype get_filetype(const char* filename);
+void create_fu31(const Chem::Gauss_filetype filetype);
+Chem::Gauss_filetype get_filetype(const char* filename);
 
 //------------------------------------------------------------------------------
 
-//
 // Prepares output from a Gaussian 94/98/03 IRC calculation for
 // input to Polyrate's unit31.
 //
@@ -75,69 +73,66 @@ int main(int argc, char* argv[])
     // Set default values:
 
     energy0 = 0.0;
-    s_corr  = 0.0;
+    s_corr = 0.0;
 
     change_sign = false;
     reverse_mep = false;
-    get_hess    = false;
+    get_hess = false;
 
     // Parse command line arguments:
 
-    namespace po = boost::program_options;
-
-    po::options_description options("Allowed options");
     // clang-format off
+    cxxopts::Options options(argv[0], "Prepare output from Gaussian for Polyrate");
     options.add_options()
-        ("help,h", "display help message")
-        ("file,f", po::value<std::string>(), "input file")
-        ("energy,e", po::value<double>(), "energy of reactants (0.0)")
-        ("corr,c", po::value<double>(), "correction to SMEP (0.0)")
-        ("sign,s", po::bool_switch()->default_value(false), "change sign of SMEP values (false)")
-        ("reverse,r", po::bool_switch()->default_value(false), "reverse MEP values (false)")
-        ("hess,h", po::bool_switch()->default_value(false), "get Hessians (false)");
+        ("h,help", "display help message")
+        ("f,file", "input file", cxxopts::value<std::string>())
+        ("e,energy", "energy of reactants (0.0)", cxxopts::value<double>())
+        ("c,corr", "correction to SMEP (0.0)", cxxopts::value<double>())
+        ("s,sign", "change sign of SMEP values (false)", cxxopts::value<bool>()->default_value("false"))
+        ("r,reverse", "reverse MEP values (false)", cxxopts::value<bool>()->default_value("false"))
+        ("h,hess", "get Hessians (false)", cxxopts::value<bool>()->default_value("false"));
     // clang-format on
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, options), vm);
-    po::notify(vm);
+
+    auto args = options.parse(argc, argv);
 
     std::string input_file;
 
-    if (vm.find("help") != vm.end()) {
-        std::cout << options << '\n';
+    if (args.count("help")) {
+        std::cout << options.help({"", "Group"}) << '\n';
         return 0;
     }
-    if (vm.find("file") != vm.end()) {
-        input_file = vm["file"].as<std::string>();
+    if (args.count("file")) {
+        input_file = args["file"].as<std::string>();
     }
     else {
-        std::cerr << options << '\n';
+        std::cerr << options.help({"", "Group"}) << '\n';
         return 1;
     }
-    if (vm.find("energy") != vm.end()) {
-        energy0 = vm["energy"].as<double>();
+    if (args.count("energy")) {
+        energy0 = args["energy"].as<double>();
     }
-    if (vm.find("corr") != vm.end()) {
-        s_corr = vm["corr"].as<double>();
+    if (args.count("corr")) {
+        s_corr = args["corr"].as<double>();
     }
-    if (vm.find("sign") != vm.end()) {
-        change_sign = vm["sign"].as<bool>();
+    if (args.count("sign")) {
+        change_sign = args["sign"].as<bool>();
     }
-    if (vm.find("reverse") != vm.end()) {
-        reverse_mep = vm["reverse"].as<bool>();
+    if (args.count("reverse")) {
+        reverse_mep = args["reverse"].as<bool>();
     }
-    if (vm.find("hess") != vm.end()) {
-        get_hess = vm["hess"].as<bool>();
+    if (args.count("hess")) {
+        get_hess = args["hess"].as<bool>();
     }
 
     // Solve problem:
 
     try {
         std::ifstream from;
-        srs::fopen(from, input_file);
+        Stdutils::fopen(from, input_file);
 
-        Gauss_filetype filetype = get_filetype(input_file.c_str());
+        Chem::Gauss_filetype filetype = get_filetype(input_file.c_str());
 
-        Gauss_data gauss(from, filetype);
+        Chem::Gauss_data gauss(from, filetype);
 
         natoms = gauss.get_natoms();
 
@@ -150,7 +145,7 @@ int main(int argc, char* argv[])
         }
 
         if (reverse_mep) {
-            srs::dvector mep_tmp(mep.size());
+            std::vector<double> mep_tmp(mep.size());
             const int npoints = mep.size() / 2;
             int indx1, indx2;
             for (int i = 0; i < npoints; i++) {
@@ -172,43 +167,43 @@ int main(int argc, char* argv[])
 
 //-----------------------------------------------------------------------------
 
-Gauss_filetype get_filetype(const char* filename)
+Chem::Gauss_filetype get_filetype(const char* filename)
 {
-    std::string suffix = srs::get_suffix(filename);
+    std::string suffix = Stdutils::get_suffix(filename);
     if ((suffix == ".out") || (suffix == ".log")) {
-        return out;
+        return Chem::out;
     }
     else if ((suffix == ".fch") || (suffix == ".fchk")) {
-        return fchk;
+        return Chem::fchk;
     }
     else {
         throw Error("unknown suffix: " + suffix);
     }
 }
 
-void create_fu31(const Gauss_filetype filetype)
+void create_fu31(const Chem::Gauss_filetype filetype)
 {
     const char* output_file = "gauss2poly.fu31";
 
     std::ofstream to;
-    srs::fopen(to, output_file);
+    Stdutils::fopen(to, output_file);
 
-    srs::Format<double> sci;
-    srs::Format<double> fix;
+    Stdutils::Format<double> sci;
+    Stdutils::Format<double> fix;
     sci.scientific_E().width(16).precision(8);
     fix.fixed().width(12).precision(8);
 
     double conv_factor;
-    if (filetype == out) {
+    if (filetype == Chem::out) {
         conv_factor = 1.0;
     }
-    else {                         // filetype == fchk
-        conv_factor = datum::a_0;  // bohr to angstrom
+    else {                                    // filetype == fchk
+        conv_factor = Numlib::Constants::a_0; // bohr to angstrom
     }
 
     const int npoints = mep.size() / 2;
     const int natoms3 = natoms * 3;
-    const int nhess   = natoms3 * (natoms3 + 1) / 2;
+    const int nhess = natoms3 * (natoms3 + 1) / 2;
 
     double smep;
     double vmep;
@@ -279,3 +274,4 @@ void create_fu31(const Gauss_filetype filetype)
     }
     std::cout << "output is written to " << output_file << '\n';
 }
+

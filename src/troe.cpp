@@ -14,63 +14,68 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4018 4267) // caused by cxxopts.hpp
+#endif
+
 #include <chem/collision.h>
 #include <chem/molecule.h>
 #include <chem/thermochem.h>
 #include <chem/thermodata.h>
 #include <chem/troe.h>
-#include <chem/whitten_rabino.h>
-#include <srs/datum.h>
-#include <srs/utils.h>
-#include <boost/program_options.hpp>
+#include <chem/whirab.h>
+#include <numlib/constants.h>
+#include <stdutils/stdutils.h>
+#include <cxxopts.hpp>
 #include <exception>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
 
-//
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 // Program for Troe factorization of low-pressure limiting
 // rate coefficients.
 //
 int main(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
-
-    po::options_description options("Allowed options");
     // clang-format off
+    cxxopts::Options options(argv[0], "Troe factorization of low-pressure rate coefficients");
     options.add_options()
-        ("help,h", "display help message")
-        ("file,f", po::value<std::string>(), "input file");
+        ("hhelp", "display help message")
+        ("f,file", "input file", cxxopts::value<std::string>());
     // clang-format on
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, options), vm);
-    po::notify(vm);
+
+    auto args = options.parse(argc, argv);
 
     std::string input_file;
 
-    if (vm.find("help") != vm.end()) {
-        std::cout << options << '\n';
+    if (args.count("help")) {
+        std::cout << options.help({"", "Group"}) << '\n';
         return 0;
     }
-    if (vm.find("file") != vm.end()) {
-        input_file = vm["file"].as<std::string>();
+    if (args.count("file")) {
+        input_file = args["file"].as<std::string>();
     }
     else {
-        std::cerr << options << '\n';
+        std::cerr << options.help({"", "Group"}) << '\n';
         return 1;
     }
 
     try {
         std::ifstream from;
-        srs::fopen(from, input_file);
+        Stdutils::fopen(from, input_file);
 
-        Molecule mol(from);
-        Thermodata tpdata(from);
-        Collision coll(from);
-        Troe troe(from, mol);
+        Chem::Molecule mol(from);
+        Chem::Thermodata tpdata(from);
+        Chem::Collision coll(from);
+        Chem::Troe troe(from, mol);
 
-        srs::Format<char> line;
+        Stdutils::Format<char> line;
         line.width(28).fill('-');
 
         std::cout << "Troe Factorization Analysis:\n"
@@ -87,13 +92,13 @@ int main(int argc, char* argv[])
                   << " F_hind - hindered internal rotation factor\n\n"
                   << "k0^SC and Z_LJ are given in cm^3 molecule^-1 s^-1\n\n";
 
-        double e0  = troe.get_energy_barrier();
-        double zpe = mol.get_vib().zero_point_energy();
-        double rho = wr::vibr_density_states(mol, e0);
-        double wra = wr::a_corr(mol, e0);
+        double e0 = troe.get_energy_barrier();
+        double zpe = mol.zero_point_energy();
+        double rho = Chem::Whirab::vibr_density_states(mol, e0);
+        double wra = Chem::Whirab::a_corr(mol, e0);
 
         std::cout << "Zero-point vibrational energy:    " << zpe << " cm^-1\n"
-			      << "Energy barrier towards reaction:  " << e0 << " cm^-1\n"
+                  << "Energy barrier towards reaction:  " << e0 << " cm^-1\n"
                   << "Vibrational density of states:    " << rho
                   << " (kJ/mol)^-1\n"
                   << "Whitten-Rabinovitch A correction: " << wra << "\n\n";
@@ -115,9 +120,9 @@ int main(int argc, char* argv[])
                   << std::resetiosflags(std::ios_base::left);
         // clang-format on
 
-        srs::Format<double> gen65;
-        srs::Format<double> sci82;
-        srs::Format<double> sci92;
+        Stdutils::Format<double> gen65;
+        Stdutils::Format<double> sci82;
+        Stdutils::Format<double> sci92;
 
         gen65.width(6).precision(5);
         sci82.scientific().width(8).precision(2);
@@ -125,18 +130,20 @@ int main(int argc, char* argv[])
 
         auto temp = tpdata.get_temperature();
 
+        namespace Pc = Numlib::Constants;
+
         for (auto t : temp) {
-            double kT     = datum::R * 1.0e-3 * t;
-            double z_lj   = coll.lj_coll_freq(t);
-            double q_vib  = chem::qvib(mol, t, "V=0");
-            double f_anh  = troe.f_anharm();
-            double f_e    = troe.f_energy(t);
-            double f_rot  = troe.f_rotation(t);
+            double kT = Pc::R * 1.0e-3 * t;
+            double z_lj = coll.lj_coll_freq(t);
+            double q_vib = Chem::qvib(mol, t, "V=0");
+            double f_anh = troe.f_anharm();
+            double f_e = troe.f_energy(t);
+            double f_rot = troe.f_rotation(t);
             double f_free = troe.f_free_rotor(t);
             double f_hind = troe.f_hind_rotor(t);
 
-            double k0 = z_lj * (rho * kT / q_vib) * f_anh * f_e * f_rot * f_free
-                        * f_hind * std::exp(-e0 * datum::icm_to_kJ / kT);
+            double k0 = z_lj * (rho * kT / q_vib) * f_anh * f_e * f_rot *
+                        f_free * f_hind * std::exp(-e0 * Pc::icm_to_kJ / kT);
 
             // clang-format off
             std::cout << gen65(t)      << "  " 
@@ -156,3 +163,4 @@ int main(int argc, char* argv[])
         return 1;
     }
 }
+

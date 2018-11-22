@@ -65,10 +65,10 @@ set(PROGRAMS
     gausshess2
     gaussnmr
     gaussopt
-#    gausstopoly
+    gausstopoly
     gmsget
     gmsgetxyz
-#    gmsscan
+    gmsscan
     mcmm 
     mcmmtocom
     mcmmtoxyz
@@ -83,16 +83,16 @@ set(PROGRAMS
     nwzmap
     polyplot
     sortirc
-#    thermo
-#    troe
-#    tst
+    thermo
+    troe
+    tst
     unitsconv
     vflxget
     vibrot 
-#	xyztocom
+    xyztocom
     xyztogms
     xyztomop
-#    zmatxyz
+    zmatxyz
 )
 
 foreach(program ${PROGRAMS})

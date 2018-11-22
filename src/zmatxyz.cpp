@@ -16,13 +16,13 @@
 
 #ifdef _MSC_VER
 #pragma warning(push)
-#pragma warning(disable : 4505)  // caused by boost/program_options.hpp
-#endif                           // _MSC_VER
+#pragma warning(disable : 4018 4267) // caused by cxxopts.hpp
+#endif
 
 #include <chem/molecule.h>
-#include <chem/molecule_io.h>
-#include <srs/utils.h>
-#include <boost/program_options.hpp>
+#include <chem/impl/io_support.h>
+#include <stdutils/stdutils.h>
+#include <cxxopts.hpp>
 #include <exception>
 #include <fstream>
 #include <iostream>
@@ -30,62 +30,57 @@
 
 #ifdef _MSC_VER
 #pragma warning(pop)
-#endif  // _MSC_VER
+#endif // _MSC_VER
 
-//
 // Program for converting between XYZ and Z matrix file formats.
 //
 int main(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
-
-    po::options_description options("Allowed options");
     // clang-format off
+    cxxopts::Options options(argv[0], "Convert between XYZ and Z-matrix file formats");
     options.add_options()
-        ("help,h", "display help message")
-        ("file,f", po::value<std::string>(), "input file")
-        ("xyz", po::bool_switch()->default_value(false), "convert to XYZ")
-        ("zmat", po::bool_switch()->default_value(false), 
-         "convert to Z matrix");
+        ("h,help", "display help message")
+        ("f,file", "input file", cxxopts::value<std::string>())
+        ("xyz", "convert to XYZ", cxxopts::value<bool>()->default_value("false"))
+        ("zmat", "convert to Z-matrix", cxxopts::value<bool>()->default_value("false"));
     // clang-format on
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, options), vm);
-    po::notify(vm);
+
+    auto args = options.parse(argc, argv);
 
     std::string input_file;
 
-    if (vm.find("help") != vm.end()) {
-        std::cout << options << '\n';
+    if (args.count("help")) {
+        std::cout << options.help({"", "Group"}) << '\n';
         return 0;
     }
-    if (vm.find("file") != vm.end()) {
-        input_file = vm["file"].as<std::string>();
+    if (args.count("file")) {
+        input_file = args["file"].as<std::string>();
     }
     else {
-        std::cerr << options << '\n';
+        std::cerr << options.help({"", "Group"}) << '\n';
         return 1;
     }
 
     try {
         std::ifstream from;
+        Stdutils::fopen(from, input_file);
+
+        Chem::Molecule mol(from);
+
         std::ofstream to;
-        srs::fopen(from, input_file);
-
-        Molecule mol(from, to, "Molecule");
-
         std::string output_file;
-        output_file = srs::strip_suffix(input_file, ".inp");
+        output_file = Stdutils::strip_suffix(input_file, ".inp");
 
-        if (vm["xyz"].as<bool>()) {
-            mol.get_zmat().load(from);
+        if (args["xyz"].as<bool>()) {
+            mol.int_coord().load(from);
             output_file = output_file + ".xyz";
-            srs::fopen(to, output_file.c_str());
-            chem::print_xyz_format(to, mol.get_atoms(), mol.get_xyz(), "");
+            Stdutils::fopen(to, output_file.c_str());
+            Chem::Impl::print_xyz_format(to, mol.atoms(), mol.cart_coord(), "");
         }
-        else if (vm["zmat"].as<bool>()) {
+        else if (args["zmat"].as<bool>()) {
             output_file = output_file + ".zmat";
-            srs::fopen(to, output_file.c_str());
-            mol.get_zmat().print(to);
+            Stdutils::fopen(to, output_file.c_str());
+            mol.int_coord().print(to);
         }
     }
     catch (std::exception& e) {
@@ -93,3 +88,4 @@ int main(int argc, char* argv[])
         return 1;
     }
 }
+

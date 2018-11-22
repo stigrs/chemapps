@@ -137,7 +137,7 @@ void Chem::Impl::Vibration::print(std::ostream& to) const
 
     if (freqs.size() > 0) {
         int it = 0;
-        to << "\nVibrational modes (cm^-1):\n" << line('-') << '\n';
+        to << "Vibrational modes (cm^-1):\n" << line('-') << '\n';
         for (Index i = 0; i < freqs.size(); ++i) {
             to << fix(freqs(i));
             if ((it == 8) && (freqs.size() > 9)) {

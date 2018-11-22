@@ -21,7 +21,6 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
-#include <map>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -99,7 +98,6 @@ int nstep;
 
 //-----------------------------------------------------------------------------
 
-//
 // Program for performing surface scan calculations with GAMESS.
 //
 int main(int argc, char* argv[])
@@ -162,42 +160,24 @@ int main(int argc, char* argv[])
 // Initialize variables by parsing setup file.
 void parse_setup(std::ifstream& from)
 {
+    using namespace Stdutils;
+
     std::string runtype_tmp;
     std::string orbstart_tmp;
     std::string coord_tmp;
     std::string axis_tmp;
+    fragment = {0};
 
-    srs::Array<int, 1> fragment_def(0, 1);
-
-    std::map<std::string, srs::Input> input_data;
-    input_data["progname"] = srs::Input(progname, "gmss");
-    input_data["tmlfile"] = srs::Input(tmlfile);
-    input_data["runtype"] = srs::Input(runtype_tmp);
-    input_data["jobname"] = srs::Input(jobname);
-    input_data["coord"] = srs::Input(coord_tmp);
-    input_data["orbstart"] = srs::Input(orbstart_tmp, "guess");
-    input_data["axis"] = srs::Input(axis_tmp, "x_axis");
-    input_data["fragment"] = srs::Input(fragment, fragment_def);
-    input_data["nstep"] = srs::Input(nstep);
-    input_data["stepsize"] = srs::Input(stepsize);
-
-    // Read input data:
-
-    std::string token;
-    while (from >> token) {
-        auto it = input_data.find(token);
-        if (it != input_data.end()) {
-            from >> it->second;
-        }
-    }
-
-    // Check if data are initialized:
-
-    for (auto& it : input_data) {
-        if (!it.second.is_init()) {
-            throw Setup_error(it.first + " not initialized");
-        }
-    }
+    get_token_value(from, 0, "progname", progname, std::string("gmss"));
+    get_token_value(from, 0, "tmlfile", tmlfile);
+    get_token_value(from, 0, "runtype", runtype_tmp);
+    get_token_value(from, 0, "jobname", jobname);
+    get_token_value(from, 0, "coord", coord_tmp);
+    get_token_value(from, 0, "orbstart", orbstart_tmp, std::string("guess"));
+    get_token_value(from, 0, "axis", axis_tmp, std::string("x_axis"));
+    get_token_value(from, 0, "fragment", fragment);
+    get_token_value(from, 0, "nstep", nstep);
+    get_token_value(from, 0, "stepsize", stepsize);
 
     // Check if data are sensible:
 
@@ -248,20 +228,22 @@ void parse_setup(std::ifstream& from)
     }
 
     if (nstep < 1) {
-        throw Setup_error("nstep has bad value: " + srs::to_string(nstep));
+        throw Setup_error("nstep has bad value: " + std::to_string(nstep));
     }
 }
 
 // Get starting geometry.
 void init_geom()
 {
+    namespace Pt = Chem::Periodic_table;
+
     std::ifstream from;
     Stdutils::fopen(from, tmlfile.c_str());
 
     std::string key = "Geometry";
-    bool found = srs::find_section(from, key);
 
-    if (found) {
+    auto pos = Stdutils::find_token(from, key);
+    if (pos != -1) {
         std::string token;
         std::vector<double> geom_tmp;
 
@@ -269,7 +251,7 @@ void init_geom()
             if (token == "End") {
                 break;
             }
-            else if (ptable::atomic_symbol_is_valid(token)) {
+            else if (Pt::atomic_symbol_is_valid(token)) {
                 double znuc, x, y, z;
                 from >> znuc >> x >> y >> z;
                 if (!from) {
@@ -279,7 +261,7 @@ void init_geom()
                 geom_tmp.push_back(y);
                 geom_tmp.push_back(z);
                 at_sym.push_back(token);
-                at_num.push_back(ptable::get_atomic_number(token));
+                at_num.push_back(Pt::get_atomic_number(token));
             }
         }
 
@@ -334,7 +316,7 @@ void get_opt_geom(const std::string& filename)
                     found = true;
                     std::getline(from, line); // ignore two lines
                     std::getline(from, line);
-                    for (unsigned i = 0; i < at_num.size(); i++) {
+                    for (std::size_t i = 0; i < at_num.size(); i++) {
                         std::getline(from, line);
                         std::istringstream iss(line);
                         iss >> name >> znuc >> x >> y >> z;
@@ -354,7 +336,7 @@ void get_opt_geom(const std::string& filename)
         throw Opt_geom_error("optimized geometry not found in " + filename);
     }
 
-    for (unsigned i = 0; i < at_num.size(); i++) {
+    for (std::size_t i = 0; i < at_num.size(); i++) {
         for (int j = 0; j < 3; j++) {
             geom(i, j) = geom_tmp[i * 3 + j];
         }
@@ -369,7 +351,7 @@ void print_geom(std::ostream& to)
     fix1.fixed().width(3).precision(1);
     fix10.fixed().width(15).precision(10);
 
-    for (unsigned i = 0; i < at_num.size(); i++) {
+    for (std::size_t i = 0; i < at_num.size(); i++) {
         to << at_sym[i] << "   " << fix1(at_num[i]) << "   ";
         for (int j = 0; j < 3; j++) {
             to << fix10(geom(i, j)) << "   ";
@@ -403,15 +385,15 @@ void create_input(const std::string& new_inp_file,
     Stdutils::fopen(to, new_inp_file);
 
     std::string key = "Input";
-    bool found = srs::find_section(from, key);
 
-    if (found) {
+    auto pos = Stdutils::find_token(from, key);
+    if (pos != -1) {
         std::string line;
         while (std::getline(from, line)) {
-            if (srs::trim(line, " \t") == "End") {
+            if (Stdutils::trim(line, " \t") == "End") {
                 break;
             }
-            else if (srs::trim(line, " \t") == "GEOMETRY_HERE") {
+            else if (Stdutils::trim(line, " \t") == "GEOMETRY_HERE") {
                 step_geom();
                 print_geom(to);
             }
@@ -460,7 +442,7 @@ void get_orbitals(const std::string& filename)
             orbitals.push_back(line);
             while (std::getline(from, line)) {
                 orbitals.push_back(line);
-                if (srs::trim(line, " \t") == "$END") {
+                if (Stdutils::trim(line, " \t") == "$END") {
                     break;
                 }
             }
@@ -526,3 +508,4 @@ double gms_final_energy(const std::string& filename)
     }
     return energy;
 }
+

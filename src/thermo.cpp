@@ -17,41 +17,37 @@
 #include <chem/molecule.h>
 #include <chem/thermochem.h>
 #include <chem/thermodata.h>
-#include <srs/utils.h>
-#include <boost/program_options.hpp>
+#include <stdutils/stdutils.h>
+#include <cxxopts.hpp>
 #include <exception>
 #include <fstream>
 #include <iostream>
 #include <string>
 
-//
 // Program for computing thermochemistry of molecules.
 //
 int main(int argc, char* argv[])
 {
-    namespace po = boost::program_options;
-
-    po::options_description options("Allowed options");
     // clang-format off
+    cxxopts::Options options(argv[0], "Compute thermochemistry of molecules");
     options.add_options()
-        ("help,h", "display help message")
-        ("file,f", po::value<std::string>(), "input file");
+        ("h,help", "display help message")
+        ("f,file", "input file", cxxopts::value<std::string>());
     // clang-format on
-    po::variables_map vm;
-    po::store(po::parse_command_line(argc, argv, options), vm);
-    po::notify(vm);
+
+    auto args = options.parse(argc, argv);
 
     std::string input_file;
 
-    if (vm.find("help") != vm.end()) {
-        std::cout << options << '\n';
+    if (args.count("help")) {
+        std::cout << options.help({"", "Group"}) << '\n';
         return 0;
     }
-    if (vm.find("file") != vm.end()) {
-        input_file = vm["file"].as<std::string>();
+    if (args.count("file")) {
+        input_file = args["file"].as<std::string>();
     }
     else {
-        std::cerr << options << '\n';
+        std::cerr << options.help({"", "Group"}) << '\n';
         return 1;
     }
 
@@ -60,23 +56,21 @@ int main(int argc, char* argv[])
         std::ofstream to;
 
         std::string output_file;
-        output_file = srs::strip_suffix(input_file, ".inp");
+        output_file = Stdutils::strip_suffix(input_file, ".inp");
         output_file = output_file + ".out";
 
-        srs::fopen(from, input_file);
-        srs::fopen(to, output_file.c_str());
+        Stdutils::fopen(from, input_file);
+        Stdutils::fopen(to, output_file.c_str());
 
-        Molecule mol(from, to, "Molecule");
-        Thermodata td(from);
+        Chem::Molecule mol(from);
+        Chem::Thermodata td(from);
 
-        chem::thermochemistry(mol,
-                              td.get_temperature(),
-                              td.get_pressure(),
-                              td.incl_rot_symmetry(),
-                              to);
+        Chem::thermochemistry(mol, td.get_temperature(), td.get_pressure(),
+                              td.incl_rot_symmetry(), to);
     }
     catch (std::exception& e) {
         std::cerr << "what: " << e.what() << '\n';
         return 1;
     }
 }
+
