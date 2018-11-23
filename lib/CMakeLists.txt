@@ -17,6 +17,7 @@ set(
     collision.cpp
     elec_state.cpp
     energy_levels.cpp
+    gamss.cpp
     gauss_data.cpp
     gaussian.cpp
     geometry.cpp
