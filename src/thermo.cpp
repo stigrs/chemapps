@@ -14,6 +14,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4018 4267) // caused by cxxopts.hpp
+#endif
+
 #include <chem/molecule.h>
 #include <chem/thermochem.h>
 #include <chem/thermodata.h>
@@ -23,6 +28,10 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 // Program for computing thermochemistry of molecules.
 //
