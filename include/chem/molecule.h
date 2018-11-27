@@ -32,19 +32,11 @@ namespace Chem {
 //
 class Molecule {
 public:
-    Molecule() = default;
+    Molecule() = delete;
 
     Molecule(std::istream& from,
              const std::string& key = "Molecule",
              bool verbose = false);
-
-    // Copy semantics:
-    Molecule(const Molecule&) = default;
-    Molecule& operator=(const Molecule&) = default;
-
-    // Move semantics:
-    Molecule(Molecule&&) = default;
-    Molecule& operator=(Molecule&&) = default;
 
     ~Molecule() = default;
 
@@ -94,6 +86,11 @@ public:
     // Get Cartesian coordinates.
     auto& cart_coord() { return geom.cart_coord(); }
     const auto& cart_coord() const { return geom.cart_coord(); }
+
+    void set_cart_coord(const Numlib::Mat<double>& x)
+    {
+        geom.set_cart_coord(x);
+    }
 
     // Get internal coordinates.
     auto& int_coord() { return geom.int_coord(); }

@@ -52,10 +52,11 @@ private:
     Molecule mol; // molecule
     Pot pot;      // potential function
 
-    double dist_min; // smallest atom distance permitted
+    double dist_min; // smallest atom-atom distance permitted
+    double dist_max; // largest bond distance permitted
 
     int pop_size;   // population size
-    int max_trials; // max number of trials for generating random conformer
+    int mut_trials; // max number of mutation trials
     int seed;       // random number generator seed
 
     std::vector<Conformer> population; // population of optimized structures

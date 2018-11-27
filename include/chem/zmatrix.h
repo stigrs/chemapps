@@ -43,6 +43,9 @@ public:
 
     ~Zmatrix() = default;
 
+    // Set atoms and Cartesian coordinates.
+    void set(std::vector<Element>& atoms_, Numlib::Mat<double>& xyz_);
+
     // Get bond distance.
     double get_distance(int index) const;
 
@@ -113,6 +116,24 @@ private:
 inline Zmatrix::Zmatrix(std::vector<Element>& atoms_, Numlib::Mat<double>& xyz_)
     : atoms(atoms_), xyz(xyz_)
 {
+    if (!atoms.empty()) {
+        distances.resize(atoms.size());
+        angles.resize(atoms.size());
+        dihedrals.resize(atoms.size());
+
+        bond_connect.resize(atoms.size());
+        angle_connect.resize(atoms.size());
+        dihedral_connect.resize(atoms.size());
+
+        build_zmat();
+    }
+}
+
+inline void Zmatrix::set(std::vector<Element>& atoms_,
+                         Numlib::Mat<double>& xyz_)
+{
+    atoms = atoms_;
+    xyz = xyz_;
     if (!atoms.empty()) {
         distances.resize(atoms.size());
         angles.resize(atoms.size());

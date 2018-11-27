@@ -60,12 +60,22 @@ namespace Impl {
         auto& int_coord() { return zmat; }
         const auto& int_coord() const { return zmat; }
 
+        // Set properties:
+
+        void set_cart_coord(const Numlib::Mat<double>& x);
+
     private:
         std::vector<Chem::Element> atms;
         Numlib::Mat<double> xyz;
         Chem::Zmatrix zmat;
         std::string title;
     };
+
+    inline void Geometry::set_cart_coord(const Numlib::Mat<double>& x)
+    {
+        xyz = x;
+        zmat.set(atms, xyz);
+    }
 
 } // namespace Impl
 
