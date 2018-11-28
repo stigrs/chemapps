@@ -65,7 +65,7 @@ void Chem::Mopac::run(Chem::Molecule& mol) const
 
         Numlib::Mat<double> xyz = mol.cart_coord();
         get_xyz(xyz);
-        mol.cart_coord() = xyz; // update Cartesian coordinates
+        mol.set_cart_coord(xyz); // update Cartesian coordinates
     }
     else { // calculation failed to converge; set energy to infinity
         constexpr double emax = std::numeric_limits<double>::max();

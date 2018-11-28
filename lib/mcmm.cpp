@@ -217,7 +217,7 @@ void Chem::Mcmm<Pot>::new_conformer()
     for (unsigned i = 0; i < ntrials; ++i) {
         Numlib::Mat<double> xnew = mol.cart_coord();
         uniform_usage(xnew);
-        mol.cart_coord() = xnew;
+        mol.set_cart_coord(xnew);
         gen_rand_conformer(mol);
         if (accept_geom_dist(mol)) { // check geometry constraints
             break;

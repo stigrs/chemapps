@@ -22,7 +22,10 @@
 #include <string>
 #include <stdexcept>
 
-Chem::Tst::Tst(std::istream& from, const std::string& key, bool verbose)
+Chem::Tst::Tst(std::istream& from,
+               std::ostream& to,
+               const std::string& key,
+               bool verbose)
     : td(from), kappa(from)
 {
     using namespace Stdutils;
@@ -62,12 +65,12 @@ Chem::Tst::Tst(std::istream& from, const std::string& key, bool verbose)
 
     // Initialize reactants and transition state:
 
-    ra = std::make_unique<Chem::Molecule>(from, "ReactantA", verbose);
+    ra = std::make_unique<Chem::Molecule>(from, to, "ReactantA", verbose);
 
     if (reaction == Bimolecular) {
-        rb = std::make_unique<Chem::Molecule>(from, "ReactantB", verbose);
+        rb = std::make_unique<Chem::Molecule>(from, to, "ReactantB", verbose);
     }
-    ts = std::make_unique<Chem::Molecule>(from, "TransitionState", verbose);
+    ts = std::make_unique<Chem::Molecule>(from, to, "TransitionState", verbose);
 }
 
 void Chem::Tst::conventional(std::ostream& to) const
@@ -144,7 +147,7 @@ double Chem::Tst::rate_conventional(double temp) const
 
     double qts = Chem::qtot(*ts, temp, 0.0, false, "V=0");
     double qa = Chem::qtot(*ra, temp, 0.0, false, "V=0");
-    double qb  = 1.0;
+    double qb = 1.0;
     if (reaction == Bimolecular) {
         qb = Chem::qtot(*rb, temp, 0.0, false, "V=0");
     }

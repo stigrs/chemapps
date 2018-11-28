@@ -29,7 +29,7 @@ TEST_CASE("test_molecule")
 
     std::ifstream from;
     fopen(from, "test_molecule.inp");
-    Molecule mol(from, "Molecule", false);
+    Molecule mol(from);
 
     SECTION("num_atoms") { CHECK(mol.num_atoms() == 8); }
 

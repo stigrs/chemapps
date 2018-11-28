@@ -35,6 +35,7 @@ public:
     Molecule() = delete;
 
     Molecule(std::istream& from,
+             std::ostream& to = std::cout,
              const std::string& key = "Molecule",
              bool verbose = false);
 
@@ -84,7 +85,6 @@ public:
     const auto& spin_orbit_energy() const { return elec.spin_orbit_energy(); }
 
     // Get Cartesian coordinates.
-    auto& cart_coord() { return geom.cart_coord(); }
     const auto& cart_coord() const { return geom.cart_coord(); }
 
     void set_cart_coord(const Numlib::Mat<double>& x)

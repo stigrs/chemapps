@@ -104,10 +104,12 @@ void read_input(const std::string& input_file)
               << "Specification of T grid (K):\n"
               << t_grid << '\n';
 
-    frag1 = std::make_unique<Chem::Molecule>(from, "Fragment1", true);
+    frag1 =
+        std::make_unique<Chem::Molecule>(from, std::cout, "Fragment1", true);
     frag1->rot_analysis();
     std::cout << '\n';
-    frag2 = std::make_unique<Chem::Molecule>(from, "Fragment2", true);
+    frag2 =
+        std::make_unique<Chem::Molecule>(from, std::cout, "Fragment2", true);
     frag2->rot_analysis();
 }
 

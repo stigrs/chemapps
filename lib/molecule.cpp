@@ -19,6 +19,7 @@
 #include <stdutils/stdutils.h>
 
 Chem::Molecule::Molecule(std::istream& from,
+                         std::ostream& to,
                          const std::string& key,
                          bool verbose)
     : elec(from, key),
@@ -34,17 +35,16 @@ Chem::Molecule::Molecule(std::istream& from,
         Stdutils::Format<double> fix;
         fix.fixed().precision(6);
 
-        std::cout << "Input data on " << key << ":\n" << line('=') << '\n';
-        std::cout << "Electronic energy: " << fix(elec.elec_energy())
-                  << " Hartree\n"
-                  << "Charge: " << elec.net_charge() << '\n'
-                  << "Spin multiplicity: " << elec.spin_mult() << '\n';
-        Chem::Impl::print_spin_orbit_states(std::cout, elec.spin_orbit_degen(),
+        to << "Input data on " << key << ":\n" << line('=') << '\n';
+        to << "Electronic energy: " << fix(elec.elec_energy()) << " Hartree\n"
+           << "Charge: " << elec.net_charge() << '\n'
+           << "Spin multiplicity: " << elec.spin_mult() << '\n';
+        Chem::Impl::print_spin_orbit_states(to, elec.spin_orbit_degen(),
                                             elec.spin_orbit_energy());
-        std::cout << "\nInput orientation:\n";
-        Chem::Impl::print_geometry(std::cout, geom.atoms(), geom.cart_coord());
-        Chem::Impl::print_atomic_masses(std::cout, geom.atoms());
-        vib.print(std::cout);
+        to << "\nInput orientation:\n";
+        Chem::Impl::print_geometry(to, geom.atoms(), geom.cart_coord());
+        Chem::Impl::print_atomic_masses(to, geom.atoms());
+        vib.print(to);
     }
 }
 

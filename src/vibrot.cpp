@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 
         Stdutils::fopen(from, input_file);
 
-        Chem::Molecule mol(from, "Molecule", true);
+        Chem::Molecule mol(from, std::cout, "Molecule", true);
         mol.rot_analysis();
         mol.tor_analysis();
         mol.vib_analysis();

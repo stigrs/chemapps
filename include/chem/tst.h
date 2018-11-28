@@ -33,6 +33,7 @@ namespace Chem {
 class Tst {
 public:
     Tst(std::istream& from,
+        std::ostream& to = std::cout,
         const std::string& key = "TST",
         bool verbose = false);
 

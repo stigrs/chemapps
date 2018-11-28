@@ -80,7 +80,7 @@ void Chem::Gaussian::run(Chem::Molecule& mol) const
 
         Chem::Gauss_coord coord;
         data.get_opt_cart_coord(coord);
-        mol.cart_coord() = coord.xyz; // update Cartesian coordinates
+        mol.set_cart_coord(coord.xyz); // update Cartesian coordinates
     }
     else { // calculation failed to converge; set energy to infinity:
         constexpr double emax = std::numeric_limits<double>::max();
