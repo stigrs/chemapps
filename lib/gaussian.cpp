@@ -37,10 +37,9 @@ void Chem::Gaussian::init(std::istream& from, const std::string& key)
         get_token_value(from, pos, "nosave", nosave_tmp, nosave_tmp);
         pos = find_token(from, "keywords", pos);
         if (pos != -1) {
-            std::string line;
-            std::getline(from, line);
-            if (line.empty()) { // not entirely safe
-                std::getline(from, line);
+            std::getline(from, keywords);
+            if (keywords.empty()) { // not entirely safe
+                std::getline(from, keywords);
             }
         }
     }

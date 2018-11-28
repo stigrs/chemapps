@@ -31,14 +31,14 @@ namespace Chem {
 template <class Pot>
 class Gamss {
 public:
-    Gamss(std::istream& from);
+    Gamss(std::istream& from, std::ostream& to = std::cout);
 
     // Run solver.
     void solve(std::ostream& to = std::cout);
 
 private:
     // Initialize population.
-    void init_population();
+    void init_population(std::ostream& to = std::cout);
 
     // Generate a new random conformer.
     void gen_rand_conformer(Molecule& m);
@@ -49,15 +49,24 @@ private:
     // Check if geometry of random conformer is sensible.
     bool geom_sensible(const Molecule& m) const;
 
+    // Check if geometry is blacklisted.
+    bool is_blacklisted(const Numlib::Mat<double>& xyz) const;
+
     Molecule mol; // molecule
     Pot pot;      // potential function
 
     double dist_min; // smallest atom-atom distance permitted
     double dist_max; // largest bond distance permitted
 
-    int pop_size;   // population size
-    int mut_trials; // max number of mutation trials
-    int seed;       // random number generator seed
+    double energy_min; // smallest energy permitted
+    double energy_max; // largest energy permitted
+
+    double rmsd_tol_uniq; // geometry tolerance
+
+    int pop_size;     // population size
+    int max_iter;     // max number of iterations
+    int max_mut_tors; // max number of torsional mutations
+    int seed;         // random number generator seed
 
     std::vector<Conformer> population; // population of optimized structures
     std::vector<Conformer> blacklist;  // population of blacklisted structures

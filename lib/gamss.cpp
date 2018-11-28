@@ -23,9 +23,11 @@
 #include <stdutils/stdutils.h>
 #include <string>
 #include <stdexcept>
+#include <algorithm>
+#include <limits>
 
 template <class Pot>
-Chem::Gamss<Pot>::Gamss(std::istream& from) : mol(from)
+Chem::Gamss<Pot>::Gamss(std::istream& from, std::ostream& to) : mol(from, to)
 {
     using namespace Stdutils;
     const std::string key = "Gamss";
@@ -34,25 +36,39 @@ Chem::Gamss<Pot>::Gamss(std::istream& from) : mol(from)
 
     dist_min = 0.5;
     dist_max = 2.5;
-    pop_size = 50;
-    mut_trials = 100;
+
+    energy_min = -std::numeric_limits<double>::max();
+    energy_max = 0.0;
+
+    rmsd_tol_uniq = 0.2;
+
+    pop_size = 20;
+    max_iter = 200;
+    max_mut_tors = 2;
     seed = 0;
 
     auto pos = find_token(from, key);
     if (pos != -1) {
-        get_token_value(from, pos, "dist_min", dist_min, 0.5);
-        get_token_value(from, pos, "dist_max", dist_min, 2.5);
-        get_token_value(from, pos, "pop_size", pop_size, 50);
-        get_token_value(from, pos, "mut_trials", mut_trials, 100);
-        get_token_value(from, pos, "seed", seed, 0);
+        get_token_value(from, pos, "dist_min", dist_min, dist_min);
+        get_token_value(from, pos, "dist_max", dist_max, dist_max);
+        get_token_value(from, pos, "energy_min", energy_min, energy_min);
+        get_token_value(from, pos, "energy_max", energy_max, energy_max);
+        get_token_value(from, pos, "rmsd_tol_uniq", rmsd_tol_uniq,
+                        rmsd_tol_uniq);
+        get_token_value(from, pos, "pop_size", pop_size, pop_size);
+        get_token_value(from, pos, "max_iter", max_iter, max_iter);
+        get_token_value(from, pos, "max_mut_tors", max_mut_tors, max_mut_tors);
+        get_token_value(from, pos, "seed", seed, seed);
     }
 
     // Validate input:
 
     Assert::dynamic(dist_min >= 0.5, "bad dist_min < 0.5");
     Assert::dynamic(dist_max > dist_min, "bad dist_max <= dist_min");
+    Assert::dynamic(rmsd_tol_uniq > 0.0, "bad rmsd_tol_uniq <= 0.0");
     Assert::dynamic(pop_size > 1, "bad pop_size <= 1");
-    Assert::dynamic(mut_trials > 1, "bad mut_trials <= 1");
+    Assert::dynamic(max_iter > pop_size, "bad max_iter <= pop_size");
+    Assert::dynamic(max_mut_tors >= 1, "bad max_mut_tors < 1");
 
     // Seed the random number engine:
 
@@ -71,7 +87,7 @@ Chem::Gamss<Pot>::Gamss(std::istream& from) : mol(from)
 
     // Initialize population:
 
-    init_population();
+    init_population(to);
 }
 
 template <class Pot>
@@ -82,9 +98,6 @@ void Chem::Gamss<Pot>::solve(std::ostream& to)
 
     Stdutils::Format<double> fix;
     fix.fixed().width(12).precision(6);
-
-    to << "Genetic Algorithm Molecular Structure Search (GAMSS)\n"
-       << line('=') << '\n';
 
     line.width(13).fill('-');
     to << "Local minima:\n" << line('-') << '\n';
@@ -99,20 +112,28 @@ void Chem::Gamss<Pot>::solve(std::ostream& to)
 //------------------------------------------------------------------------------
 
 template <class Pot>
-void Chem::Gamss<Pot>::init_population()
+void Chem::Gamss<Pot>::init_population(std::ostream& to)
 {
     Stdutils::Format<char> line;
     line.width(52).fill('=');
 
-    std::cout << "Genetic Algorithm Molecular Structure Search (GAMSS)\n"
-              << line('=') << '\n';
-    line.width(19).fill('-');
-    std::cout << "Initial population:\n" << line('-') << '\n';
+    int ipop = 0;
+    int iter = 0;
+    while (ipop < pop_size && iter < max_iter) {
+        ++iter;
 
-    for (int i = 0; i < pop_size; ++i) {
         // Generate new random structure with sensible geometry:
         Chem::Molecule m(mol);
         gen_rand_conformer(m);
+        if (!geom_sensible(m)) {
+            continue;
+        }
+
+        // Check if new random structure is blacklisted.
+        if (is_blacklisted(m.cart_coord()) && iter > 0) {
+            continue;
+        }
+        std::cout << m.cart_coord() << std::endl;
 
         // Add starting structure for local optimization to blacklist:
         blacklist.push_back(Chem::Conformer(m.elec_energy(), m.cart_coord()));
@@ -120,17 +141,30 @@ void Chem::Gamss<Pot>::init_population()
         // Perform local optimization:
         pot.run(m);
 
-        // Add optimized structure to blacklist and population:
-        blacklist.push_back(Chem::Conformer(m.elec_energy(), m.cart_coord()));
-        population.push_back(Chem::Conformer(m.elec_energy(), m.cart_coord()));
+        if (m.elec_energy() >= energy_min && m.elec_energy() < energy_max) {
+            // Add optimized structure to blacklist and population:
+            blacklist.push_back(
+                Chem::Conformer(m.elec_energy(), m.cart_coord()));
+            population.push_back(
+                Chem::Conformer(m.elec_energy(), m.cart_coord()));
+            ++ipop;
+        }
+    }
+    std::sort(population.begin(), population.end());
 
-        Stdutils::Format<double> fix;
-        fix.fixed().width(12).precision(6);
+    to << "Genetic Algorithm Molecular Structure Search (GAMSS)\n"
+       << line('=') << '\n';
+    line.width(19).fill('-');
+    to << "Initial population:\n" << line('-') << '\n';
 
-        std::cout << "Conformer: " << i + 1 << '\n'
-                  << "Energy: " << fix(population[i].energy) << '\n';
-        Chem::Impl::print_geometry(std::cout, mol.atoms(), population[i].xyz);
-        std::cout << '\n';
+    Stdutils::Format<double> fix;
+    fix.fixed().width(12).precision(6);
+
+    for (std::size_t i = 0; i < population.size(); ++i) {
+        to << "Conformer: " << i + 1 << '\n'
+           << "Energy: " << fix(population[i].energy) << '\n';
+        Chem::Impl::print_geometry(to, mol.atoms(), population[i].xyz);
+        to << '\n';
     }
 }
 
@@ -138,8 +172,7 @@ template <class Pot>
 void Chem::Gamss<Pot>::gen_rand_conformer(Chem::Molecule& m)
 {
     int iter = 0;
-    auto xyz_orig = m.cart_coord();
-    while (iter < mut_trials) {
+    while (iter < max_mut_tors) {
         // Select a random dihedral angle:
         auto moiety = select_rand_dihedral(m);
 
@@ -148,16 +181,7 @@ void Chem::Gamss<Pot>::gen_rand_conformer(Chem::Molecule& m)
         double delta = rnd_uni_real(mt);
         m.int_coord().rotate_moiety(moiety, delta);
 
-        // Check if geometry is sensible:
-        if (geom_sensible(m)) {
-            break;
-        }
-        m.set_cart_coord(xyz_orig); // restore original geometry
         ++iter;
-    }
-    if (iter >= mut_trials) {
-        std::cerr << "warning: mut_trials exceeded, could not generate "
-                     "sensible random conformer\n";
     }
 }
 
@@ -199,6 +223,19 @@ bool Chem::Gamss<Pot>::geom_sensible(const Chem::Molecule& m) const
         }
     }
     return geom_ok;
+}
+
+template <class Pot>
+bool Chem::Gamss<Pot>::is_blacklisted(const Numlib::Mat<double>& xyz) const
+{
+    bool res = false;
+    for (const auto& conformer : blacklist) {
+        if (Numlib::kabsch_rmsd(conformer.xyz, xyz) < rmsd_tol_uniq) {
+            res = true;
+            break;
+        }
+    }
+    return res;
 }
 
 template class Chem::Gamss<Chem::Gaussian>;
