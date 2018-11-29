@@ -40,7 +40,7 @@ TEST_CASE("test_zmatrix")
                              1.09, 1.09, 1.09, 1.09, 1.09, 1.09};
 
         for (std::size_t i = 1; i < mol.num_atoms(); ++i) {
-            CHECK(std::abs(mol.int_coord().get_distance(i) - bonds(i - 1)) <
+            CHECK(std::abs(mol.geom().get_distance(i) - bonds(i - 1)) <
                   1.0e-12);
         }
     }
@@ -51,8 +51,7 @@ TEST_CASE("test_zmatrix")
                               110.0, 110.0, 110.0, 110.0, 110.0, 110.0};
 
         for (std::size_t i = 2; i < mol.num_atoms(); ++i) {
-            CHECK(std::abs(mol.int_coord().get_angle(i) - angles(i - 2)) <
-                  1.0e-12);
+            CHECK(std::abs(mol.geom().get_angle(i) - angles(i - 2)) < 1.0e-12);
         }
     }
 
@@ -62,7 +61,7 @@ TEST_CASE("test_zmatrix")
                                  60.0,  -60.0, 0.0,   120.0,  -120.0};
 
         for (std::size_t i = 3; i < mol.num_atoms(); ++i) {
-            CHECK(std::abs(mol.int_coord().get_dihedral(i) - dihedrals(i - 3)) <
+            CHECK(std::abs(mol.geom().get_dihedral(i) - dihedrals(i - 3)) <
                   1.0e-12);
         }
     }
@@ -83,9 +82,9 @@ TEST_CASE("test_zmatrix")
                            {1.62151810e+00, 1.62228626e+00, 2.81749906e+00},
                            {3.28860700e+00, 1.62228626e+00, 2.21072833e+00}};
 
-        std::vector<int> moiety = {3, 9, 10};
-        mol.int_coord().rotate_moiety(moiety, 90.0);
-        auto res = mol.cart_coord();
+        std::vector<Index> moiety = {3, 9, 10};
+        mol.geom().rotate_moiety(moiety, 90.0);
+        auto res = mol.geom().get_xyz();
 
         CHECK(same_extents(res, ans));
 

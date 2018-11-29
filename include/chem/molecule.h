@@ -17,11 +17,11 @@
 #ifndef CHEM_MOLECULE_H
 #define CHEM_MOLECULE_H
 
-#include <chem/impl/elec_state.h>
-#include <chem/impl/geometry.h>
-#include <chem/impl/rotation.h>
-#include <chem/impl/vibration.h>
-#include <chem/impl/torsion.h>
+//#include <chem/elec_state.h>
+#include <chem/geometry.h>
+//#include <chem/rotation.h>
+//#include <chem/vibration.h>
+//#include <chem/torsion.h>
 #include <chem/traits.h>
 #include <iostream>
 #include <string>
@@ -32,19 +32,31 @@ namespace Chem {
 //
 class Molecule {
 public:
-    Molecule() = delete;
+    Molecule() = default;
 
     Molecule(std::istream& from,
              std::ostream& to = std::cout,
              const std::string& key = "Molecule",
              bool verbose = false);
 
+    // Copy semantics:
+    Molecule(const Molecule&) = default;
+    Molecule& operator=(const Molecule&) = default;
+
+    // Move semantics:
+    Molecule(Molecule&&) = default;
+    Molecule& operator=(Molecule&&) = default;
+
     ~Molecule() = default;
 
-    //
-    // Molecular properties:
-    //
+    auto num_atoms() const { return geom_.atoms().size(); }
 
+    const auto& atoms() const { return geom_.atoms(); }
+
+    auto& geom() { return geom_; }
+    const auto& geom() const { return geom_; }
+
+#if 0
     // Get information string for molecule.
     std::string info() const { return geom.info(); }
 
@@ -168,15 +180,16 @@ public:
     {
         return tor.analysis(to);
     }
-
+#endif
 private:
-    Impl::Elec_state elec; // molecular electronic states
-    Impl::Geometry geom;   // molecular geometry
-    Impl::Rotation rot;    // molecular rotations
-    Impl::Vibration vib;   // molecular vibrations
-    Impl::Torsion tor;     // internal torsional modes
+    // Impl::Elec_state elec; // molecular electronic states
+    Geometry geom_; // molecular geometry
+    // Impl::Rotation rot;    // molecular rotations
+    // Impl::Vibration vib;   // molecular vibrations
+    // Impl::Torsion tor;     // internal torsional modes
 };
 
+#if 0
 inline Mol_type Molecule::structure() const
 {
     Mol_type res;
@@ -191,6 +204,7 @@ inline Mol_type Molecule::structure() const
     }
     return res;
 }
+#endif
 
 } // namespace Chem
 

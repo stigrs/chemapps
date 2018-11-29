@@ -69,21 +69,21 @@ function(add_chemapps_test name)
 endfunction()
 
 set(PROGRAMS 
-    test_collision
-    test_gauss_data
-    test_gaussnmr
+    #test_collision
+    #test_gauss_data
+    #test_gaussnmr
     test_molecule
     test_periodic_table
-    test_rotation
-    test_statecount
-    test_thermochem
-    test_thermodata
-    test_torsion
-    test_troe
-    test_tst
-    test_tunnel
-    test_units
-    test_vibration
+    #test_rotation
+    #test_statecount
+    #test_thermochem
+    #test_thermodata
+    #test_torsion
+    #test_troe
+    #test_tst
+    #test_tunnel
+    #test_units
+    #test_vibration
     test_zmatrix
 )
 

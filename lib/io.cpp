@@ -14,20 +14,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <chem/impl/io_support.h>
+#include <chem/io.h>
 #include <chem/periodic_table.h>
 #include <numlib/constants.h>
 #include <stdutils/stdutils.h>
 #include <sstream>
 #include <stdexcept>
 
-void Chem::Impl::read_xyz_format(std::istream& from,
-                                 std::vector<Element>& atoms,
-                                 Numlib::Mat<double>& xyz,
-                                 std::string& title)
+void Chem::read_xyz_format(std::istream& from,
+                           std::vector<Element>& atoms,
+                           Numlib::Mat<double>& xyz,
+                           std::string& title)
 {
     // Get number of atoms:
-    int natoms;
+    Index natoms;
     from >> natoms;
     from.ignore(); // need to consume '\n' before reading title line
     from.clear();
@@ -45,7 +45,7 @@ void Chem::Impl::read_xyz_format(std::istream& from,
     title = Stdutils::trim(title, " ");
 
     // Read XYZ coordinates:
-    for (int i = 0; i < natoms; ++i) {
+    for (Index i = 0; i < natoms; ++i) {
         from >> symbol >> x >> y >> z;
         atoms[i] = Periodic_table::get_element(symbol);
         xyz(i, 0) = x;
@@ -54,14 +54,14 @@ void Chem::Impl::read_xyz_format(std::istream& from,
     }
 }
 
-void Chem::Impl::read_zmat_format(std::istream& from,
-                                  std::vector<Element>& atoms,
-                                  Numlib::Vec<double>& distances,
-                                  Numlib::Vec<double>& angles,
-                                  Numlib::Vec<double>& dihedrals,
-                                  Numlib::Vec<int>& bond_connect,
-                                  Numlib::Vec<int>& angle_connect,
-                                  Numlib::Vec<int>& dihedral_connect)
+void Chem::read_zmat_format(std::istream& from,
+                            std::vector<Element>& atoms,
+                            Numlib::Vec<double>& distances,
+                            Numlib::Vec<double>& angles,
+                            Numlib::Vec<double>& dihedrals,
+                            Numlib::Vec<Index>& bond_connect,
+                            Numlib::Vec<Index>& angle_connect,
+                            Numlib::Vec<Index>& dihedral_connect)
 {
     atoms.clear();
 
@@ -71,7 +71,7 @@ void Chem::Impl::read_zmat_format(std::istream& from,
     std::string line;
     std::string symbol;
 
-    int natoms = 0;
+    Index natoms = 0;
     std::streamoff pos = 0;
 
     // Count number of atoms:
@@ -109,7 +109,7 @@ void Chem::Impl::read_zmat_format(std::istream& from,
     if (natoms > 0) {
         std::getline(from, line); // first atom is already read
     }
-    int iat1;
+    Index iat1;
     double distance;
     if (natoms > 1) {
         std::getline(from, line);
@@ -118,7 +118,7 @@ void Chem::Impl::read_zmat_format(std::istream& from,
         distances(1) = distance;
         bond_connect(1) = iat1 - 1;
     }
-    int iat2;
+    Index iat2;
     double angle;
     if (natoms > 2) {
         std::getline(from, line);
@@ -129,10 +129,10 @@ void Chem::Impl::read_zmat_format(std::istream& from,
         angles(2) = angle;
         angle_connect(2) = iat2 - 1;
     }
-    int iat3;
+    Index iat3;
     double dihedral;
     if (natoms > 3) {
-        for (int i = 3; i < natoms; ++i) {
+        for (Index i = 3; i < natoms; ++i) {
             std::getline(from, line);
             std::istringstream iss(line);
             // clang-format off
@@ -151,8 +151,8 @@ void Chem::Impl::read_zmat_format(std::istream& from,
     }
 }
 
-void Chem::Impl::read_mol_formula(std::istream& from,
-                                  std::vector<Mol_formula>& formula)
+void Chem::read_mol_formula(std::istream& from,
+                            std::vector<Mol_formula>& formula)
 {
     std::string buf;
     from >> buf;
@@ -197,10 +197,10 @@ void Chem::Impl::read_mol_formula(std::istream& from,
     }
 }
 
-void Chem::Impl::print_xyz_format(std::ostream& to,
-                                  const std::vector<Element>& atoms,
-                                  const Numlib::Mat<double>& xyz,
-                                  const std::string& title)
+void Chem::print_xyz_format(std::ostream& to,
+                            const std::vector<Element>& atoms,
+                            const Numlib::Mat<double>& xyz,
+                            const std::string& title)
 {
     Stdutils::Format<double> fix;
     fix.fixed().width(10);
@@ -216,19 +216,19 @@ void Chem::Impl::print_xyz_format(std::ostream& to,
     }
 }
 
-void Chem::Impl::print_zmat_format(std::ostream& to,
-                                   const std::vector<Element>& atoms,
-                                   const Numlib::Vec<double>& distances,
-                                   const Numlib::Vec<double>& angles,
-                                   const Numlib::Vec<double>& dihedrals,
-                                   const Numlib::Vec<int>& bond_connect,
-                                   const Numlib::Vec<int>& angle_connect,
-                                   const Numlib::Vec<int>& dihedral_connect)
+void Chem::print_zmat_format(std::ostream& to,
+                             const std::vector<Element>& atoms,
+                             const Numlib::Vec<double>& distances,
+                             const Numlib::Vec<double>& angles,
+                             const Numlib::Vec<double>& dihedrals,
+                             const Numlib::Vec<Index>& bond_connect,
+                             const Numlib::Vec<Index>& angle_connect,
+                             const Numlib::Vec<Index>& dihedral_connect)
 {
     Stdutils::Format<double> dfix;
     dfix.fixed().width(10).precision(4);
 
-    Stdutils::Format<int> ifix;
+    Stdutils::Format<Index> ifix;
     ifix.fixed().width(3);
 
     if (!atoms.empty()) {
@@ -254,9 +254,9 @@ void Chem::Impl::print_zmat_format(std::ostream& to,
     }
 }
 
-void Chem::Impl::print_spin_orbit_states(std::ostream& to,
-                                         const Numlib::Vec<int>& so_degen,
-                                         const Numlib::Vec<double>& so_energy)
+void Chem::print_spin_orbit_states(std::ostream& to,
+                                   const Numlib::Vec<int>& so_degen,
+                                   const Numlib::Vec<double>& so_energy)
 {
     Assert::dynamic(same_extents(so_degen, so_energy));
 
@@ -277,10 +277,10 @@ void Chem::Impl::print_spin_orbit_states(std::ostream& to,
     to << line('-') << '\n';
 }
 
-void Chem::Impl::print_geometry(std::ostream& to,
-                                const std::vector<Element>& atoms,
-                                const Numlib::Mat<double>& xyz,
-                                const std::string& unit)
+void Chem::print_geometry(std::ostream& to,
+                          const std::vector<Element>& atoms,
+                          const Numlib::Mat<double>& xyz,
+                          const std::string& unit)
 {
     Stdutils::Format<char> line;
     Stdutils::Format<double> fix;
@@ -303,8 +303,8 @@ void Chem::Impl::print_geometry(std::ostream& to,
     }
 }
 
-void Chem::Impl::print_atomic_masses(std::ostream& to,
-                                     const std::vector<Element>& atoms)
+void Chem::print_atomic_masses(std::ostream& to,
+                               const std::vector<Element>& atoms)
 {
     Stdutils::Format<double> fix;
     fix.fixed().width(10);
@@ -322,8 +322,8 @@ void Chem::Impl::print_atomic_masses(std::ostream& to,
     to << "Molecular mass:\t" << totmass << " amu\n";
 }
 
-void Chem::Impl::print_center_of_mass(std::ostream& to,
-                                      const Numlib::Vec<double>& com)
+void Chem::print_center_of_mass(std::ostream& to,
+                                const Numlib::Vec<double>& com)
 {
     Stdutils::Format<double> fix;
     fix.fixed().width(8).precision(4);
@@ -332,9 +332,9 @@ void Chem::Impl::print_center_of_mass(std::ostream& to,
        << ", " << fix(com(2)) << '\n';
 }
 
-void Chem::Impl::print_principal_moments(std::ostream& to,
-                                         const Numlib::Vec<double>& pmom,
-                                         const Numlib::Mat<double>& paxis)
+void Chem::print_principal_moments(std::ostream& to,
+                                   const Numlib::Vec<double>& pmom,
+                                   const Numlib::Mat<double>& paxis)
 {
     Stdutils::Format<char> line;
     line.width(54).fill('-');
@@ -363,10 +363,10 @@ void Chem::Impl::print_principal_moments(std::ostream& to,
     to << '\n';
 }
 
-void Chem::Impl::print_rot_constants(std::ostream& to,
-                                     int sigma,
-                                     const std::string& symm,
-                                     const Numlib::Vec<double>& rotc)
+void Chem::print_rot_constants(std::ostream& to,
+                               int sigma,
+                               const std::string& symm,
+                               const Numlib::Vec<double>& rotc)
 {
     using namespace Numlib::Constants;
 

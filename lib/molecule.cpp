@@ -15,18 +15,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/molecule.h>
-#include <chem/impl/io_support.h>
+#include <chem/io.h>
 #include <stdutils/stdutils.h>
 
 Chem::Molecule::Molecule(std::istream& from,
                          std::ostream& to,
                          const std::string& key,
                          bool verbose)
-    : elec(from, key),
-      geom(from, key),
-      rot(from, key, geom),
-      vib(from, key, geom, rot),
-      tor(from, key, geom, rot)
+    : geom_(from, key)
 {
     if (verbose) {
         Stdutils::Format<char> line;
@@ -36,15 +32,17 @@ Chem::Molecule::Molecule(std::istream& from,
         fix.fixed().precision(6);
 
         to << "Input data on " << key << ":\n" << line('=') << '\n';
+#if 0
         to << "Electronic energy: " << fix(elec.elec_energy()) << " Hartree\n"
            << "Charge: " << elec.net_charge() << '\n'
            << "Spin multiplicity: " << elec.spin_mult() << '\n';
         Chem::Impl::print_spin_orbit_states(to, elec.spin_orbit_degen(),
                                             elec.spin_orbit_energy());
+#endif
         to << "\nInput orientation:\n";
-        Chem::Impl::print_geometry(to, geom.atoms(), geom.cart_coord());
-        Chem::Impl::print_atomic_masses(to, geom.atoms());
-        vib.print(to);
+        Chem::print_geometry(to, geom_.atoms(), geom_.get_xyz());
+        Chem::print_atomic_masses(to, geom_.atoms());
+        // vib.print(to);
     }
 }
 
