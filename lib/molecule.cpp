@@ -1,18 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 Stig Rune Sellevag
 //
-// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
 #include <chem/molecule.h>
 #include <chem/io.h>
@@ -24,6 +14,10 @@ Chem::Molecule::Molecule(std::istream& from,
                          bool verbose)
     : geom_(from, key)
 {
+    rot_ = Chem::Rotation(from, key, geom_.atoms(), geom_.get_xyz());
+    vib_ = Chem::Vibration(from, key, geom_.atoms(), rot_.get_xyz_paxis(),
+                           rot_.principal_axes());
+
     if (verbose) {
         Stdutils::Format<char> line;
         line.width(15 + key.size()).fill('=');
@@ -42,7 +36,7 @@ Chem::Molecule::Molecule(std::istream& from,
         to << "\nInput orientation:\n";
         Chem::print_geometry(to, geom_.atoms(), geom_.get_xyz());
         Chem::print_atomic_masses(to, geom_.atoms());
-        // vib.print(to);
+        vib_.print(to);
     }
 }
 

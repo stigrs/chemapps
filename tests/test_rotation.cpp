@@ -32,7 +32,7 @@ TEST_CASE("test_rotation")
     Molecule mol(from);
 
     Numlib::Vec<double> ans = {127.63201, 24.89071, 24.02767};
-    Numlib::Vec<double> res = mol.rot_constants();
+    Numlib::Vec<double> res = mol.rot().constants();
 
     for (Index i = 0; i < ans.size(); ++i) {
         CHECK(std::abs(res(i) - ans(i)) < 1.0e-4);

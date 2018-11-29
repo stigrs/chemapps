@@ -19,8 +19,8 @@
 
 //#include <chem/elec_state.h>
 #include <chem/geometry.h>
-//#include <chem/rotation.h>
-//#include <chem/vibration.h>
+#include <chem/rotation.h>
+#include <chem/vibration.h>
 //#include <chem/torsion.h>
 #include <chem/traits.h>
 #include <iostream>
@@ -49,20 +49,37 @@ public:
 
     ~Molecule() = default;
 
+    // Get information string for molecule.
+    std::string title() const { return geom_.title(); }
+
+    // Get number of atoms.
     auto num_atoms() const { return geom_.atoms().size(); }
 
+    // Get atoms in molecule.
     const auto& atoms() const { return geom_.atoms(); }
-
-    auto& geom() { return geom_; }
-    const auto& geom() const { return geom_; }
-
-#if 0
-    // Get information string for molecule.
-    std::string info() const { return geom.info(); }
 
     // Get molecular structure.
     Mol_type structure() const;
 
+    // Get molecular geometry.
+    const auto& geom() const { return geom_; }
+
+    // Modify molecular geometry.
+    auto& geom() { return geom_; }
+
+    // Get molecular rotation object.
+    const auto& rot() const { return rot_; }
+
+    // Modify molecular rotations.
+    auto& rot() { return rot_; }
+
+    // Get molecular vibrations object.
+    const auto& vib() const { return vib_; }
+
+    // Modify molecular vibrations.
+    auto& vib() { return vib_; }
+
+#if 0
     // Get number of atoms.
     auto num_atoms() const { return geom.atoms().size(); }
 
@@ -184,19 +201,18 @@ public:
 private:
     // Impl::Elec_state elec; // molecular electronic states
     Geometry geom_; // molecular geometry
-    // Impl::Rotation rot;    // molecular rotations
-    // Impl::Vibration vib;   // molecular vibrations
+    Rotation rot_;  // molecular rotations
+    Vibration vib_; // molecular vibrations
     // Impl::Torsion tor;     // internal torsional modes
 };
 
-#if 0
 inline Mol_type Molecule::structure() const
 {
     Mol_type res;
     if (num_atoms() == 1) {
         res = atom;
     }
-    else if (rot_constants().size() == 1) {
+    else if (rot_.constants().size() == 1) {
         res = linear;
     }
     else {
@@ -204,7 +220,6 @@ inline Mol_type Molecule::structure() const
     }
     return res;
 }
-#endif
 
 } // namespace Chem
 

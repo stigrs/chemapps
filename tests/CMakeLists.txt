@@ -74,7 +74,7 @@ set(PROGRAMS
     #test_gaussnmr
     test_molecule
     test_periodic_table
-    #test_rotation
+    test_rotation
     #test_statecount
     #test_thermochem
     #test_thermodata
@@ -83,7 +83,7 @@ set(PROGRAMS
     #test_tst
     #test_tunnel
     #test_units
-    #test_vibration
+    test_vibration
     test_zmatrix
 )
 

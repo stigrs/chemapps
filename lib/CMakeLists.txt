@@ -26,7 +26,7 @@ set(
     molecule.cpp
     #mopac.cpp
     periodic_table.cpp
-    #rotation.cpp
+    rotation.cpp
     #statecount.cpp
     #thermochem.cpp
     #thermodata.cpp
@@ -35,7 +35,7 @@ set(
     #tst.cpp
     #tunnel.cpp
     #units.cpp
-    #vibration.cpp
+    vibration.cpp
     #whirab.cpp
 )
 add_library(

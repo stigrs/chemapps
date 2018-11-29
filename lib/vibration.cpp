@@ -1,30 +1,21 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 Stig Rune Sellevag
 //
-// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
-#include <chem/impl/vibration.h>
+#include <chem/vibration.h>
 #include <numlib/constants.h>
 #include <numlib/math.h>
 #include <numlib/traits.h>
 #include <cmath>
 
-Chem::Impl::Vibration::Vibration(std::istream& from,
-                                 const std::string& key,
-                                 Geometry& g,
-                                 Rotation& r)
-    : geom(g), rot(r)
+Chem::Vibration::Vibration(std::istream& from,
+                           const std::string& key,
+                           const std::vector<Chem::Element>& at,
+                           const Numlib::Mat<double>& x,
+                           const Numlib::Mat<double>& p)
+    : atms(at), xyz(x), paxis(p)
 {
     using namespace Stdutils;
 
@@ -53,7 +44,7 @@ Chem::Impl::Vibration::Vibration(std::istream& from,
     }
 }
 
-double Chem::Impl::Vibration::zero_point_energy() const
+double Chem::Vibration::zero_point_energy() const
 {
     double zpe = 0.0;
     for (auto v : freqs) {
@@ -67,7 +58,7 @@ double Chem::Impl::Vibration::zero_point_energy() const
     return 0.5 * zpe;
 }
 
-void Chem::Impl::Vibration::calc_normal_modes()
+void Chem::Vibration::calc_normal_modes()
 {
     // Transform Cartesian force constants to internal coordinates:
 
@@ -80,9 +71,9 @@ void Chem::Impl::Vibration::calc_normal_modes()
 
     // Calculate vibrational frequencies:
 
-    int natoms = narrow_cast<int>(geom.atoms().size());
-    int natoms3 = 3 * natoms;
-    int n_vib = natoms3 - n_tr_rot;
+    Index natoms = narrow_cast<Index>(atms.size());
+    Index natoms3 = 3 * natoms;
+    Index n_vib = natoms3 - n_tr_rot;
 
     freqs.resize(n_vib);
     lmat.resize(n_vib, n_vib);
@@ -103,15 +94,15 @@ void Chem::Impl::Vibration::calc_normal_modes()
     Numlib::Mat<double> tmp(3, natoms);
     Numlib::Mat<double> ltmp(natoms3, n_vib);
 
-    for (int i = 0; i < n_vib; ++i) {
+    for (Index i = 0; i < n_vib; ++i) {
         double y = 0.0;
-        for (int k1 = 0; k1 < natoms; ++k1) {
+        for (Index k1 = 0; k1 < natoms; ++k1) {
             for (int k2 = 0; k2 < 3; ++k2) {
                 double x = 0.0;
-                for (int j = 0; j < n_vib; ++j) {
+                for (Index j = 0; j < n_vib; ++j) {
                     x += dmat(j, k1, k2) * lmat(j, i);
                 }
-                x /= std::sqrt(geom.atoms()[k1].atomic_mass);
+                x /= std::sqrt(atms[k1].atomic_mass);
                 y += x * x;
                 tmp(k2, k1) = x;
             }
@@ -119,7 +110,7 @@ void Chem::Impl::Vibration::calc_normal_modes()
         mu_freqs(i) = 1.0 / y;
         k_fc(i) = freqs(i) * freqs(i) * mu_freqs(i) * factor;
         y = 1.0 / std::sqrt(y);
-        for (int it = 0; it < natoms3; ++it) {
+        for (Index it = 0; it < natoms3; ++it) {
             ltmp(it, i) = y * tmp.data()[it];
         }
     }
@@ -127,7 +118,7 @@ void Chem::Impl::Vibration::calc_normal_modes()
     l_cart = Numlib::Cube<double>(ms, ltmp.data());
 }
 
-void Chem::Impl::Vibration::print(std::ostream& to) const
+void Chem::Vibration::print(std::ostream& to) const
 {
     Stdutils::Format<char> line;
     line.width(26).fill('-');
@@ -136,7 +127,7 @@ void Chem::Impl::Vibration::print(std::ostream& to) const
     fix.fixed().width(8).precision(2);
 
     if (freqs.size() > 0) {
-        int it = 0;
+        Index it = 0;
         to << "Vibrational modes (cm^-1):\n" << line('-') << '\n';
         for (Index i = 0; i < freqs.size(); ++i) {
             to << fix(freqs(i));
@@ -154,7 +145,7 @@ void Chem::Impl::Vibration::print(std::ostream& to) const
     }
 }
 
-Numlib::Mat<double> Chem::Impl::Vibration::mw_hessians() const
+Numlib::Mat<double> Chem::Vibration::mw_hessians() const
 {
     Numlib::Mat<double> hess_mw(hess.rows(), hess.cols());
     if (!hess.empty()) {
@@ -166,36 +157,35 @@ Numlib::Mat<double> Chem::Impl::Vibration::mw_hessians() const
         }
         for (Index i = 0; i < hess_mw.rows(); ++i) {
             for (Index j = 0; j < hess_mw.cols(); ++j) {
-                hess_mw(i, j) /= std::sqrt(geom.atoms()[i / 3].atomic_mass *
-                                           geom.atoms()[j / 3].atomic_mass);
+                hess_mw(i, j) /= std::sqrt(atms[i / 3].atomic_mass *
+                                           atms[j / 3].atomic_mass);
             }
         }
     }
     return hess_mw;
 }
 
-void Chem::Impl::Vibration::trans_rot_vec(Numlib::Cube<double>& dmat,
-                                          int& n_tr_rot) const
+void Chem::Vibration::trans_rot_vec(Numlib::Cube<double>& dmat,
+                                    int& n_tr_rot) const
 {
     // This function generates the vectors corresponding to translations and
     // infinitesimal rotations. The variable n_tr_rot is set to 5 or 6,
     // depending on how many such vectors there are. The function does not
     // take the symmetry of the molecule into account.
 
-    int natoms = narrow_cast<int>(geom.atoms().size());
+    Index natoms = narrow_cast<Index>(atms.size());
 
     // Determine center of mass, moments of inertia and rotation generators:
 
-    auto xyz = geom.cart_coord() / Numlib::Constants::a_0;
-    auto paxis = rot.principal_axes();
+    auto xyz_ = xyz / Numlib::Constants::a_0;
 
     // Generate transformation matrix:
 
-    for (int i = 0; i < natoms; ++i) {
-        double m = std::sqrt(geom.atoms()[i].atomic_mass);
-        double cx = xyz(i, 0);
-        double cy = xyz(i, 1);
-        double cz = xyz(i, 2);
+    for (Index i = 0; i < natoms; ++i) {
+        double m = std::sqrt(atms[i].atomic_mass);
+        double cx = xyz_(i, 0);
+        double cy = xyz_(i, 1);
+        double cz = xyz_(i, 2);
         double cxp = cx * paxis(0, 0) + cy * paxis(1, 0) + cz * paxis(2, 0);
         double cyp = cx * paxis(0, 1) + cy * paxis(1, 1) + cz * paxis(2, 1);
         double czp = cx * paxis(0, 2) + cy * paxis(1, 2) + cz * paxis(2, 2);
@@ -233,9 +223,9 @@ void Chem::Impl::Vibration::trans_rot_vec(Numlib::Cube<double>& dmat,
     }
 }
 
-void Chem::Impl::Vibration::trans_hess_int_coord(Numlib::Cube<double>& dmat,
-                                                 Numlib::Mat<double>& lmat,
-                                                 int& n_tr_rot) const
+void Chem::Vibration::trans_hess_int_coord(Numlib::Cube<double>& dmat,
+                                           Numlib::Mat<double>& lmat,
+                                           int& n_tr_rot) const
 {
     // Set up coordinate vectors for translation and rotation about principal
     // axes of inertia.
@@ -243,8 +233,8 @@ void Chem::Impl::Vibration::trans_hess_int_coord(Numlib::Cube<double>& dmat,
     // Since these coordinate vectors involve mass-weighting in amu, the
     // reduced masses computed will also be in amu.
 
-    int natoms = narrow_cast<int>(geom.atoms().size());
-    int natoms3 = 3 * natoms;
+    Index natoms = narrow_cast<Index>(atms.size());
+    Index natoms3 = 3 * natoms;
 
     dmat.resize(natoms3, natoms, 3);
     dmat = 0.0;
@@ -272,23 +262,22 @@ void Chem::Impl::Vibration::trans_hess_int_coord(Numlib::Cube<double>& dmat,
     lmat = tmp * fc_int;
 }
 
-void Chem::Impl::Vibration::shuffle(Numlib::Cube<double>& dmat,
-                                    int n_tr_rot) const
+void Chem::Vibration::shuffle(Numlib::Cube<double>& dmat, int n_tr_rot) const
 {
     Numlib::Cube<double> tmp(dmat);
 
-    int natoms3 = tmp.rows();
-    int n_vib = natoms3 - n_tr_rot;
+    Index natoms3 = tmp.rows();
+    Index n_vib = natoms3 - n_tr_rot;
 
-    for (int k = 0; k < n_vib; ++k) {
+    for (Index k = 0; k < n_vib; ++k) {
         dmat.row(k) = tmp.row(n_tr_rot + k);
     }
-    for (int k = n_vib; k < natoms3; ++k) {
+    for (Index k = n_vib; k < natoms3; ++k) {
         dmat.row(k) = tmp.row(k - n_vib);
     }
 }
 
-void Chem::Impl::Vibration::freqs_unit_conv(Numlib::Vec<double>& vib) const
+void Chem::Vibration::freqs_unit_conv(Numlib::Vec<double>& vib) const
 {
     using namespace Numlib::Constants;
 
@@ -301,7 +290,7 @@ void Chem::Impl::Vibration::freqs_unit_conv(Numlib::Vec<double>& vib) const
     }
 }
 
-void Chem::Impl::Vibration::print_cart_freqs(std::ostream& to) const
+void Chem::Vibration::print_cart_freqs(std::ostream& to) const
 {
     Stdutils::Format<char> line;
     line.width(24).fill('-');
@@ -331,7 +320,7 @@ void Chem::Impl::Vibration::print_cart_freqs(std::ostream& to) const
     to << '\n';
 }
 
-void Chem::Impl::Vibration::print_normal_modes(std::ostream& to) const
+void Chem::Vibration::print_normal_modes(std::ostream& to) const
 {
     print_cart_freqs(to);
 
@@ -367,8 +356,8 @@ void Chem::Impl::Vibration::print_normal_modes(std::ostream& to) const
            << "Cartesian normal coordinates:\n"
            << line('-') << '\n'
            << "Atom\t  X\t  Y\t  Z\n";
-        for (std::size_t j = 0; j < geom.atoms().size(); ++j) {
-            to << geom.atoms()[j].atomic_symbol;
+        for (std::size_t j = 0; j < atms.size(); ++j) {
+            to << atms[j].atomic_symbol;
             for (int k = 0; k < 3; ++k) {
                 to << '\t' << fix2(l_cart(k, j, i));
             }
@@ -377,3 +366,4 @@ void Chem::Impl::Vibration::print_normal_modes(std::ostream& to) const
         to << '\n';
     }
 }
+

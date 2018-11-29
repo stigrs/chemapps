@@ -36,7 +36,7 @@ TEST_CASE("test_vibration")
         Molecule mol(from);
 
         double zpe_ans = 0.024386;
-        double zpe = mol.zero_point_energy() / Constants::au_to_icm;
+        double zpe = mol.vib().zero_point_energy() / Constants::au_to_icm;
 
         CHECK(std::abs(zpe - zpe_ans) < 1.0e-6);
 
@@ -44,9 +44,9 @@ TEST_CASE("test_vibration")
         Numlib::Vec<double> mu_ans = {1.0785, 1.0491, 1.0774};
         Numlib::Vec<double> k_ans = {2.9915, 10.6023, 12.2488};
 
-        auto nu = mol.frequencies();
-        auto mu = mol.vib_red_masses();
-        auto k = mol.vib_force_constants();
+        auto nu = mol.vib().frequencies();
+        auto mu = mol.vib().red_masses();
+        auto k = mol.vib().force_constants();
 
         for (Index i = 0; i < nu.size(); ++i) {
             CHECK(std::abs(nu(i) - nu_ans(i)) < 1.0e-4);
@@ -67,16 +67,16 @@ TEST_CASE("test_vibration")
         Molecule mol(from);
 
         double zpe_ans = 0.011626;
-        double zpe = mol.zero_point_energy() / Constants::au_to_icm;
+        double zpe = mol.vib().zero_point_energy() / Constants::au_to_icm;
         CHECK(std::abs(zpe - zpe_ans) < 1.0e-6);
 
         Numlib::Vec<double> nu_ans = {566.2442, 566.2442, 1435.2233, 2535.7089};
         Numlib::Vec<double> mu_ans = {12.8774, 12.8774, 15.9949, 12.8774};
         Numlib::Vec<double> k_ans = {2.4327, 2.4327, 19.4120, 48.7838};
 
-        auto nu = mol.frequencies();
-        auto mu = mol.vib_red_masses();
-        auto k = mol.vib_force_constants();
+        auto nu = mol.vib().frequencies();
+        auto mu = mol.vib().red_masses();
+        auto k = mol.vib().force_constants();
 
         for (Index i = 0; i < nu.size(); ++i) {
             CHECK(std::abs(nu(i) - nu_ans(i)) < 1.0e-4);
@@ -97,7 +97,7 @@ TEST_CASE("test_vibration")
         Molecule mol(from);
 
         double zpe_ans = 0.051319;
-        double zpe = mol.zero_point_energy() / Constants::au_to_icm;
+        double zpe = mol.vib().zero_point_energy() / Constants::au_to_icm;
         CHECK(std::abs(zpe - zpe_ans) < 1.0e-6);
 
         Numlib::Vec<double> nu_ans = {
@@ -111,9 +111,9 @@ TEST_CASE("test_vibration")
                                      0.7495, 0.9713, 1.0425, 1.1859, 1.2939,
                                      1.3124, 5.8116, 6.8635, 6.8826, 8.9245};
 
-        auto nu = mol.frequencies();
-        auto mu = mol.vib_red_masses();
-        auto k = mol.vib_force_constants();
+        auto nu = mol.vib().frequencies();
+        auto mu = mol.vib().red_masses();
+        auto k = mol.vib().force_constants();
 
         for (Index i = 0; i < nu.size(); ++i) {
             CHECK(std::abs(nu(i) - nu_ans(i)) < 1.0e-4);

@@ -1,54 +1,43 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 Stig Rune Sellevag
 //
-// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
-#include <chem/impl/rotation.h>
-#include <chem/impl/io_support.h>
+#include <chem/rotation.h>
+#include <chem/io.h>
 #include <numlib/constants.h>
 #include <stdutils/stdutils.h>
 #include <cassert>
 #include <cmath>
 
-Chem::Impl::Rotation::Rotation(std::istream& from,
-                               const std::string& key,
-                               Geometry& g)
-    : geom(g), pmom(3), paxis(3, 3)
+Chem::Rotation::Rotation(std::istream& from,
+                         const std::string& key,
+                         const std::vector<Chem::Element>& at,
+                         const Numlib::Mat<double>& x)
+    : atms(at), xyz(x), pmom(3), paxis(3, 3), sigma_{1}
 {
     using namespace Stdutils;
 
-    aligned = false;
-
     auto pos = find_token(from, key);
     if (pos != -1) {
-        get_token_value(from, pos, "sigma", sigma, 1);
+        get_token_value(from, pos, "sigma", sigma_, 1);
     }
     rotate_to_principal_axes();
 }
 
-void Chem::Impl::Rotation::analysis(std::ostream& to) const
+void Chem::Rotation::analysis(std::ostream& to) const
 {
-    if (geom.atoms().size() > 1) {
+    if (atms.size() > 1) {
         to << "\nGeometry in principal axes coordinate system:\n";
-        Chem::Impl::print_geometry(to, geom.atoms(), geom.cart_coord());
-        Chem::Impl::print_center_of_mass(to, center_of_mass());
-        Chem::Impl::print_principal_moments(to, pmom, paxis);
-        Chem::Impl::print_rot_constants(to, sigma, symmetry(), constants());
+        Chem::print_geometry(to, atms, xyz);
+        Chem::print_center_of_mass(to, center_of_mass());
+        Chem::print_principal_moments(to, pmom, paxis);
+        Chem::print_rot_constants(to, sigma(), symmetry(), constants());
     }
 }
 
-Numlib::Vec<double> Chem::Impl::Rotation::constants() const
+Numlib::Vec<double> Chem::Rotation::constants() const
 {
     using namespace Numlib::Constants;
 
@@ -57,7 +46,7 @@ Numlib::Vec<double> Chem::Impl::Rotation::constants() const
 
     Numlib::Vec<double> res(3);
 
-    if (geom.atoms().size() > 1) {
+    if (atms.size() > 1) {
         if (std::abs(pmom(0)) < tol) {
             res(0) = factor / pmom(2);
         }
@@ -70,7 +59,7 @@ Numlib::Vec<double> Chem::Impl::Rotation::constants() const
     return res;
 }
 
-std::string Chem::Impl::Rotation::symmetry() const
+std::string Chem::Rotation::symmetry() const
 {
     const double tol = 1.0e-3;
 
@@ -80,13 +69,13 @@ std::string Chem::Impl::Rotation::symmetry() const
     std::string symm = "asymmetric top";
     if (ab && bc) {
         symm = "spherical top";
-        if (geom.atoms().size() == 1) {
+        if (atms.size() == 1) {
             symm = "atom";
         }
     }
     else if (bc) {
         symm = "prolate symmetric top";
-        if (geom.atoms().size() == 2) {
+        if (atms.size() == 2) {
             symm = "linear " + symm;
         }
     }
@@ -96,43 +85,45 @@ std::string Chem::Impl::Rotation::symmetry() const
     return symm;
 }
 
-Numlib::Vec<double> Chem::Impl::Rotation::center_of_mass() const
+Numlib::Vec<double> Chem::Rotation::center_of_mass() const
 {
     Numlib::Vec<double> com(3);
 
-    for (Index j = 0; j < geom.cart_coord().cols(); ++j) {
+    for (Index j = 0; j < xyz.cols(); ++j) {
         double sum = 0.0;
-        for (Index i = 0; i < geom.cart_coord().rows(); ++i) {
-            sum += geom.atoms()[i].atomic_mass * geom.cart_coord()(i, j);
+        double tot_mass = 0.0;
+        for (Index i = 0; i < xyz.rows(); ++i) {
+            sum += atms[i].atomic_mass * xyz(i, j);
+            tot_mass += atms[i].atomic_mass;
         }
-        com(j) = sum / geom.tot_mass();
+        com(j) = sum / tot_mass;
     }
     return com;
 }
 
-void Chem::Impl::Rotation::calc_principal_moments()
+void Chem::Rotation::calc_principal_moments()
 {
     // Work on a local copy of the Cartesian coordinates:
-    Numlib::Mat<double> xyz = geom.cart_coord();
+    Numlib::Mat<double> xyz_ = xyz;
 
     // Convert geometry units to bohr:
-    xyz /= Numlib::Constants::a_0;
+    xyz_ /= Numlib::Constants::a_0;
 
     // Move geometry to center of mass:
     auto com = center_of_mass();
-    Numlib::translate(xyz, -com(0), -com(1), -com(2));
+    Numlib::translate(xyz_, -com(0), -com(1), -com(2));
 
     // Compute principal moments:
 
     paxis = 0.0;
     pmom = 0.0;
 
-    if (geom.atoms().size() > 1) {
-        for (std::size_t i = 0; i < geom.atoms().size(); ++i) {
-            double m = geom.atoms()[i].atomic_mass;
-            double x = xyz(i, 0);
-            double y = xyz(i, 1);
-            double z = xyz(i, 2);
+    if (atms.size() > 1) {
+        for (std::size_t i = 0; i < atms.size(); ++i) {
+            double m = atms[i].atomic_mass;
+            double x = xyz_(i, 0);
+            double y = xyz_(i, 1);
+            double z = xyz_(i, 2);
             paxis(0, 0) += m * (y * y + z * z);
             paxis(1, 1) += m * (x * x + z * z);
             paxis(2, 2) += m * (x * x + y * y);

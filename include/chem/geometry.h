@@ -107,7 +107,7 @@ private:
     // the MIT license.
     Numlib::Vec<double> calc_position(Index i) const;
 
-    std::vector<Chem::Element> atms;
+    std::vector<Element> atms;
     Numlib::Mat<double> xyz;
 
     Numlib::Vec<double> distances;
