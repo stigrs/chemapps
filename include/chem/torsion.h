@@ -55,7 +55,7 @@ public:
     ~Torsion() = default;
 
     // Perform torsional mode analysis.
-    void analysis(std::ostream& to) const;
+    void analysis(std::ostream& to = std::cout) const;
 
     // Set new Cartesian coordinates.
     void set(const Numlib::Mat<double>& x,

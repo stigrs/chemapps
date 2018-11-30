@@ -1,18 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 Stig Rune Sellevag
 //
-// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
 #ifndef CHEM_TUNNEL_H
 #define CHEM_TUNNEL_H
@@ -47,10 +37,10 @@ public:
 private:
     enum Method_t { None, Wigner, Eckart };
 
-    Method_t method = None;  // tunneling correction method
-    double freq_im;          // imaginary frequency
-    double en_barrier;       // potential barrier height
-    double en_rxn;           // energy of reaction
+    Method_t method = None; // tunneling correction method
+    double freq_im;         // imaginary frequency
+    double en_barrier;      // potential barrier height
+    double en_rxn;          // energy of reaction
 };
 
 inline double Tunnel::wigner(double temp) const
@@ -91,5 +81,5 @@ inline std::string Tunnel::get_method() const
 
 } // namespace Chem
 
-#endif  // CHEM_TUNNEL_H
+#endif // CHEM_TUNNEL_H
 

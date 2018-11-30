@@ -1,18 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 Stig Rune Sellevag
 //
-// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -65,9 +55,9 @@ int main(int argc, char* argv[])
         Stdutils::fopen(from, input_file);
 
         Chem::Molecule mol(from, std::cout, "Molecule", true);
-        mol.rot_analysis();
-        mol.tor_analysis();
-        mol.vib_analysis();
+        mol.rot().analysis();
+        mol.tor().analysis();
+        mol.vib().analysis();
     }
     catch (std::exception& e) {
         std::cerr << "what: " << e.what() << '\n';

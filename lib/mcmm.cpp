@@ -1,22 +1,12 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 Stig Rune Sellevag
 //
-// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
 #include <chem/gaussian.h>
 #include <chem/mcmm.h>
-#include <chem/impl/io_support.h>
+#include <chem/io.h>
 #include <chem/mopac.h>
 #include <stdutils/stdutils.h>
 #include <cmath>
@@ -26,7 +16,7 @@
 
 template <class Pot>
 Chem::Mcmm<Pot>::Mcmm(std::istream& from,
-                      Chem::Molecule& mol_,
+                      const Chem::Molecule& mol_,
                       const std::string& key,
                       bool verbose_)
     : mol(mol_), verbose(verbose_)
@@ -39,15 +29,15 @@ Chem::Mcmm<Pot>::Mcmm(std::istream& from,
 
     auto pos = find_token(from, key);
     if (pos != -1) {
-        get_token_value(from, pos, "xtol", xtol, 5.0e-3);
-        get_token_value(from, pos, "etol", etol, 1.0e-3);
+        get_token_value(from, pos, "xtol", xtol, 5.0e-2);
+        get_token_value(from, pos, "etol", etol, 1.0e-2);
         get_token_value(from, pos, "emin", emin, emin_def);
         get_token_value(from, pos, "emax", emax, 0.0);
         get_token_value(from, pos, "rmin", rmin, 0.5);
         get_token_value(from, pos, "temp", temp, 298.15);
-        get_token_value(from, pos, "maxiter", maxiter, 5000u);
-        get_token_value(from, pos, "miniter", miniter, 500u);
-        get_token_value(from, pos, "maxreject", maxreject, 200u);
+        get_token_value(from, pos, "maxiter", maxiter, 500u);
+        get_token_value(from, pos, "miniter", miniter, 50u);
+        get_token_value(from, pos, "maxreject", maxreject, 100u);
         get_token_value(from, pos, "nminima", nminima, 20u);
         get_token_value(from, pos, "seed", seed, 0);
     }
@@ -75,8 +65,8 @@ Chem::Mcmm<Pot>::Mcmm(std::istream& from,
 
     // Initialize storage containers:
 
-    xcurr = mol.cart_coord();
-    ecurr = mol.elec_energy();
+    xcurr = mol.get_xyz();
+    ecurr = mol.elec().energy();
 
     // Seed the random number engine:
 
@@ -121,7 +111,7 @@ void Chem::Mcmm<Pot>::solve(std::ostream& to)
         to << "Global minimum:\n"
            << line('-') << '\n'
            << "Energy: " << dfix(eglobal_min) << '\n';
-        Chem::Impl::print_geometry(to, mol.atoms(), xglobal);
+        Chem::print_geometry(to, mol.atoms(), xglobal);
         to << '\n';
 
         line.width(13).fill('-');
@@ -129,7 +119,7 @@ void Chem::Mcmm<Pot>::solve(std::ostream& to)
         for (std::size_t i = 0; i < conformers.size(); ++i) {
             to << "Conformer: " << i + 1 << '\n'
                << "Energy: " << dfix(conformers[i].energy) << '\n';
-            Chem::Impl::print_geometry(to, mol.atoms(), conformers[i].xyz);
+            Chem::print_geometry(to, mol.atoms(), conformers[i].xyz);
             to << '\n';
         }
     }
@@ -186,7 +176,7 @@ bool Chem::Mcmm<Pot>::accept_geom_dist(const Chem::Molecule& m) const
 {
     bool geom_ok = true;
     Numlib::Mat<double> dist_mat;
-    Numlib::pdist_matrix(dist_mat, m.cart_coord());
+    Numlib::pdist_matrix(dist_mat, m.get_xyz());
     for (auto v : dist_mat) {
         if (v > 0.0 && v < rmin) { // avoid too close atoms
             geom_ok = false;
@@ -200,9 +190,9 @@ bool Chem::Mcmm<Pot>::duplicate(const Chem::Molecule& m) const
 {
     bool res = false;
     for (std::size_t i = 0; i < conformers.size(); ++i) { // check geometry
-        res = Numlib::kabsch_rmsd(conformers[i].xyz, m.cart_coord()) <= xtol;
+        res = Numlib::kabsch_rmsd(conformers[i].xyz, m.get_xyz()) <= xtol;
         if (res) { // duplicate geometry; check energy
-            double ediff = std::abs(conformers[i].energy - m.elec_energy());
+            double ediff = std::abs(conformers[i].energy - m.elec().energy());
             res = ediff <= etol;
         }
     }
@@ -215,9 +205,9 @@ void Chem::Mcmm<Pot>::new_conformer()
     const unsigned ntrials = 20;
     // Generate a new random conformer by using the uniform usage scheme:
     for (unsigned i = 0; i < ntrials; ++i) {
-        Numlib::Mat<double> xnew = mol.cart_coord();
+        Numlib::Mat<double> xnew = mol.get_xyz();
         uniform_usage(xnew);
-        mol.set_cart_coord(xnew);
+        mol.set_xyz(xnew);
         gen_rand_conformer(mol);
         if (accept_geom_dist(mol)) { // check geometry constraints
             break;
@@ -228,10 +218,10 @@ void Chem::Mcmm<Pot>::new_conformer()
     pot.run(mol);
 
     // Check acceptance:
-    if (accept_energy(mol.elec_energy())) {
+    if (accept_energy(mol.elec().energy())) {
         if (!duplicate(mol)) { // store new conformer
-            xcurr = mol.cart_coord();
-            ecurr = mol.elec_energy();
+            xcurr = mol.get_xyz();
+            ecurr = mol.elec().energy();
             save_conformer(mol);
             naccept += 1;
         }
@@ -310,10 +300,10 @@ inline void Chem::Mcmm<Pot>::sort_conformers()
 template <class Pot>
 std::vector<int> Chem::Mcmm<Pot>::select_rand_dihedral(const Chem::Molecule& m)
 {
-    std::vector<Numlib::Vec<int>> connect = m.int_coord().get_connectivities();
+    auto connect = m.geom().get_connectivities();
     std::uniform_int_distribution<> rnd_uni_int(2, connect.size() - 1);
     int index = rnd_uni_int(mt);
-    Numlib::Vec<int> dihedral = connect[index];
+    auto dihedral = connect[index];
 
     std::vector<int> res(0);
     for (std::size_t i = 2; i < connect.size(); ++i) {

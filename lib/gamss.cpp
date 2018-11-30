@@ -1,23 +1,13 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018 Stig Rune Sellevag
 //
-// Copyright (c) 2018 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
 #include <chem/gamss.h>
 #include <chem/gaussian.h>
 #include <chem/mopac.h>
-#include <chem/impl/io_support.h>
+#include <chem/io.h>
 #include <numlib/matrix.h>
 #include <numlib/math.h>
 #include <stdutils/stdutils.h>
@@ -104,7 +94,7 @@ void Chem::Gamss<Pot>::solve(std::ostream& to)
     for (std::size_t i = 0; i < population.size(); ++i) {
         to << "Conformer: " << i + 1 << '\n'
            << "Energy: " << fix(population[i].energy) << '\n';
-        Chem::Impl::print_geometry(to, mol.atoms(), population[i].xyz);
+        Chem::print_geometry(to, mol.atoms(), population[i].xyz);
         to << '\n';
     }
 }
@@ -129,24 +119,18 @@ void Chem::Gamss<Pot>::init_population(std::ostream& to)
             continue;
         }
 
-        // Check if new random structure is blacklisted.
-        if (is_blacklisted(m.cart_coord()) && iter > 0) {
-            continue;
-        }
-        std::cout << m.cart_coord() << std::endl;
-
         // Add starting structure for local optimization to blacklist:
-        blacklist.push_back(Chem::Conformer(m.elec_energy(), m.cart_coord()));
+        blacklist.push_back(Chem::Conformer(m.elec().energy(), m.get_xyz()));
 
         // Perform local optimization:
         pot.run(m);
 
-        if (m.elec_energy() >= energy_min && m.elec_energy() < energy_max) {
+        if (m.elec().energy() >= energy_min && m.elec().energy() < energy_max) {
             // Add optimized structure to blacklist and population:
             blacklist.push_back(
-                Chem::Conformer(m.elec_energy(), m.cart_coord()));
+                Chem::Conformer(m.elec().energy(), m.get_xyz()));
             population.push_back(
-                Chem::Conformer(m.elec_energy(), m.cart_coord()));
+                Chem::Conformer(m.elec().energy(), m.get_xyz()));
             ++ipop;
         }
     }
@@ -163,7 +147,7 @@ void Chem::Gamss<Pot>::init_population(std::ostream& to)
     for (std::size_t i = 0; i < population.size(); ++i) {
         to << "Conformer: " << i + 1 << '\n'
            << "Energy: " << fix(population[i].energy) << '\n';
-        Chem::Impl::print_geometry(to, mol.atoms(), population[i].xyz);
+        Chem::print_geometry(to, mol.atoms(), population[i].xyz);
         to << '\n';
     }
 }
@@ -171,6 +155,7 @@ void Chem::Gamss<Pot>::init_population(std::ostream& to)
 template <class Pot>
 void Chem::Gamss<Pot>::gen_rand_conformer(Chem::Molecule& m)
 {
+    std::cout << "before\n" << m.get_xyz() << std::endl;
     int iter = 0;
     while (iter < max_mut_tors) {
         // Select a random dihedral angle:
@@ -179,16 +164,17 @@ void Chem::Gamss<Pot>::gen_rand_conformer(Chem::Molecule& m)
         // Apply random variation to dihedral angle:
         std::uniform_real_distribution<> rnd_uni_real(-179.0, 180.0);
         double delta = rnd_uni_real(mt);
-        m.int_coord().rotate_moiety(moiety, delta);
+        m.geom().rotate_moiety(moiety, delta);
 
         ++iter;
     }
+    std::cout << "after\n" << m.get_xyz() << std::endl;
 }
 
 template <class Pot>
 std::vector<int> Chem::Gamss<Pot>::select_rand_dihedral(const Chem::Molecule& m)
 {
-    std::vector<Numlib::Vec<int>> connect = m.int_coord().get_connectivities();
+    auto connect = m.geom().get_connectivities();
     std::uniform_int_distribution<> rnd_uni_int(2, connect.size() - 1);
     int index = rnd_uni_int(mt);
     auto dihedral = connect[index];
@@ -207,7 +193,7 @@ bool Chem::Gamss<Pot>::geom_sensible(const Chem::Molecule& m) const
 {
     bool geom_ok = true;
     Numlib::Mat<double> dist_mat;
-    Numlib::pdist_matrix(dist_mat, m.cart_coord());
+    Numlib::pdist_matrix(dist_mat, m.get_xyz());
     for (auto v : dist_mat) {
         if (v > 0.0 && v < dist_min) { // avoid too close atoms
             geom_ok = false;
@@ -216,7 +202,7 @@ bool Chem::Gamss<Pot>::geom_sensible(const Chem::Molecule& m) const
     }
     if (geom_ok) { // avoid too long bond distances
         for (std::size_t i = 0; i < m.num_atoms(); ++i) {
-            if (m.int_coord().get_distance(i) >= dist_max) {
+            if (m.geom().get_distance(i) >= dist_max) {
                 geom_ok = false;
                 break;
             }

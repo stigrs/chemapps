@@ -17,12 +17,12 @@ set(
     collision.cpp
     electronic.cpp
     energy_levels.cpp
-    #gamss.cpp
+    gamss.cpp
     gauss_data.cpp
     gaussian.cpp
     geometry.cpp
     io.cpp
-    #mcmm.cpp
+    mcmm.cpp
     molecule.cpp
     mopac.cpp
     periodic_table.cpp

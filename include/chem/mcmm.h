@@ -1,18 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 Stig Rune Sellevag
 //
-// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
 #ifndef CHEM_MCMM_H
 #define CHEM_MCMM_H
@@ -36,7 +26,7 @@ template <class Pot>
 class Mcmm {
 public:
     Mcmm(std::istream& from,
-         Molecule& mol_,
+         const Molecule& mol_,
          const std::string& key = "Mcmm",
          bool verbose_ = false);
 
@@ -82,8 +72,8 @@ private:
     // Select random dihedral angle.
     std::vector<int> select_rand_dihedral(const Molecule& m);
 
-    Molecule& mol; // molecule
-    Pot pot;       // potential function
+    Molecule mol; // molecule
+    Pot pot;      // potential function
 
     double xtol; // absolute error in geometry
     double etol; // absolute error in energy
@@ -143,13 +133,13 @@ inline void Mcmm<Pot>::gen_rand_conformer(Molecule& m)
     // Apply random variation to dihedral angle:
     std::uniform_real_distribution<> rnd_uni_real(-180.0, 180.0);
     double delta = rnd_uni_real(mt);
-    m.int_coord().rotate_moiety(moiety, delta);
+    m.geom().rotate_moiety(moiety, delta);
 }
 
 template <class Pot>
 void Mcmm<Pot>::save_conformer(const Molecule& m)
 {
-    Conformer c(m.elec_energy(), m.cart_coord());
+    Conformer c(m.elec().energy(), m.get_xyz());
     conformers.push_back(c);
 }
 

@@ -1,18 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 Stig Rune Sellevag
 //
-// Copyright (c) 2018 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
 #ifndef CHEM_WHIRAB_H
 #define CHEM_WHIRAB_H
@@ -25,11 +15,11 @@ namespace Chem {
 //
 namespace Whirab {
 
-// Whitten-Rabinovitch correction.
-double a_corr(const Molecule& mol, double e_barrier);
+    // Whitten-Rabinovitch correction.
+    double a_corr(const Molecule& mol, double e_barrier);
 
-// Vibrational density of states.
-double vibr_density_states(const Molecule& mol, double e_barrier);
+    // Vibrational density of states.
+    double vibr_density_states(const Molecule& mol, double e_barrier);
 
 } // namespace Whirab
 

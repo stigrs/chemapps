@@ -1,18 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 Stig Rune Sellevag
 //
-// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -20,7 +10,7 @@
 #endif
 
 #include <chem/molecule.h>
-#include <chem/impl/io_support.h>
+#include <chem/io.h>
 #include <stdutils/stdutils.h>
 #include <cxxopts.hpp>
 #include <exception>
@@ -30,7 +20,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(pop)
-#endif // _MSC_VER
+#endif
 
 // Program for converting between XYZ and Z matrix file formats.
 //
@@ -72,15 +62,15 @@ int main(int argc, char* argv[])
         output_file = Stdutils::strip_suffix(input_file, ".inp");
 
         if (args["xyz"].as<bool>()) {
-            mol.int_coord().load(from);
+            mol.geom().load_zmat(from);
             output_file = output_file + ".xyz";
             Stdutils::fopen(to, output_file.c_str());
-            Chem::Impl::print_xyz_format(to, mol.atoms(), mol.cart_coord(), "");
+            Chem::print_xyz_format(to, mol.atoms(), mol.get_xyz(), "");
         }
         else if (args["zmat"].as<bool>()) {
             output_file = output_file + ".zmat";
             Stdutils::fopen(to, output_file.c_str());
-            mol.int_coord().print(to);
+            mol.geom().print_zmat(to);
         }
     }
     catch (std::exception& e) {

@@ -1,18 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 Stig Rune Sellevag
 //
-// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
 #include <chem/traits.h>
 #include <chem/molecule.h>
@@ -28,7 +18,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include <memory>
 
 //-----------------------------------------------------------------------------
 
@@ -50,12 +39,12 @@ void read_nej(const std::string& input_file);
 
 // Global declarations:
 
-Numlib::Grid e_grid;                   // energy grid
-Numlib::Grid j_grid;                   // angular momentum grid
-Numlib::Grid t_grid;                   // temperature grid
-Numlib::Mat<double> nej;               // N(E,J) data
-std::unique_ptr<Chem::Molecule> frag1; // input data on fragment 1
-std::unique_ptr<Chem::Molecule> frag2; // input data on fragment 2
+Numlib::Grid e_grid;     // energy grid
+Numlib::Grid j_grid;     // angular momentum grid
+Numlib::Grid t_grid;     // temperature grid
+Numlib::Mat<double> nej; // N(E,J) data
+Chem::Molecule frag1;    // input data on fragment 1
+Chem::Molecule frag2;    // input data on fragment 2
 
 //-----------------------------------------------------------------------------
 
@@ -104,13 +93,11 @@ void read_input(const std::string& input_file)
               << "Specification of T grid (K):\n"
               << t_grid << '\n';
 
-    frag1 =
-        std::make_unique<Chem::Molecule>(from, std::cout, "Fragment1", true);
-    frag1->rot_analysis();
+    frag1 = Chem::Molecule(from, std::cout, "Fragment1", true);
+    frag1.rot().analysis();
     std::cout << '\n';
-    frag2 =
-        std::make_unique<Chem::Molecule>(from, std::cout, "Fragment2", true);
-    frag2->rot_analysis();
+    frag2 = Chem::Molecule(from, std::cout, "Fragment2", true);
+    frag2.rot().analysis();
 }
 
 void read_nej(const std::string& input_file)
@@ -174,8 +161,8 @@ void integrate()
     double qfrag;
     double kcap;
 
-    double red_mass = frag1->tot_mass() * frag2->tot_mass() /
-                      (frag1->tot_mass() + frag2->tot_mass());
+    double red_mass = frag1.tot_mass() * frag2.tot_mass() /
+                      (frag1.tot_mass() + frag2.tot_mass());
 
     for (Index t = 0; t < t_grid.size(); ++t) {
         kcap = 0.0;
@@ -187,8 +174,8 @@ void integrate()
             }
         }
         qfrag = Chem::qtrans(red_mass, t_grid[t]) * 1.0e-6; // cm**-3
-        qfrag *= Chem::qrot(*frag1, t_grid[t], true);
-        qfrag *= Chem::qrot(*frag2, t_grid[t], true);
+        qfrag *= Chem::qrot(frag1, t_grid[t], true);
+        qfrag *= Chem::qrot(frag2, t_grid[t], true);
         kcap *= estep * jstep / (2.0 * Pc::pi * Pc::h_bar * qfrag / Pc::E_h);
 
         std::cout << t_grid[t] << '\t' << qfrag << '\t' << kcap << '\n';

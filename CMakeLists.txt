@@ -109,7 +109,7 @@ endif()
 # Build the software:
 
 add_subdirectory(lib)
-#add_subdirectory(src)
+add_subdirectory(src)
 
 # Enable testing.
 option(BUILD_TESTS "Build tests." ON)
