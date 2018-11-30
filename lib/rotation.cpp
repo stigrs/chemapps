@@ -7,7 +7,6 @@
 #include <chem/rotation.h>
 #include <chem/io.h>
 #include <numlib/constants.h>
-#include <stdutils/stdutils.h>
 #include <cassert>
 #include <cmath>
 

@@ -94,7 +94,7 @@ private:
 
 inline double Troe::f_anharm() const
 {
-    auto s = mol.frequencies().size();
+    auto s = mol.vib().frequencies().size();
 
     return std::pow((s - 1.0) / (s - 1.5), n_morse_osc);
 }

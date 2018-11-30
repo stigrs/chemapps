@@ -27,8 +27,8 @@ void Chem::thermochemistry(const Chem::Molecule& mol,
     using namespace Numlib;
 
     Stdutils::Format<char> line;
-    if (!mol.info().empty()) {
-        line.width(20 + mol.info().size()).fill('=');
+    if (!mol.title().empty()) {
+        line.width(20 + mol.title().size()).fill('=');
     }
     else {
         line.width(16).fill('=');
@@ -36,9 +36,9 @@ void Chem::thermochemistry(const Chem::Molecule& mol,
     Stdutils::Format<double> fix;
     fix.fixed().precision(6);
 
-    double e0 = mol.elec_energy();
-    if (!mol.info().empty()) {
-        to << "\nThermochemistry of " << mol.info() << ":\n"
+    double e0 = mol.elec().energy();
+    if (!mol.title().empty()) {
+        to << "\nThermochemistry of " << mol.title() << ":\n"
            << line('=') << '\n';
     }
     else {
@@ -46,14 +46,14 @@ void Chem::thermochemistry(const Chem::Molecule& mol,
     }
     to << "Electronic energy: " << fix(e0) << " Hartree\n";
 
-    mol.rot_analysis(to);
+    mol.rot().analysis(to);
 
-    if (mol.tot_tor_minima() > 0) {
-        mol.tor_analysis(to);
+    if (mol.tor().tot_minima() > 0) {
+        mol.tor().analysis(to);
     }
-    mol.vib_analysis(to);
+    mol.vib().analysis(to);
 
-    double zpe = mol.zero_point_energy() / Constants::au_to_icm;
+    double zpe = mol.vib().zero_point_energy() / Constants::au_to_icm;
     const double factor = 1.0 / (Constants::E_h * Constants::N_A);
 
     for (const auto& p : pressure) {
@@ -132,7 +132,7 @@ void Chem::thermochemistry(const Chem::Molecule& mol,
             to << "Vibrational:\t\t" << fix(evib) << '\t' << fix(cvib) << '\t'
                << fix(svib) << '\n';
 
-            if (mol.tot_tor_minima() > 0) {
+            if (mol.tor().tot_minima() > 0) {
                 double etor =
                     Chem::thermal_energy_tor(mol, t) / Constants::kilo;
                 double ctor = Chem::const_vol_heat_tor(mol, t);
@@ -170,7 +170,7 @@ void Chem::thermochemistry(const Chem::Molecule& mol,
             q = Chem::qrot(mol, t, incl_sigma);
             to << "Rotational:\t\t" << sci(q) << '\n';
 
-            if (mol.tot_tor_minima() > 0) {
+            if (mol.tor().tot_minima() > 0) {
                 q = Chem::qtor(mol, t);
                 to << "Torsional:\t\t" << sci(q) << '\n';
             }
@@ -183,8 +183,8 @@ double Chem::qelec(const Chem::Molecule& mol, double temp)
 {
     using namespace Numlib::Constants;
 
-    auto so_degen = mol.spin_orbit_degen();
-    auto so_energy = mol.spin_orbit_energy();
+    auto so_degen = mol.elec().spin_orbit_degen();
+    auto so_energy = mol.elec().spin_orbit_energy();
 
     double qe = 0.0;
     for (Index i = 0; i < so_degen.size(); ++i) {
@@ -199,26 +199,26 @@ double Chem::qrot(const Chem::Molecule& mol, double temp, bool incl_sigma)
 
     Assert::dynamic<Assert::level(2)>(temp >= 0.0, "bad temperature");
 
-    std::string rot_symm = mol.rot_symmetry();
+    std::string rot_symm = mol.rot().symmetry();
     double res = 0.0;
 
     if (rot_symm.find("atom") != std::string::npos) {
         res = 1.0;
     }
     else if (rot_symm.find("linear") != std::string::npos) {
-        auto rotc = GHz_to_K * mol.rot_constants();
+        auto rotc = GHz_to_K * mol.rot().constants();
         double rsig = 1.0;
         if (incl_sigma) {
-            rsig /= mol.rot_sigma();
+            rsig /= mol.rot().sigma();
         }
         res = rsig * temp / rotc(0);
     }
     else { // nonlinear molecule
-        auto rotc = GHz_to_K * mol.rot_constants();
+        auto rotc = GHz_to_K * mol.rot().constants();
         double b = Numlib::prod(rotc);
         double rsig = std::sqrt(pi);
         if (incl_sigma) {
-            rsig /= mol.rot_sigma();
+            rsig /= mol.rot().sigma();
         }
         res = rsig * std::pow(temp, 1.5) / std::sqrt(b);
     }
@@ -228,7 +228,7 @@ double Chem::qrot(const Chem::Molecule& mol, double temp, bool incl_sigma)
 double
 Chem::entropy_rot(const Chem::Molecule& mol, double temp, bool incl_sigma)
 {
-    std::string rot_symm = mol.rot_symmetry();
+    std::string rot_symm = mol.rot().symmetry();
     double res = 0.0;
 
     if (rot_symm.find("atom") != std::string::npos) {
@@ -249,7 +249,7 @@ Chem::entropy_rot(const Chem::Molecule& mol, double temp, bool incl_sigma)
 double
 Chem::qvib(const Chem::Molecule& mol, double temp, const std::string& zeroref)
 {
-    std::string rot_symm = mol.rot_symmetry();
+    std::string rot_symm = mol.rot().symmetry();
     double res = 0.0;
 
     if (rot_symm.find("atom") != std::string::npos) {
@@ -257,7 +257,7 @@ Chem::qvib(const Chem::Molecule& mol, double temp, const std::string& zeroref)
     }
     else {
         Assert::dynamic<Assert::level(2)>(temp > 0.0);
-        auto w = Numlib::Constants::icm_to_K * mol.frequencies();
+        auto w = Numlib::Constants::icm_to_K * mol.vib().frequencies();
         double qv = 1.0;
         if (zeroref == "V=0") { // zero at first vibrational level
             for (auto wi : w) {
@@ -287,7 +287,7 @@ Chem::qvib(const Chem::Molecule& mol, double temp, const std::string& zeroref)
 
 double Chem::entropy_vib(const Chem::Molecule& mol, double temp)
 {
-    std::string rot_symm = mol.rot_symmetry();
+    std::string rot_symm = mol.rot().symmetry();
     double res = 0.0;
 
     if (rot_symm.find("atom") != std::string::npos) {
@@ -295,7 +295,7 @@ double Chem::entropy_vib(const Chem::Molecule& mol, double temp)
     }
     else {
         Assert::dynamic<Assert::level(2)>(temp > 0.0);
-        auto w = Numlib::Constants::icm_to_K * mol.frequencies();
+        auto w = Numlib::Constants::icm_to_K * mol.vib().frequencies();
         double sv = 0.0;
         for (auto wi : w) {
             if (wi < 0.0) { // ignore imaginary frequencies
@@ -314,7 +314,7 @@ double Chem::entropy_vib(const Chem::Molecule& mol, double temp)
 
 double Chem::thermal_energy_vib(const Chem::Molecule& mol, double temp)
 {
-    std::string rot_symm = mol.rot_symmetry();
+    std::string rot_symm = mol.rot().symmetry();
     double res = 0.0;
 
     if (rot_symm.find("atom") != std::string::npos) {
@@ -322,7 +322,7 @@ double Chem::thermal_energy_vib(const Chem::Molecule& mol, double temp)
     }
     else {
         Assert::dynamic<Assert::level(2)>(temp > 0.0);
-        auto w = Numlib::Constants::icm_to_K * mol.frequencies();
+        auto w = Numlib::Constants::icm_to_K * mol.vib().frequencies();
         double ev = 0.0;
         for (auto wi : w) {
             if (wi < 0.0) {
@@ -340,7 +340,7 @@ double Chem::thermal_energy_vib(const Chem::Molecule& mol, double temp)
 
 double Chem::const_vol_heat_vib(const Chem::Molecule& mol, double temp)
 {
-    std::string rot_symm = mol.rot_symmetry();
+    std::string rot_symm = mol.rot().symmetry();
     double res = 0.0;
 
     if (rot_symm.find("atom") != std::string::npos) {
@@ -348,7 +348,7 @@ double Chem::const_vol_heat_vib(const Chem::Molecule& mol, double temp)
     }
     else {
         Assert::dynamic<Assert::level(2)>(temp > 0.0);
-        auto w = Numlib::Constants::icm_to_K * mol.frequencies();
+        auto w = Numlib::Constants::icm_to_K * mol.vib().frequencies();
         double cv_v = 0.0;
         for (auto wi : w) {
             if (wi < 0.0) { // ignore imaginary frequencies
@@ -372,25 +372,25 @@ double Chem::qctcw(const Chem::Molecule& mol, double temp)
 
     double qtor = 1.0;
 
-    std::string rot_symm = mol.rot_symmetry();
+    std::string rot_symm = mol.rot().symmetry();
     if (rot_symm.find("atom") != std::string::npos) {
         qtor = 1.0;
     }
     else {
-        if (mol.tot_tor_minima() > 0) {
+        if (mol.tor().tot_minima() > 0) {
             Assert::dynamic<Assert::level(2)>(temp > 0.0);
             // Calculate free rotor partition function:
-            double imom = mol.tor_eff_moment();
+            double imom = mol.tor().eff_moment();
             imom *= au_to_kgm2;
-            double sig = mol.tor_symmetry_number();
+            double sig = mol.tor().symmetry_number();
             double qfr = std::sqrt(2.0 * pi * imom * k * temp) / (h_bar * sig);
 
             // Calculate partition function for harmonic oscillator and
             // intermediate case:
             double qho = 0.0;
             double qin = 0.0;
-            auto pot = mol.tor_pot_coeff();
-            auto freq = mol.tor_frequencies();
+            auto pot = mol.tor().pot_coeff();
+            auto freq = mol.tor().frequencies();
             Assert::dynamic<Assert::level(2)>(pot.size() == freq.size());
             for (Index i = 0; i < pot.size(); ++i) {
                 double ui = pot(i) * icm_to_K;
@@ -411,7 +411,7 @@ double Chem::const_vol_heat_tor(const Chem::Molecule& mol, double temp)
     // derivative of the thermal torsional energy with respect to
     // temperature (dEtor/dT) at constant N and V.
 
-    std::string rot_symm = mol.rot_symmetry();
+    std::string rot_symm = mol.rot().symmetry();
     double res = 0.0;
 
     if (rot_symm.find("atom") != std::string::npos) {

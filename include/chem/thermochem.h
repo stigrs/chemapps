@@ -221,8 +221,7 @@ inline double thermal_energy_rot(const Molecule& mol, double temp)
 
 inline double const_vol_heat_rot(const Molecule& mol)
 {
-    Molecule tmp(mol);
-    std::string rot_symm = tmp.rot_symmetry();
+    std::string rot_symm = mol.rot().symmetry();
 
     double res = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {
@@ -268,8 +267,7 @@ inline double entropy_tor(const Molecule& mol, double temp)
 {
     using namespace Numlib::Constants;
 
-    Molecule tmp(mol);
-    std::string rot_symm = tmp.rot_symmetry();
+    std::string rot_symm = mol.rot().symmetry();
 
     double res = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {
@@ -292,8 +290,7 @@ inline double thermal_energy_tor(const Molecule& mol, double temp)
 {
     using namespace Numlib::Constants;
 
-    Molecule tmp(mol);
-    std::string rot_symm = tmp.rot_symmetry();
+    std::string rot_symm = mol.rot().symmetry();
 
     double res = 0.0;
     if (rot_symm.find("atom") != std::string::npos) {

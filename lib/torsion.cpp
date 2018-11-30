@@ -1,39 +1,31 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 Stig Rune Sellevag
 //
-// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
-#include <chem/impl/torsion.h>
+#include <chem/torsion.h>
 #include <numlib/constants.h>
-#include <stdutils/stdutils.h>
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
 #include <cassert>
 
-Chem::Impl::Torsion::Torsion(std::istream& from,
-                             const std::string& key,
-                             Geometry& g,
-                             Rotation& r)
-    : geom(g), rot(r)
+Chem::Torsion::Torsion(std::istream& from,
+                       const std::string& key,
+                       const std::vector<Chem::Element>& at,
+                       const Numlib::Mat<double>& x,
+                       const Numlib::Mat<double>& pa,
+                       const Numlib::Vec<double>& pm)
+    : atms(at), xyz(x), paxis(pa), pmom(pm)
 {
     using namespace Stdutils;
 
+    xyz /= Numlib::Constants::a_0; // convert geometry units to bohr
+
     perform_analysis = false;
 
-    xyz = Numlib::Mat<double>(0, 3);
     alpha = Numlib::zeros<Numlib::Mat<double>>(3, 3);
 
     rot_axis = Numlib::Vec<int>(0);
@@ -77,7 +69,7 @@ Chem::Impl::Torsion::Torsion(std::istream& from,
     validate();
 }
 
-void Chem::Impl::Torsion::analysis(std::ostream& to) const
+void Chem::Torsion::analysis(std::ostream& to) const
 {
     using namespace Numlib::Constants;
 
@@ -103,8 +95,8 @@ void Chem::Impl::Torsion::analysis(std::ostream& to) const
            << "Number  Symbol  Mass\n"
            << line('-') << '\n';
         for (Index i = 0; i < rot_top.size(); ++i) {
-            to << i + 1 << '\t' << geom.atoms()[i].atomic_symbol << '\t'
-               << fix(geom.atoms()[i].atomic_mass) << '\n';
+            to << i + 1 << '\t' << atms[i].atomic_symbol << '\t'
+               << fix(atms[i].atomic_mass) << '\n';
         }
         to << line('-') << "\n\n";
 
@@ -180,13 +172,8 @@ void Chem::Impl::Torsion::analysis(std::ostream& to) const
     }
 }
 
-double Chem::Impl::Torsion::red_moment()
+double Chem::Torsion::red_moment()
 {
-    // Work on a local copy of the XYZ and convert coordinates to bohr:
-
-    xyz = geom.cart_coord();
-    xyz /= Numlib::Constants::a_0;
-
     // Set up axis system for rotating top:
 
     axis_system();
@@ -200,7 +187,7 @@ double Chem::Impl::Torsion::red_moment()
 
     Numlib::Vec<double> rm(3);
     for (Index i = 0; i < rm.size(); ++i) {
-        rm(i) = Numlib::dot(top_origo, rot.principal_axes().row(i));
+        rm(i) = Numlib::dot(top_origo, paxis.row(i));
     }
 
     // Calculate moment of inertia of rotating top:
@@ -223,30 +210,34 @@ double Chem::Impl::Torsion::red_moment()
         betam(i) = alpha(2, i) * am - alpha(0, i) * bm - alpha(1, i) * cm +
                    um * (alpha(1, im1) * rm(ip1) - alpha(1, ip1) * rm(im1));
     }
+    double tot_mass = 0.0;
+    for (std::size_t i = 0; i < atms.size(); ++i) {
+        tot_mass += atms[i].atomic_mass;
+    }
     double lambdam = 0.0;
     for (int i = 0; i < 3; ++i) {
-        lambdam += std::pow(alpha(1, i) * um, 2.0) / geom.tot_mass() +
-                   std::pow(betam(i), 2.0) / rot.principal_moments()(i);
+        lambdam += std::pow(alpha(1, i) * um, 2.0) / tot_mass +
+                   std::pow(betam(i), 2.0) / pmom(i);
     }
     return am - lambdam;
 }
 
-void Chem::Impl::Torsion::validate() const
+void Chem::Torsion::validate() const
 {
     if (!rot_axis.empty()) {
         if (rot_axis.size() != 2) {
             throw std::runtime_error("bad rot_axis size");
         }
-        if (rot_axis(1) > narrow_cast<int>(geom.atoms().size())) {
+        if (rot_axis(1) > narrow_cast<int>(atms.size())) {
             throw std::runtime_error("bad rot_axis");
         }
     }
     if (!rot_top.empty()) {
-        if (rot_top.size() > narrow_cast<int>(geom.atoms().size())) {
+        if (rot_top.size() > narrow_cast<int>(atms.size())) {
             throw std::runtime_error("bad rot_top size");
         }
         for (auto ri : rot_top) {
-            if (ri > narrow_cast<int>(geom.atoms().size())) {
+            if (ri > narrow_cast<int>(atms.size())) {
                 throw std::runtime_error("bad center in rot_top");
             }
         }
@@ -273,7 +264,7 @@ void Chem::Impl::Torsion::validate() const
     }
 }
 
-void Chem::Impl::Torsion::axis_system()
+void Chem::Torsion::axis_system()
 {
     /*
       Definition of axis system for rotating top:
@@ -338,23 +329,27 @@ void Chem::Impl::Torsion::axis_system()
     z_axis /= z_norm;
 }
 
-void Chem::Impl::Torsion::center_of_mass()
+void Chem::Torsion::center_of_mass()
 {
+    double tot_mass = 0.0;
+    for (std::size_t i = 0; i < atms.size(); ++i) {
+        tot_mass += atms[i].atomic_mass;
+    }
     for (Index j = 0; j < xyz.cols(); ++j) {
         double sum = 0.0;
         for (Index i = 0; i < rot_top.size(); ++i) {
-            sum += geom.atoms()[i].atomic_mass * xyz(i, j);
+            sum += atms[i].atomic_mass * xyz(i, j);
         }
-        top_com(j) = sum / geom.tot_mass();
+        top_com(j) = sum / tot_mass;
     }
 }
 
-void Chem::Impl::Torsion::direction_cosines()
+void Chem::Torsion::direction_cosines()
 {
     for (int i = 0; i < 3; ++i) {
-        alpha(0, i) = Numlib::dot(x_axis, rot.principal_axes().column(i));
-        alpha(1, i) = Numlib::dot(y_axis, rot.principal_axes().column(i));
-        alpha(2, i) = Numlib::dot(z_axis, rot.principal_axes().column(i));
+        alpha(0, i) = Numlib::dot(x_axis, paxis.column(i));
+        alpha(1, i) = Numlib::dot(y_axis, paxis.column(i));
+        alpha(2, i) = Numlib::dot(z_axis, paxis.column(i));
     }
     if (Numlib::det(alpha) < 0.0) {
         alpha *= -1.0;
@@ -362,7 +357,7 @@ void Chem::Impl::Torsion::direction_cosines()
     assert(std::abs(Numlib::det(alpha) - 1.0) < 1.0e-12);
 }
 
-void Chem::Impl::Torsion::top_moment_of_inertia()
+void Chem::Torsion::top_moment_of_inertia()
 {
     // Project coordinates of rotating top onto the (x,y,z) coordinate system:
 
@@ -388,7 +383,7 @@ void Chem::Impl::Torsion::top_moment_of_inertia()
     um = 0.0;
 
     for (Index i = 0; i < top_xyz.rows(); ++i) {
-        double mass = geom.atoms()[rot_top(i)].atomic_mass;
+        double mass = atms[rot_top(i)].atomic_mass;
         double xi = top_xyz(i, 0);
         double yi = top_xyz(i, 1);
         double zi = top_xyz(i, 2);
@@ -399,7 +394,7 @@ void Chem::Impl::Torsion::top_moment_of_inertia()
     }
 }
 
-double Chem::Impl::Torsion::eff_moment() const
+double Chem::Torsion::eff_moment() const
 {
     double imom_eff = 0.0;
     if (tot_minima() > 0) {
@@ -411,7 +406,7 @@ double Chem::Impl::Torsion::eff_moment() const
     return imom_eff;
 }
 
-Numlib::Vec<double> Chem::Impl::Torsion::constant() const
+Numlib::Vec<double> Chem::Torsion::constant() const
 {
     using namespace Numlib::Constants;
 
@@ -425,107 +420,3 @@ Numlib::Vec<double> Chem::Impl::Torsion::constant() const
     return rotc;
 }
 
-#if 0
-void Torsion::analysis(std::ostream& to)
-{
-    srs::Format<char> line;
-    line.width(24).fill('=');
-
-    srs::Format<double> fix;
-    fix.fixed().width(10);
-
-    srs::Format<int> ifix;
-    ifix.fixed().width(11);
-
-    srs::Format<double> sci;
-    sci.scientific().precision(3);
-
-    if (perform_torsional_analysis) {
-        to << "\nTorsional Mode Analysis:\n" << line('=') << "\n\n";
-
-        line.width(28).fill('-');
-        to << "Atoms defining rotating top:\n"
-           << line('-') << '\n'
-           << "Center  Atomic  Atomic\n"
-           << "Number  Symbol  Mass\n"
-           << line('-') << '\n';
-        for (srs::size_t i = 0; i < rot_top.size(); ++i) {
-            to << i + 1 << '\t' << rot.atoms[i].atomic_symbol << '\t'
-               << fix(rot.atoms[i].atomic_mass) << '\n';
-        }
-        to << line('-') << "\n\n";
-
-        to << "Center " << rot_axis(0) + 1 << " and " << rot_axis(1) + 1
-           << " define axis of rotation\n\n";
-
-        fix.width(10).precision(6);
-        to << "Center of mass of top (x, y, z): " << fix(top_com(0)) << " "
-           << fix(top_com(1)) << " " << fix(top_com(2)) << '\n';
-
-        to << "Origin of coordinates (x, y, z): " << fix(top_origo(0)) << " "
-           << fix(top_origo(1)) << " " << fix(top_origo(2)) << "\n\n";
-
-        fix.width(9).precision(3);
-        to << "xz product of inertia: " << fix(bm) << " amu bohr^2\n"
-           << "yz product of inertia: " << fix(cm) << " amu bohr^2\n"
-           << "off-balance factor:    " << fix(um) << " amu bohr^2\n\n";
-
-        fix.width(0).precision(3);
-        to << "Moment of inertia of top:  " << fix(am) << " amu bohr^2, "
-           << sci(am * datum::au_to_kgm2) << " kg m^2\n";
-
-        to << "Reduced moment of inertia: " << fix(rmi_tor(0))
-           << " amu bohr^2, " << sci(rmi_tor(0) * datum::au_to_kgm2)
-           << " kg m^2\n\n";
-
-        const double factor = datum::giga / (datum::c_0 * 100.0);
-
-        to << "Rotational constant: " << fix(constant()(0)) << " GHz, "
-           << fix(constant()(0) * factor) << " cm^-1\n";
-    }
-    else {
-        if (!sigma_tor.empty()) {
-            line.width(32 + 11 * sigma_tor.size()).fill('-');
-            to << "\nTorsional modes:\n" << line('-') << '\n';
-            line.width(32).fill(' ');
-            to << line(' ');
-            for (srs::size_t i = 0; i < sigma_tor.size(); ++i) {
-                to << "  Minimum " << i + 1;
-            }
-            line.width(32 + 11 * sigma_tor.size()).fill('-');
-            to << '\n' << line('-') << '\n';
-
-            to << "Symmetry number:                ";
-            for (auto si : sigma_tor) {
-                to << ifix(si);
-            }
-            to << '\n';
-
-            fix.width(11).precision(3);
-            to << "Moment of inertia [amu bohr^2]: ";
-            for (auto ri : rmi_tor) {
-                to << fix(ri);
-            }
-            to << '\n';
-
-            to << "Potential energy [cm^-1]:       ";
-            for (auto pi : pot_tor) {
-                to << fix(pi);
-            }
-            to << '\n';
-
-            to << "Vibrational frequency [cm^-1]:  ";
-            for (auto vi : freq_tor) {
-                to << fix(vi);
-            }
-            to << '\n' << line('-') << '\n';
-
-            to << "Total number of minima:      " << tot_minima() << '\n'
-               << "Effective symmetry number:   " << symmetry_number() << '\n'
-               << "Effective moment of inertia: " << eff_moment_of_inertia()
-               << " amu bohr^2\n";
-        }
-    }
-}
-
-#endif

@@ -51,7 +51,7 @@ Chem::Troe::Troe(std::istream& from, Molecule& mol_) : mol(mol_)
     Assert::dynamic(n_free_rot >= 0, "bad number of free rotors");
     Assert::dynamic(n_morse_osc >= 0, "bad number of Morse oscillators");
 
-    zpe = mol.zero_point_energy();
+    zpe = mol.vib().zero_point_energy();
 }
 
 double Chem::Troe::f_energy(const double temp) const
@@ -61,7 +61,7 @@ double Chem::Troe::f_energy(const double temp) const
     double en = en_barrier + Whirab::a_corr(mol, en_barrier) * zpe;
     en = R * 1.0e-3 * temp / (en * icm_to_kJ);
 
-    auto s = mol.frequencies().size();
+    auto s = mol.vib().frequencies().size();
     double f_e = 0.0;
 
     for (Index i = 0; i < s; ++i) {
@@ -77,17 +77,17 @@ double Chem::Troe::f_rotation(const double temp) const
 
     double e0_azpe = en_barrier + Whirab::a_corr(mol, en_barrier) * zpe;
     double e0_kT = en_barrier / kT;
-    double f_rot   = 1.0;
-    auto s = mol.frequencies().size();
+    double f_rot = 1.0;
+    auto s = mol.vib().frequencies().size();
 
     switch (pot_type) {
-    case type1:  // no barrier
+    case type1: // no barrier
         if (mol.structure() == linear) {
             e0_azpe /= s * kT;
             e0_kT = 2.15 * std::pow(e0_kT, 1. / 3.);
             f_rot = e0_azpe * (e0_kT / (e0_kT - 1.0 + e0_azpe));
         }
-        else {  // nonlinear
+        else { // nonlinear
             e0_kT = std::pow(e0_kT, 1. / 3.);
             f_rot = (std::tgamma(s) / std::tgamma(s + 0.5 + 1.0)) *
                     std::pow(e0_azpe / kT, 1.5) *
@@ -95,12 +95,12 @@ double Chem::Troe::f_rotation(const double temp) const
                      (2.15 * e0_kT - 1.0 + e0_azpe / ((s + 0.5) * kT)));
         }
         break;
-    case type2:  // barrier
+    case type2: // barrier
         if (mol.structure() == linear) {
             e0_azpe /= s * kT;
             f_rot = e0_azpe * imom_ratio / (imom_ratio - 1.0 - e0_azpe);
         }
-        else {  // nonlinear
+        else { // nonlinear
             f_rot =
                 (std::tgamma(s) / std::tgamma(s + 0.5 + 1.0)) *
                 std::pow(e0_azpe / kT, 1.5) *
@@ -121,7 +121,7 @@ double Chem::Troe::f_free_rotor(const double temp) const
         double e0_azpe =
             (en_barrier + Whirab::a_corr(mol, en_barrier) * zpe) / kT;
 
-        auto s = mol.frequencies().size();
+        auto s = mol.vib().frequencies().size();
         auto r = n_free_rot;
 
         f_free_rot = (std::tgamma(s) / std::tgamma(s + 0.5 * r)) *
@@ -135,20 +135,20 @@ double Chem::Troe::f_hind_rotor(const double temp) const
     using namespace Numlib::Constants;
     double f_hind_rot = 1.0;
 
-    if (mol.tor_pot_coeff().size() > 0) {
+    if (mol.tor().pot_coeff().size() > 0) {
         const double kT = k * temp;
         const double f = icm_to_kJ * 1.0e+3 / N_A;
 
-        double v0 = Numlib::max(mol.tor_pot_coeff());
+        double v0 = Numlib::max(mol.tor().pot_coeff());
         if ((en_barrier / v0) <= 3.0) {
             throw std::runtime_error(
                 "Troe::f_hind_rotor(): E0/V0 <= 3, not implemented yet");
         }
         double a = Whirab::a_corr(mol, en_barrier);
-        double s = mol.frequencies().size();
-        double n = mol.tor_symmetry_number();
-        double b = Numlib::max(mol.tor_constant()) * 100.0;
-        double v0f  = v0 * f;
+        double s = mol.vib().frequencies().size();
+        double n = mol.tor().symmetry_number();
+        double b = Numlib::max(mol.tor().constant()) * 100.0;
+        double v0f = v0 * f;
         double e0 = en_barrier * f;
         double zpef = zpe * f;
 

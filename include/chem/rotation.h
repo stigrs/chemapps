@@ -10,6 +10,7 @@
 #include <chem/element.h>
 #include <numlib/math.h>
 #include <numlib/matrix.h>
+#include <stdutils/stdutils.h>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -43,6 +44,9 @@ public:
 
     // Perform rotational analysis.
     void analysis(std::ostream& to = std::cout) const;
+
+    // Set new Cartesian coordinates.
+    void set(const Numlib::Mat<double>& x);
 
     // Get rotational symmetry number.
     auto sigma() const { return sigma_; }
@@ -93,6 +97,14 @@ inline Rotation::Rotation(const std::vector<Element>& at,
                           int sig)
     : atms(at), xyz(x), pmom(3), paxis(3, 3), sigma_{sig}
 {
+    rotate_to_principal_axes();
+}
+
+inline void Rotation::set(const Numlib::Mat<double>& x)
+{
+    Assert::dynamic(Numlib::same_extents(xyz, x),
+                    "bad size of Cartesian coordinates");
+    xyz = x;
     rotate_to_principal_axes();
 }
 

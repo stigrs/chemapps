@@ -1,154 +1,157 @@
-////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2017 Stig Rune Sellevag
 //
-// Copyright (c) 2017 Stig Rune Sellevag. All rights reserved.
-//
-// This code is licensed under the MIT License (MIT).
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-//
-////////////////////////////////////////////////////////////////////////////////
+// This file is distributed under the MIT License. See the accompanying file
+// LICENSE.txt or http://www.opensource.org/licenses/mit-license.php for terms
+// and conditions.
 
 #ifndef CHEM_TORSION_H
 #define CHEM_TORSION_H
 
-#include <chem/impl/geometry.h>
-#include <chem/impl/rotation.h>
+#include <chem/element.h>
 #include <numlib/traits.h>
 #include <numlib/matrix.h>
+#include <numlib/math.h>
+#include <stdutils/stdutils.h>
 #include <iostream>
 #include <string>
+#include <vector>
 
 namespace Chem {
 
-namespace Impl {
+// Class for handling torsional modes in molecules using the CT-Cw scheme.
+//
+// Algorithm:
+//   The reduced moment of inertia of a symmetrical or unsymmetrical rotating
+//   top attached to a rigid frame is calculated according to eq 1 in
+//   Pitzer, K. S. J. Chem. Phys. 1946, vol. 14, pp. 239-243, also known as
+//   the curvilinear (C) scheme.
+//
+//   The CT-Cw scheme is described in the following paper: Chuang, Y.-Y.;
+//   Truhlar, D. G. J. Chem. Phys. 2000, vol. 112, p. 1221.
+//
+// Note:
+//   Atoms specifying the rotational axis must not be included in the list
+//   of atoms specifying the rotating top.
+//
+class Torsion {
+public:
+    Torsion() = default;
 
-    // Class for handling torsional modes in molecules using the CT-Cw scheme.
-    //
-    // Algorithm:
-    // ----------
-    // The reduced moment of inertia of a symmetrical or unsymmetrical rotating
-    // top attached to a rigid frame is calculated according to eq 1 in
-    // Pitzer, K. S. J. Chem. Phys. 1946, vol. 14, pp. 239-243, also known as
-    // the curvilinear (C) scheme.
-    //
-    // The CT-Cw scheme is described in the following paper: Chuang, Y.-Y.;
-    //  Truhlar, D. G. J. Chem. Phys. 2000, vol. 112, p. 1221.
-    //
-    // Note:
-    // -----
-    // Atoms specifying the rotational axis must not be included in the list
-    // of atoms specifying the rotating top.
-    //
-    class Torsion {
-    public:
-        Torsion() = delete;
+    Torsion(std::istream& from,
+            const std::string& key,
+            const std::vector<Element>& at,
+            const Numlib::Mat<double>& x,
+            const Numlib::Mat<double>& pa,
+            const Numlib::Vec<double>& pm);
 
-        Torsion(Geometry& g, Rotation& r)
-            : geom(g), rot(r), perform_analysis{false}
-        {
-            alpha = Numlib::zeros<Numlib::Mat<double>>(3, 3);
-            top_origo = Numlib::zeros<Numlib::Vec<double>>(3);
-            top_com = Numlib::zeros<Numlib::Vec<double>>(3);
-        }
+    // Copy semantics:
+    Torsion(const Torsion&) = default;
+    Torsion& operator=(const Torsion&) = default;
 
-        Torsion(std::istream& from,
-                const std::string& key,
-                Geometry& g,
-                Rotation& r);
+    // Move semantics:
+    Torsion(Torsion&&) = default;
+    Torsion& operator=(Torsion&&) = default;
 
-        // Copy semantics:
-        Torsion(const Torsion&) = default;
-        Torsion& operator=(const Torsion&) = default;
+    ~Torsion() = default;
 
-        // Move semantics:
-        Torsion(Torsion&&) = default;
-        Torsion& operator=(Torsion&&) = default;
+    // Perform torsional mode analysis.
+    void analysis(std::ostream& to) const;
 
-        ~Torsion() = default;
+    // Set new Cartesian coordinates.
+    void set(const Numlib::Mat<double>& x,
+             const Numlib::Mat<double>& pa,
+             const Numlib::Vec<double>& pm);
 
-        // Perform torsional mode analysis.
-        void analysis(std::ostream& to) const;
+    // Get total number of minima (eq 1 in C&T, 2000).
+    int tot_minima() const { return Numlib::sum(sigma_tor); }
 
-        // Get total number of minima (eq 1 in C&T, 2000).
-        int tot_minima() const { return Numlib::sum(sigma_tor); }
+    // Calculate effective symmetry number.
+    double symmetry_number() const;
 
-        // Calculate effective symmetry number.
-        double symmetry_number() const;
+    // Calculate reduced moment of inertia.
+    double red_moment();
 
-        // Calculate reduced moment of inertia.
-        double red_moment();
+    // Calculate effective moment of inertia.
+    double eff_moment() const;
 
-        // Calculate effective moment of inertia.
-        double eff_moment() const;
+    // Calculate rotational constant for torsional mode.
+    Numlib::Vec<double> constant() const;
 
-        // Calculate rotational constant for torsional mode.
-        Numlib::Vec<double> constant() const;
+    // Return potential coefficients.
+    const auto& pot_coeff() const { return pot_tor; }
 
-        // Return potential coefficients.
-        const auto& pot_coeff() const { return pot_tor; }
+    // Return torsional frequencies.
+    const auto& frequencies() const { return freq_tor; }
 
-        // Return torsional frequencies.
-        const auto& frequencies() const { return freq_tor; }
+private:
+    // Validate input data.
+    void validate() const;
 
-    private:
-        // Validate input data.
-        void validate() const;
+    // Set up axis system for rotating top.
+    void axis_system();
 
-        // Set up axis system for rotating top.
-        void axis_system();
+    // Calculate center of mass for rotating top.
+    void center_of_mass();
 
-        // Calculate center of mass for rotating top.
-        void center_of_mass();
+    // Set up direction cosines matrix.
+    void direction_cosines();
 
-        // Set up direction cosines matrix.
-        void direction_cosines();
+    // Calculate moment of inertia of rotating top.
+    void top_moment_of_inertia();
 
-        // Calculate moment of inertia of rotating top.
-        void top_moment_of_inertia();
+    std::vector<Element> atms;
 
-        Geometry& geom;
-        Rotation& rot;
+    Numlib::Mat<double> xyz;
+    Numlib::Mat<double> paxis;
+    Numlib::Vec<double> pmom;
 
-        bool perform_analysis;
+    Numlib::Mat<double> alpha; // direction cosines
 
-        Numlib::Mat<double> xyz;   // local copy of Cartesian coordinates
-        Numlib::Mat<double> alpha; // direction cosines
+    Numlib::Vec<int> rot_axis;  // rotational axis
+    Numlib::Vec<int> rot_top;   // rotating top moiety
+    Numlib::Vec<int> sigma_tor; // symmetry number
 
-        Numlib::Vec<int> rot_axis;  // rotational axis
-        Numlib::Vec<int> rot_top;   // rotating top moiety
-        Numlib::Vec<int> sigma_tor; // symmetry number
+    Numlib::Vec<double> rmi_tor;  // red. moment of inertia
+    Numlib::Vec<double> pot_tor;  // potential coefficients
+    Numlib::Vec<double> freq_tor; // torsional frequencies
 
-        Numlib::Vec<double> rmi_tor;  // red. moment of inertia
-        Numlib::Vec<double> pot_tor;  // potential coefficients
-        Numlib::Vec<double> freq_tor; // torsional frequencies
+    Numlib::Vec<double> x_axis; // x axis of rotating top
+    Numlib::Vec<double> y_axis; // y axis of rotating top
+    Numlib::Vec<double> z_axis; // z axis of rotating top
 
-        Numlib::Vec<double> x_axis; // x axis of rotating top
-        Numlib::Vec<double> y_axis; // y axis of rotating top
-        Numlib::Vec<double> z_axis; // z axis of rotating top
+    Numlib::Vec<double> top_origo; // origo of rotating top
+    Numlib::Vec<double> top_com;   // center of mass of rotating top
 
-        Numlib::Vec<double> top_origo; // origo of rotating top
-        Numlib::Vec<double> top_com;   // center of mass of rotating top
+    double am; // moment of inertia of rotating top
+    double bm; // xz product of inertia
+    double cm; // yz product of inertia
+    double um; // off-balance factor
 
-        double am; // moment of inertia of rotating top
-        double bm; // xz product of inertia
-        double cm; // yz product of inertia
-        double um; // off-balance factor
-    };
+    bool perform_analysis;
+};
 
-    inline double Torsion::symmetry_number() const
-    {
-        // Eq. 8 in Chuang and Truhlar (2000):
-        return tot_minima() / narrow_cast<double>(sigma_tor.size());
-    }
+inline void Torsion::set(const Numlib::Mat<double>& x,
+                         const Numlib::Mat<double>& pa,
+                         const Numlib::Vec<double>& pm)
+{
+    Assert::dynamic(Numlib::same_extents(xyz, x),
+                    "bad size of Cartesian coordinates");
+    Assert::dynamic(Numlib::same_extents(paxis, pa),
+                    "bad size of principal axes");
+    Assert::dynamic(Numlib::same_extents(pmom, pm),
+                    "bad size of principal moments");
+    xyz = x;
+    paxis = pa;
+    pmom = pm;
+}
 
-} // namespace Impl
+inline double Torsion::symmetry_number() const
+{
+    // Eq. 8 in Chuang and Truhlar (2000):
+    return tot_minima() / narrow_cast<double>(sigma_tor.size());
+}
 
 } // namespace Chem
 
 #endif // CHEM_TORSION_H
+

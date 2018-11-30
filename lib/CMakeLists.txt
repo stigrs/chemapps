@@ -14,29 +14,29 @@ endif()
 
 set(
     SRC_FILES
-    #collision.cpp
-    #elec_state.cpp
-    #energy_levels.cpp
+    collision.cpp
+    electronic.cpp
+    energy_levels.cpp
     #gamss.cpp
-    #gauss_data.cpp
-    #gaussian.cpp
+    gauss_data.cpp
+    gaussian.cpp
     geometry.cpp
     io.cpp
     #mcmm.cpp
     molecule.cpp
-    #mopac.cpp
+    mopac.cpp
     periodic_table.cpp
     rotation.cpp
-    #statecount.cpp
-    #thermochem.cpp
-    #thermodata.cpp
-    #torsion.cpp
-    #troe.cpp
-    #tst.cpp
-    #tunnel.cpp
-    #units.cpp
+    statecount.cpp
+    thermochem.cpp
+    thermodata.cpp
+    torsion.cpp
+    troe.cpp
+    tst.cpp
+    tunnel.cpp
+    units.cpp
     vibration.cpp
-    #whirab.cpp
+    whirab.cpp
 )
 add_library(
     chem 

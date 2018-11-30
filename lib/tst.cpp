@@ -65,12 +65,12 @@ Chem::Tst::Tst(std::istream& from,
 
     // Initialize reactants and transition state:
 
-    ra = std::make_unique<Chem::Molecule>(from, to, "ReactantA", verbose);
+    ra = Chem::Molecule(from, to, "ReactantA", verbose);
 
     if (reaction == Bimolecular) {
-        rb = std::make_unique<Chem::Molecule>(from, to, "ReactantB", verbose);
+        rb = Chem::Molecule(from, to, "ReactantB", verbose);
     }
-    ts = std::make_unique<Chem::Molecule>(from, to, "TransitionState", verbose);
+    ts = Chem::Molecule(from, to, "TransitionState", verbose);
 }
 
 void Chem::Tst::conventional(std::ostream& to) const
@@ -78,11 +78,11 @@ void Chem::Tst::conventional(std::ostream& to) const
     Numlib::Vec<double> temp = td.get_temperature();
     Numlib::Vec<double> pressure = {0.0};
 
-    Chem::thermochemistry(*ra, temp, pressure, false, to);
+    Chem::thermochemistry(ra, temp, pressure, false, to);
     if (reaction == Bimolecular) {
-        Chem::thermochemistry(*rb, temp, pressure, false, to);
+        Chem::thermochemistry(rb, temp, pressure, false, to);
     }
-    Chem::thermochemistry(*ts, temp, pressure, false, to);
+    Chem::thermochemistry(ts, temp, pressure, false, to);
 
     Stdutils::Format<char> line;
     line.width(37).fill('=');
@@ -145,11 +145,11 @@ double Chem::Tst::rate_conventional(double temp) const
 
     Assert::dynamic<Assert::level(2)>(temp > 0.0, "bad temperature");
 
-    double qts = Chem::qtot(*ts, temp, 0.0, false, "V=0");
-    double qa = Chem::qtot(*ra, temp, 0.0, false, "V=0");
+    double qts = Chem::qtot(ts, temp, 0.0, false, "V=0");
+    double qa = Chem::qtot(ra, temp, 0.0, false, "V=0");
     double qb = 1.0;
     if (reaction == Bimolecular) {
-        qb = Chem::qtot(*rb, temp, 0.0, false, "V=0");
+        qb = Chem::qtot(rb, temp, 0.0, false, "V=0");
     }
     double ktst = sigma_rxn * mega * k * temp / h;
     ktst *= (qts / (qa * qb)) * std::exp(-en_barrier * kilo / (R * temp));

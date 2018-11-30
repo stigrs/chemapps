@@ -12,12 +12,21 @@ Chem::Molecule::Molecule(std::istream& from,
                          std::ostream& to,
                          const std::string& key,
                          bool verbose)
-    : geom_(from, key)
+    : elec_(from, key),
+      geom_(from, key),
+      rot_(from, key, geom_.atoms(), geom_.get_xyz()),
+      vib_(from,
+           key,
+           geom_.atoms(),
+           rot_.get_xyz_paxis(),
+           rot_.principal_axes()),
+      tor_(from,
+           key,
+           geom_.atoms(),
+           rot_.get_xyz_paxis(),
+           rot_.principal_axes(),
+           rot_.principal_moments())
 {
-    rot_ = Chem::Rotation(from, key, geom_.atoms(), geom_.get_xyz());
-    vib_ = Chem::Vibration(from, key, geom_.atoms(), rot_.get_xyz_paxis(),
-                           rot_.principal_axes());
-
     if (verbose) {
         Stdutils::Format<char> line;
         line.width(15 + key.size()).fill('=');
@@ -26,17 +35,24 @@ Chem::Molecule::Molecule(std::istream& from,
         fix.fixed().precision(6);
 
         to << "Input data on " << key << ":\n" << line('=') << '\n';
-#if 0
-        to << "Electronic energy: " << fix(elec.elec_energy()) << " Hartree\n"
-           << "Charge: " << elec.net_charge() << '\n'
-           << "Spin multiplicity: " << elec.spin_mult() << '\n';
-        Chem::Impl::print_spin_orbit_states(to, elec.spin_orbit_degen(),
-                                            elec.spin_orbit_energy());
-#endif
+        to << "Electronic energy: " << fix(elec_.energy()) << " Hartree\n"
+           << "Charge: " << elec_.charge() << '\n'
+           << "Spin multiplicity: " << elec_.spin_mult() << '\n';
+        Chem::print_spin_orbit_states(to, elec_.spin_orbit_degen(),
+                                      elec_.spin_orbit_energy());
         to << "\nInput orientation:\n";
         Chem::print_geometry(to, geom_.atoms(), geom_.get_xyz());
         Chem::print_atomic_masses(to, geom_.atoms());
         vib_.print(to);
     }
+}
+
+double Chem::Molecule::tot_mass() const
+{
+    double res = 0.0;
+    for (const auto& at : atoms()) {
+        res += at.atomic_mass;
+    }
+    return res;
 }
 

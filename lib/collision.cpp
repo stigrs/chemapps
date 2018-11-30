@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <chem/collision.h>
-#include <chem/impl/io_support.h>
+#include <chem/io.h>
 #include <chem/periodic_table.h>
 #include <stdutils/stdutils.h>
 #include <stdexcept>
@@ -43,7 +43,7 @@ Chem::Collision::Collision(std::istream& from, const std::string& key)
         get_token_value(from, pos, "vibr_high", vibr_high, 0.0);
         pos = find_token(from, "mol_formula", pos);
         if (pos != -1) {
-            Chem::Impl::read_mol_formula(from, mol_formula);
+            Chem::read_mol_formula(from, mol_formula);
         }
     }
     // Validate input data:

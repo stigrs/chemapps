@@ -61,15 +61,15 @@ void Chem::Mopac::run(Chem::Molecule& mol) const
         ok = false; // optimization failed
     }
     if (ok) {
-        mol.set_elec_energy(get_heat_of_formation()); // update energy
+        mol.elec().set_energy(get_heat_of_formation()); // update energy
 
-        Numlib::Mat<double> xyz = mol.cart_coord();
+        Numlib::Mat<double> xyz = mol.get_xyz();
         get_xyz(xyz);
-        mol.set_cart_coord(xyz); // update Cartesian coordinates
+        mol.set_xyz(xyz); // update Cartesian coordinates
     }
     else { // calculation failed to converge; set energy to infinity
         constexpr double emax = std::numeric_limits<double>::max();
-        mol.set_elec_energy(emax);
+        mol.elec().set_energy(emax);
     }
 }
 
@@ -77,7 +77,7 @@ void Chem::Mopac::write_dat(const Chem::Molecule& mol) const
 {
     std::ofstream to;
     Stdutils::fopen(to, jobname + ".dat");
-    to << keywords << '\n' << mol.info() << "\n\n";
+    to << keywords << '\n' << mol.title() << "\n\n";
     write_xyz(to, mol);
 }
 
@@ -88,8 +88,8 @@ void Chem::Mopac::write_xyz(std::ostream& to, const Chem::Molecule& mol) const
 
     for (std::size_t i = 0; i < mol.num_atoms(); ++i) {
         to << mol.atoms()[i].atomic_symbol << '\t';
-        for (Index j = 0; j < mol.cart_coord().cols(); ++j) {
-            to << fix(mol.cart_coord()(i, j)) << " " << opt_geom << " ";
+        for (Index j = 0; j < mol.get_xyz().cols(); ++j) {
+            to << fix(mol.get_xyz()(i, j)) << " " << opt_geom << " ";
         }
         to << '\n';
     }

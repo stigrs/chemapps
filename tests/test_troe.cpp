@@ -27,7 +27,6 @@
 #include <cmath>
 #include <fstream>
 
-
 TEST_CASE("test_troe")
 {
     SECTION("h2o_ar")
@@ -40,7 +39,7 @@ TEST_CASE("test_troe")
         Chem::Molecule mol(from);
 
         Numlib::Vec<double> freqs_ans = {3657.05, 1594.59, 3755.79};
-        auto freqs = mol.frequencies();
+        auto freqs = mol.vib().frequencies();
         for (Index i = 0; i < freqs.size(); ++i) {
             CHECK(std::abs(freqs(i) - freqs_ans(i)) < 1.0e-12);
         }
@@ -81,8 +80,8 @@ TEST_CASE("test_troe")
         CHECK((std::abs(z_lj - 1.80e+14) / 1.80e+14) < 1.0e-2);
 
         rho /= cal_to_J;
-        double k0
-            = z_lj * (rho * kT / qvib) * f_anh * f_e * f_rot * f_hind * f_free;
+        double k0 =
+            z_lj * (rho * kT / qvib) * f_anh * f_e * f_rot * f_hind * f_free;
         CHECK((std::abs(k0 - 4.1e+17) / 4.1e+17) < 1.0e-1);
 
         temp = 2000.0;

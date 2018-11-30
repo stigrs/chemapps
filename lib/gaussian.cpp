@@ -75,15 +75,15 @@ void Chem::Gaussian::run(Chem::Molecule& mol) const
         ok = false;
     }
     if (ok) {
-        mol.set_elec_energy(data.get_scf_zpe_energy()[0]); // update energy
+        mol.elec().set_energy(data.get_scf_zpe_energy()[0]); // update energy
 
         Chem::Gauss_coord coord;
         data.get_opt_cart_coord(coord);
-        mol.set_cart_coord(coord.xyz); // update Cartesian coordinates
+        mol.set_xyz(coord.xyz); // update Cartesian coordinates
     }
     else { // calculation failed to converge; set energy to infinity:
         constexpr double emax = std::numeric_limits<double>::max();
-        mol.set_elec_energy(emax);
+        mol.elec().set_energy(emax);
     }
 }
 
@@ -99,15 +99,15 @@ void Chem::Gaussian::write_com(const Chem::Molecule& mol) const
         to << "%nosave\n";
     }
     to << "# " << keywords << "\n\n"
-       << mol.info() << "\n\n"
-       << mol.net_charge() << " " << mol.spin_mult() << '\n';
+       << mol.title() << "\n\n"
+       << mol.elec().charge() << " " << mol.elec().spin_mult() << '\n';
 
     Stdutils::Format<double> fix;
     fix.fixed().width(10).precision(6);
     for (std::size_t i = 0; i < mol.num_atoms(); ++i) {
         to << mol.atoms()[i].atomic_symbol << '\t';
-        for (Index j = 0; j < mol.cart_coord().cols(); ++j) {
-            to << fix(mol.cart_coord()(i, j)) << "  ";
+        for (Index j = 0; j < mol.get_xyz().cols(); ++j) {
+            to << fix(mol.get_xyz()(i, j)) << "  ";
         }
         to << '\n';
     }

@@ -21,7 +21,6 @@
 #include <chem/thermodata.h>
 #include <chem/tunnel.h>
 #include <iostream>
-#include <memory>
 
 namespace Chem {
 
@@ -63,9 +62,9 @@ private:
     Thermodata td; // thermochemistry parameters
     Tunnel kappa;  // tunneling correction
 
-    std::unique_ptr<Molecule> ra; // reactant A
-    std::unique_ptr<Molecule> rb; // reactant B
-    std::unique_ptr<Molecule> ts; // transition state
+    Molecule ra; // reactant A
+    Molecule rb; // reactant B
+    Molecule ts; // transition state
 
     double en_barrier; // reaction barrier (kJ/mol)
     int sigma_rxn;     // reaction symmetry number

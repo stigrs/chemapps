@@ -27,10 +27,10 @@ Numlib::Vec<double> Chem::Statecount::count(const Chem::Molecule& mol,
                                             bool sum)
 {
     Numlib::Vec<double> rot;
-    if (mol.tot_tor_minima() > 0) {
-        double sigma = mol.tor_symmetry_number();
-        double rotc = Numlib::max(mol.tor_constant());
-        double barrier = Numlib::max(mol.tor_pot_coeff());
+    if (mol.tor().tot_minima() > 0) {
+        double sigma = mol.tor().symmetry_number();
+        double rotc = Numlib::max(mol.tor().constant());
+        double barrier = Numlib::max(mol.tor().pot_coeff());
         if (barrier < 0.01) { // free rotor
             rot = free_rotor(sigma, rotc, ngrains, egrain, sum);
         }
@@ -38,7 +38,7 @@ Numlib::Vec<double> Chem::Statecount::count(const Chem::Molecule& mol,
             rot = hindered_rotor(sigma, rotc, barrier, ngrains, egrain, sum);
         }
     }
-    return bswine(mol.frequencies(), ngrains, egrain, sum, rot);
+    return bswine(mol.vib().frequencies(), ngrains, egrain, sum, rot);
 }
 
 Numlib::Vec<double> Chem::Statecount::bswine(const Numlib::Vec<double>& vibr,

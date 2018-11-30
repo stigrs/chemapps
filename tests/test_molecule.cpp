@@ -32,31 +32,29 @@ TEST_CASE("test_molecule")
     Molecule mol(from);
 
     SECTION("num_atoms") { CHECK(mol.num_atoms() == 8); }
-#if 0
-    SECTION("net_charge") { CHECK(mol.net_charge() == 0); }
 
-    SECTION("spin_mult") { CHECK(mol.spin_mult() == 2); }
+    SECTION("charge") { CHECK(mol.elec().charge() == 0); }
 
-    SECTION("elec_energy")
-    {
-        CHECK(std::abs(mol.elec_energy() + 0.5) < 1.0e-12);
-    }
+    SECTION("spin_mult") { CHECK(mol.elec().spin_mult() == 2); }
+
+    SECTION("energy") { CHECK(std::abs(mol.elec().energy() + 0.5) < 1.0e-12); }
 
     SECTION("spin-orbit")
     {
         Vec<int> degen_ans = {2, 2};
         Vec<double> energy_ans = {0.0, 140.0};
 
-        CHECK(same_extents(mol.spin_orbit_degen(), mol.spin_orbit_energy()));
+        CHECK(same_extents(mol.elec().spin_orbit_degen(),
+                           mol.elec().spin_orbit_energy()));
 
-        CHECK(mol.spin_orbit_degen() == degen_ans);
+        CHECK(mol.elec().spin_orbit_degen() == degen_ans);
 
         for (Index i = 0; i < degen_ans.size(); ++i) {
-            CHECK(std::abs(mol.spin_orbit_energy()(i) - energy_ans(i)) <
+            CHECK(std::abs(mol.elec().spin_orbit_energy()(i) - energy_ans(i)) <
                   1.0e-12);
         }
     }
-#endif
+
     SECTION("geometry")
     {
         Mat<double> ans = {
