@@ -17,7 +17,7 @@ set(
     collision.cpp
     electronic.cpp
     energy_levels.cpp
-    gamss.cpp
+    gamcs.cpp
     gauss_data.cpp
     gaussian.cpp
     geometry.cpp

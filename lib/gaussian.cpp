@@ -65,11 +65,10 @@ void Chem::Gaussian::run(Chem::Molecule& mol) const
         ok = false;
     }
     if (ok) {
-        mol.elec().set_energy(data.get_scf_zpe_energy()[0]); // update energy
-
         Chem::Gauss_coord coord;
         data.get_opt_cart_coord(coord);
         mol.set_xyz(coord.xyz); // update Cartesian coordinates
+        mol.elec().set_energy(data.get_scf_zpe_energy()[0]); // update energy
     }
     else { // calculation failed to converge; set energy to infinity:
         constexpr double emax = std::numeric_limits<double>::max();

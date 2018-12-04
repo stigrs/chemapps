@@ -117,9 +117,12 @@ inline void Molecule::set_xyz(const Numlib::Mat<double>& x)
 {
     Assert::dynamic(Numlib::same_extents(geom_.get_xyz(), x),
                     "bad size of Cartesian coordinates");
+
+    // Geometry has changed; set molecule in proper state:
+    elec_.set_energy(0.0);
     geom_.set_xyz(x);
     rot_.set(x);
-    vib_ = Vibration(); // geometry has changed; frequencies no longer valid
+    vib_ = Vibration();
     tor_.set(x, rot_.principal_axes(), rot_.principal_moments());
 }
 

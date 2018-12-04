@@ -11,7 +11,7 @@
 
 #include <chem/gaussian.h>
 #include <chem/mopac.h>
-#include <chem/gamss.h>
+#include <chem/gamcs.h>
 #include <chem/molecule.h>
 #include <stdutils/stdutils.h>
 #include <cxxopts.hpp>
@@ -29,7 +29,7 @@
 int main(int argc, char* argv[])
 {
     // clang-format off
-    cxxopts::Options options(argv[0], "Genetic Algorithm Molecular Structure Search");
+    cxxopts::Options options(argv[0], "Genetic Algorithm Molecular Conformer Search");
     options.add_options()
         ("h,help", "display help message")
         ("f,file", "input file", cxxopts::value<std::string>()) 
@@ -61,11 +61,11 @@ int main(int argc, char* argv[])
         Stdutils::fopen(from, input_file);
 
         if (pot == "Gaussian" || pot == "gaussian") {
-            Chem::Gamss<Chem::Gaussian> ga(from);
+            Chem::Gamcs<Chem::Gaussian> ga(from);
             ga.solve();
         }
         else {
-            Chem::Gamss<Chem::Mopac> ga(from);
+            Chem::Gamcs<Chem::Mopac> ga(from);
             ga.solve();
         }
     }

@@ -58,7 +58,7 @@ set(PROGRAMS
     caprate
     cartoxyz
     fchktoxyz
-    gamss
+    gamcs
     gausscan
     gausscp
     gaussfreq

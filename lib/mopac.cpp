@@ -51,11 +51,10 @@ void Chem::Mopac::run(Chem::Molecule& mol) const
         ok = false; // optimization failed
     }
     if (ok) {
-        mol.elec().set_energy(get_heat_of_formation()); // update energy
-
         Numlib::Mat<double> xyz = mol.get_xyz();
         get_xyz(xyz);
         mol.set_xyz(xyz); // update Cartesian coordinates
+        mol.elec().set_energy(get_heat_of_formation()); // update energy
     }
     else { // calculation failed to converge; set energy to infinity
         constexpr double emax = std::numeric_limits<double>::max();
