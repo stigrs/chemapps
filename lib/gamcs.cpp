@@ -137,6 +137,8 @@ void Chem::Gamcs<Pot>::solve(std::ostream& to)
     std::uniform_real_distribution<> rnd_uni_real(0.0, 1.0);
 
     int iter = 0;
+    int nsuccess = 0;
+    int nfailed = 0;
     bool converged = false;
     std::string status = "";
 
@@ -190,21 +192,25 @@ void Chem::Gamcs<Pot>::solve(std::ostream& to)
             compute_fitness();
             min_energy.push_back(population[0].energy); // update energy log
             status = "success";
+            ++nsuccess;
         }
         else {
             status = "failed";
+            ++nfailed;
         }
         // Check convergence:
         if (energy_converged(iter)) {
             converged = true;
         }
-        to << ifix(iter) << "  " << dfix(population[0].energy) << "  "
+        to << ifix(iter + 1) << "  " << dfix(population[0].energy) << "  "
            << sci(ediff_global) << "  " << sci(energy_var) << "  " << status
            << std::endl;
 
         ++iter;
     }
-    to << line('-') << "\n\n";
+    to << line('-') << '\n'
+       << "Number of successful trials: " << nsuccess << '\n'
+       << "Number of failed trials:     " << nfailed << "\n\n";
 
     line.width(13).fill('-');
     to << "Local minima:\n" << line('-') << '\n';
@@ -246,6 +252,7 @@ void Chem::Gamcs<Pot>::init_population(std::ostream& to)
     }
     sort_population();
     compute_fitness();
+    estart = population[0].energy; // save initial energy of global minimum
 
     Stdutils::Format<char> line;
     line.width(19).fill('-');
@@ -521,9 +528,10 @@ void Chem::Gamcs<Pot>::print_global_minimum(std::ostream& to) const
     Stdutils::Format<double> fix;
     fix.fixed().width(12).precision(6);
 
-    to << "Estimated global minimum:\n" << line('-') << '\n';
-    to << "Conformer: " << 1 << '\n'
-       << "Energy: " << fix(population[0].energy) << '\n';
+    to << "Estimated global minimum:\n"
+       << line('-') << '\n'
+       << "E(start): " << fix(estart) << '\n'
+       << "E(final): " << fix(population[0].energy) << '\n';
     Chem::print_geometry(to, mol.atoms(), population[0].xyz);
     to << std::endl;
 }

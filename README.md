@@ -19,6 +19,7 @@ and chemical kinetics.
 * Calculation of Wigner [5] and Eckart tunneling corrections [6-8]
 * Conformer search using an internal coordinate Monte Carlo Multiple 
   Minima (MCMM) technique with uniform usage scheme [9,10]
+* Conformer search using a genetic algorithm [11]
 * Interface to MOPAC 7, MOPAC 5.022mn, and Gaussian
 
 ## Code of Conduct
@@ -116,3 +117,6 @@ errors in MOPAC on different platforms.
 9.  Li, Z.; Scheraga, H. A. Proc. Natl. Acad. Sci., 1987, vol. 84, p. 6611.
 10. Chang, G.; Guida, W. C.; Still, C. J. Am. Chem. Soc., 1989, vol. 111,
     p. 4379.
+11. Sudapy, A.; Blum, V.; Baldauf, C. J. Chem. Inf. Model, 2015, vol. 55,
+    p. 2338.
+

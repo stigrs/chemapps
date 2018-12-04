@@ -19,6 +19,11 @@ namespace Chem {
 
 // Class providing molecular structure search using a genetic algorithm.
 //
+// Algorithm:
+//   First-principles molecular structure search with a genetic algorithm.
+//   Sudapy, A.; Blum, V.; Baldauf, C. J. Chem. Inf. Model, 2015, vol. 55,
+//   pp. 2338-2348.
+//
 template <class Pot>
 class Gamcs {
 public:
@@ -94,6 +99,7 @@ private:
     double energy_var;   // lowest energy variance permitted
     double energy_tol;   // energy convergence tolerance
     double ediff_global; // energy difference for global minimum
+    double estart;       // energy of global minimum before optimization
 
     double fit_sum_lim; // threshold for sum of fitness values
     double prob_cross;  // probability for crossing
@@ -123,7 +129,7 @@ inline bool Chem::Gamcs<Pot>::energy_converged(int iter)
     bool converged = false;
     if (iter > min_gen) {
         std::sort(min_energy.begin(), min_energy.end());
-        if (min_energy.size() > min_gen) {
+        if (narrow_cast<int>(min_energy.size()) > min_gen) {
             min_energy.pop_back();
         }
         if (min_energy[0] < energy_min) {
