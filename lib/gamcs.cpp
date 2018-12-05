@@ -191,6 +191,7 @@ void Chem::Gamcs<Pot>::solve(std::ostream& to)
 
             compute_fitness();
             min_energy.push_back(population[0].energy); // update energy log
+
             status = "success";
             ++nsuccess;
         }
@@ -223,11 +224,33 @@ void Chem::Gamcs<Pot>::solve(std::ostream& to)
 template <class Pot>
 void Chem::Gamcs<Pot>::init_population(std::ostream& to)
 {
+    Stdutils::Format<char> line;
+    line.width(58).fill('-');
+
+    Stdutils::Format<int> ifix;
+    ifix.fixed().width(4);
+
+    Stdutils::Format<double> dfix;
+    dfix.fixed().width(12).precision(6);
+
+    Stdutils::Format<double> sci;
+    sci.scientific().width(8).precision(2);
+
+    to << "Initialization:\n"
+       << line('-') << '\n'
+       << "Iter  E(curr)       E(best)       Optimization\n"
+       << line('-') << std::endl;
+
     int ipop = 0;
     int iter = 0;
-    while (ipop < pop_size && iter < max_gen) {
-        ++iter;
+    int nsuccess = 0;
+    int nfailed = 0;
+    double ecurr = 0.0;
+    double ebest = 0.0;
 
+    std::string status = "";
+
+    while (ipop < pop_size && iter < max_gen) {
         // Generate new random structure with sensible geometry:
         Chem::Molecule m(mol);
         gen_rand_conformer(m);
@@ -240,6 +263,7 @@ void Chem::Gamcs<Pot>::init_population(std::ostream& to)
 
         // Perform local optimization:
         pot.run(m);
+        ecurr = m.elec().energy();
 
         if (m.elec().energy() >= energy_min && m.elec().energy() < energy_max) {
             // Add optimized structure to blacklist and population:
@@ -247,16 +271,31 @@ void Chem::Gamcs<Pot>::init_population(std::ostream& to)
                 Chem::Conformer(m.elec().energy(), m.get_xyz()));
             population.push_back(
                 Chem::Conformer(m.elec().energy(), m.get_xyz()));
+            if (ecurr < ebest) {
+                ebest = ecurr;
+            }
+            status = "success";
+            ++nsuccess;
             ++ipop;
         }
+        else {
+            status = "failed";
+            ++nfailed;
+        }
+        to << ifix(iter + 1) << "  " << dfix(ecurr) << "  " << dfix(ebest)
+           << "  " << status << std::endl;
+        ++iter;
     }
+    to << line('-') << '\n'
+       << "Number of successful trials: " << nsuccess << '\n'
+       << "Number of failed trials:     " << nfailed << '\n'
+       << std::endl;
+
     sort_population();
     compute_fitness();
     estart = population[0].energy; // save initial energy of global minimum
 
-    Stdutils::Format<char> line;
     line.width(19).fill('-');
-
     to << "Initial population:\n" << line('-') << '\n';
     print_population(to);
 }
