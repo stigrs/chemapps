@@ -155,7 +155,11 @@ void Chem::Mopac::get_xyz(Numlib::Mat<double>& xyz) const
             while (std::getline(from, buf)) {
                 pattern = "CARTESIAN COORDINATES";
                 if (buf.find(pattern) != std::string::npos) {
-                    for (int i = 0; i < 3; ++i) { // ignore three lines
+                    int nlines = 3;
+                    if (version == "mopac2016") {
+                        nlines = 1;
+                    }
+                    for (int i = 0; i < nlines; ++i) { // ignore lines
                         std::getline(from, buf);
                     }
                     int center;
