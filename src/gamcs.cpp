@@ -58,15 +58,22 @@ int main(int argc, char* argv[])
 
     try {
         std::ifstream from;
+        std::ofstream to;
+
+        std::string output_file =
+            Stdutils::strip_suffix(input_file, "inp") + "out";
+        std::cout << output_file << std::endl;
+
         Stdutils::fopen(from, input_file);
+        Stdutils::fopen(to, output_file);
 
         if (pot == "Gaussian" || pot == "gaussian") {
-            Chem::Gamcs<Chem::Gaussian> ga(from);
-            ga.solve();
+            Chem::Gamcs<Chem::Gaussian> ga(from, to);
+            ga.solve(to);
         }
         else {
-            Chem::Gamcs<Chem::Mopac> ga(from);
-            ga.solve();
+            Chem::Gamcs<Chem::Mopac> ga(from, to);
+            ga.solve(to);
         }
     }
     catch (std::exception& e) {
