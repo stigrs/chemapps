@@ -62,7 +62,6 @@ int main(int argc, char* argv[])
 
         std::string output_file =
             Stdutils::strip_suffix(input_file, "inp") + "out";
-        std::cout << output_file << std::endl;
 
         Stdutils::fopen(from, input_file);
         Stdutils::fopen(to, output_file);

@@ -5,6 +5,10 @@ project(ChemApps CXX)
 #
 # Set compiler options:
 
+if(UNIX)
+    find_package(OpenMP)
+endif()
+
 # Enforce C++14 standard.
 set(CMAKE_CXX_STANDARD 14)
 
@@ -23,19 +27,30 @@ if(MSVC)
 endif()
 
 # Set release compiler options.
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wpedantic -Wall -Wshadow -Wextra -Wno-maybe-uninitialized -Wno-missing-braces -Werror -Wno-error=strict-overflow")
+endif()
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wpedantic -Wall -Wshadow -Wextra -Wno-missing-braces -Werror -Wno-error=strict-overflow")
 endif()
 if(MSVC)
     set(CMAKE_CXX_FLAGS_RELEASE "/DNDEBUG /std:c++14 /W4 /WX /wd4100 /GR /EHsc /MT /O2")
 endif()
 
 # Set debugging compiler options.
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wpedantic -Wall -Wshadow -Wextra -Wno-missing-braces -Werror -Wno-error=strict-overflow")
+endif()
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wpedantic -Wall -Wshadow -Wextra -Wno-missing-braces -Werror -Wno-error=strict-overflow")
 endif()
 if(MSVC)
     set(CMAKE_CXX_FLAGS_DEBUG "/std:c++14 /EHsc /W4 /WX /wd4100 /MT /GR /Zi /Od")
+endif()
+
+# Set OpenMP compiler options.
+if(UNIX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
 #-------------------------------------------------------------------------------
