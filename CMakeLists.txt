@@ -5,7 +5,7 @@ project(ChemApps CXX)
 #
 # Set compiler options:
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
     find_package(OpenMP)
 endif()
 
