@@ -2,7 +2,7 @@
 # Released under the MIT license.
 
 language: cpp
-sudo: required
+sudo: false
 notifications:
   email: true
 
