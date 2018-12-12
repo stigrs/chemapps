@@ -49,7 +49,7 @@ if(MSVC)
 endif()
 
 # Set OpenMP compiler options.
-if(UNIX)
+if(OpenMP_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
