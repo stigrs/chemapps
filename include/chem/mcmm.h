@@ -70,7 +70,7 @@ private:
     void sort_conformers();
 
     // Select random dihedral angle.
-    std::vector<int> select_rand_dihedral(const Molecule& m);
+    std::vector<Index> select_rand_dihedral(const Molecule& m);
 
     Molecule mol; // molecule
     Pot pot;      // potential function
@@ -128,7 +128,7 @@ template <class Pot>
 inline void Mcmm<Pot>::gen_rand_conformer(Molecule& m)
 {
     // Select a random dihedral angle:
-    std::vector<int> moiety = select_rand_dihedral(m);
+    std::vector<Index> moiety = select_rand_dihedral(m);
 
     // Apply random variation to dihedral angle:
     std::uniform_real_distribution<> rnd_uni_real(-180.0, 180.0);
@@ -146,4 +146,3 @@ void Mcmm<Pot>::save_conformer(const Molecule& m)
 } // namespace Chem
 
 #endif // CHEM_MCMM_H
-

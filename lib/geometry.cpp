@@ -63,7 +63,8 @@ std::vector<Numlib::Vec<Index>> Chem::Geometry::get_connectivities() const
     return connect;
 }
 
-void Chem::Geometry::rotate_moiety(const std::vector<int>& moiety, double value)
+void Chem::Geometry::rotate_moiety(const std::vector<Index>& moiety,
+                                   double value)
 {
     if (atms.size() > 3) {
         for (auto& mi : moiety) {

@@ -135,7 +135,7 @@ double Chem::Troe::f_hind_rotor(const double temp) const
                 "Troe::f_hind_rotor(): E0/V0 <= 3, not implemented yet");
         }
         double a = Whirab::a_corr(mol, en_barrier);
-        double s = mol.vib().frequencies().size();
+        double s = narrow_cast<double>(mol.vib().frequencies().size());
         double n = mol.tor().symmetry_number();
         double b = Numlib::max(mol.tor().constant()) * 100.0;
         double v0f = v0 * f;
@@ -156,4 +156,3 @@ double Chem::Troe::f_hind_rotor(const double temp) const
     }
     return f_hind_rot;
 }
-

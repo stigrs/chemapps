@@ -259,7 +259,7 @@ void Chem::Mcmm<Pot>::uniform_usage(Numlib::Mat<double>& xnew)
     xnew = xcurr;
     if (!conformers.empty()) {
         std::vector<Chem::Conformer> index;
-        int istart = 0;
+        std::size_t istart = 0;
         int min_nstart = kiter;
         // Find least used:
         for (std::size_t i = 0; i < conformers.size(); ++i) {
@@ -298,14 +298,16 @@ inline void Chem::Mcmm<Pot>::sort_conformers()
 }
 
 template <class Pot>
-std::vector<int> Chem::Mcmm<Pot>::select_rand_dihedral(const Chem::Molecule& m)
+std::vector<Index>
+Chem::Mcmm<Pot>::select_rand_dihedral(const Chem::Molecule& m)
 {
     auto connect = m.geom().get_connectivities();
-    std::uniform_int_distribution<> rnd_uni_int(2, connect.size() - 1);
-    int index = rnd_uni_int(mt);
+    std::uniform_int_distribution<std::size_t> rnd_uni_int(2,
+                                                           connect.size() - 1);
+    std::size_t index = rnd_uni_int(mt);
     auto dihedral = connect[index];
 
-    std::vector<int> res(0);
+    std::vector<Index> res(0);
     for (std::size_t i = 2; i < connect.size(); ++i) {
         if (connect[i] == dihedral) {
             res.push_back(i);
@@ -316,4 +318,3 @@ std::vector<int> Chem::Mcmm<Pot>::select_rand_dihedral(const Chem::Molecule& m)
 
 template class Chem::Mcmm<Chem::Gaussian>;
 template class Chem::Mcmm<Chem::Mopac>;
-

@@ -299,7 +299,7 @@ void Chem::print_atomic_masses(std::ostream& to,
     Stdutils::Format<double> fix;
     fix.fixed().width(10);
 
-    Stdutils::Format<int> gen;
+    Stdutils::Format<std::size_t> gen;
     gen.width(3);
 
     double totmass = 0.0;
@@ -393,4 +393,3 @@ void Chem::print_rot_constants(std::ostream& to,
         }
     }
 }
-

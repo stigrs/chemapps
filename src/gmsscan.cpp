@@ -255,13 +255,13 @@ void init_geom()
             }
         }
 
-        int natoms = at_num.size();
+        std::size_t natoms = at_num.size();
         if (natoms < 1) {
             throw Init_geom_error("geometry not initialized");
         }
 
         geom.resize(natoms, 3);
-        for (int i = 0; i < natoms; i++) {
+        for (std::size_t i = 0; i < natoms; i++) {
             for (int j = 0; j < 3; j++) {
                 geom(i, j) = geom_tmp[i * 3 + j];
             }
@@ -498,4 +498,3 @@ double gms_final_energy(const std::string& filename)
     }
     return energy;
 }
-

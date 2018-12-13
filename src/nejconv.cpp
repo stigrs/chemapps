@@ -100,7 +100,7 @@ void init(const std::string& filename)
 
 void vibr_count()
 {
-    int nsize = e_grid.size();
+    Index nsize = e_grid.size();
 
     vibr_nos.resize(nsize);
     vibr_nos = 0.0;
@@ -144,4 +144,3 @@ void nej_conv(const std::string& filename)
         }
     }
 }
-

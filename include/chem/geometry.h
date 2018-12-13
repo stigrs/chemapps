@@ -69,7 +69,7 @@ public:
     void set_dihedral(Index index, double value);
 
     // Rotate moiety around a given torsional bond.
-    void rotate_moiety(const std::vector<int>& moiety, double value);
+    void rotate_moiety(const std::vector<Index>& moiety, double value);
 
     // Load molecular coordinates in XYZ format.
     void load_xyz(std::istream& from);
@@ -207,4 +207,3 @@ inline void Geometry::print_zmat(std::ostream& to) const
 } // namespace Chem
 
 #endif // CHEM_GEOMETRY_H
-

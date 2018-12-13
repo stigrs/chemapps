@@ -136,9 +136,10 @@ int main(int argc, char* argv[])
 
         if (reverse_mep) {
             std::vector<double> mep_tmp(mep.size());
-            const int npoints = mep.size() / 2;
-            int indx1, indx2;
-            for (int i = 0; i < npoints; i++) {
+            const std::size_t npoints = mep.size() / 2;
+            std::size_t indx1;
+            std::size_t indx2;
+            for (std::size_t i = 0; i < npoints; i++) {
                 indx1 = (npoints - 1 - i) * 2;
                 indx2 = i * 2;
                 for (int j = 0; j < 2; j++) {
@@ -191,20 +192,20 @@ void create_fu31(const Chem::Gauss_filetype filetype)
         conv_factor = Numlib::Constants::a_0; // bohr to angstrom
     }
 
-    const int npoints = mep.size() / 2;
-    const int natoms3 = natoms * 3;
-    const int nhess = natoms3 * (natoms3 + 1) / 2;
+    const std::size_t npoints = mep.size() / 2;
+    const std::size_t natoms3 = natoms * 3;
+    const std::size_t nhess = natoms3 * (natoms3 + 1) / 2;
 
     double smep;
     double vmep;
 
-    int indx1 = 0;
-    int indx2 = 1;
-    int indx3 = 0;
-    int indx4 = 0;
-    int count = 0;
+    std::size_t indx1 = 0;
+    std::size_t indx2 = 1;
+    std::size_t indx3 = 0;
+    std::size_t indx4 = 0;
+    std::size_t count = 0;
 
-    for (int i = 0; i < npoints; i++) {
+    for (std::size_t i = 0; i < npoints; i++) {
         vmep = mep[indx1];
         smep = mep[indx2];
         if (change_sign) {
@@ -219,7 +220,7 @@ void create_fu31(const Chem::Gauss_filetype filetype)
 
         to << " GEOM \n";
         count = 0;
-        for (int j = 0; j < natoms3; j++) {
+        for (std::size_t j = 0; j < natoms3; j++) {
             to << fix(geom[indx3 + j] * conv_factor);
             count++;
             if (count == 3) {
@@ -231,7 +232,7 @@ void create_fu31(const Chem::Gauss_filetype filetype)
 
         to << " GRADS \n";
         count = 0;
-        for (int j = 0; j < natoms3; j++) {
+        for (std::size_t j = 0; j < natoms3; j++) {
             to << sci(grad[indx3 + j]);
             count++;
             if (count == 3) {
@@ -244,7 +245,7 @@ void create_fu31(const Chem::Gauss_filetype filetype)
         if (get_hess) {
             to << " HESSIANS \n";
             count = 0;
-            for (int j = 0; j < nhess; j++) {
+            for (std::size_t j = 0; j < nhess; j++) {
                 to << sci(hess[indx4 + j]);
                 count++;
                 if (count == 5) {
@@ -264,4 +265,3 @@ void create_fu31(const Chem::Gauss_filetype filetype)
     }
     std::cout << "output is written to " << output_file << '\n';
 }
-

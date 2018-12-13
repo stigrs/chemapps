@@ -40,7 +40,7 @@ private:
     void gen_rand_conformer(Molecule& m);
 
     // Select random dihedral angle.
-    std::vector<int> select_rand_dihedral(const Molecule& m);
+    std::vector<Index> select_rand_dihedral(const Molecule& m);
 
     // Check if geometry of random conformer is sensible.
     bool geom_sensible(const Molecule& m) const;
@@ -181,4 +181,3 @@ inline void Gamcs<Pot>::sort_population()
 } // namespace Chem
 
 #endif // CHEM_GAMCS_H
-

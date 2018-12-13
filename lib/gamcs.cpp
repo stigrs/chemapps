@@ -318,7 +318,8 @@ void Chem::Gamcs<Pot>::gen_rand_conformer(Chem::Molecule& m)
 }
 
 template <class Pot>
-std::vector<int> Chem::Gamcs<Pot>::select_rand_dihedral(const Chem::Molecule& m)
+std::vector<Index>
+Chem::Gamcs<Pot>::select_rand_dihedral(const Chem::Molecule& m)
 {
     auto connect = m.geom().get_connectivities();
     std::uniform_int_distribution<std::size_t> rnd_uni_int(2,
@@ -326,7 +327,7 @@ std::vector<int> Chem::Gamcs<Pot>::select_rand_dihedral(const Chem::Molecule& m)
     auto index = rnd_uni_int(mt);
     auto dihedral = connect[index];
 
-    std::vector<int> res;
+    std::vector<Index> res;
     for (std::size_t i = 2; i < connect.size(); ++i) {
         if (connect[i] == dihedral) {
             res.push_back(i);
@@ -577,4 +578,3 @@ void Chem::Gamcs<Pot>::print_global_minimum(std::ostream& to) const
 
 template class Chem::Gamcs<Chem::Gaussian>;
 template class Chem::Gamcs<Chem::Mopac>;
-

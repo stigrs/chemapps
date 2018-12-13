@@ -72,7 +72,7 @@ TEST_CASE("test_zmatrix")
                            {1.62151810e+00, 1.62228626e+00, 2.81749906e+00},
                            {3.28860700e+00, 1.62228626e+00, 2.21072833e+00}};
 
-        std::vector<int> moiety = {3, 9, 10};
+        std::vector<Index> moiety = {3, 9, 10};
         mol.geom().rotate_moiety(moiety, 90.0);
         auto res = mol.geom().get_xyz();
 
