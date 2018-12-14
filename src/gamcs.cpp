@@ -7,6 +7,7 @@
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4018 4267) // caused by cxxopts.hpp
+#pragma warning(disable : 4996)      // caused by ctime
 #endif
 
 #include <chem/gaussian.h>
@@ -19,10 +20,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include <chrono>
 
 // Program providing Genetic Algorithm Molecular Structure Search.
 //
@@ -66,6 +64,8 @@ int main(int argc, char* argv[])
         Stdutils::fopen(from, input_file);
         Stdutils::fopen(to, output_file);
 
+        auto tstart = std::chrono::system_clock::now();
+
         if (pot == "Gaussian" || pot == "gaussian") {
             Chem::Gamcs<Chem::Gaussian> ga(from, to);
             ga.solve(to);
@@ -74,6 +74,13 @@ int main(int argc, char* argv[])
             Chem::Gamcs<Chem::Mopac> ga(from, to);
             ga.solve(to);
         }
+
+        auto tend = std::chrono::system_clock::now();
+        std::chrono::duration<double> telapsed = tend - tstart;
+        std::time_t end_time = std::chrono::system_clock::to_time_t(tend);
+
+        to << "Computation finished at " << std::ctime(&end_time) << '\n'
+           << "Elapsed time: " << telapsed.count() << " s\n";
     }
     catch (std::exception& e) {
         std::cerr << "what: " << e.what() << '\n';
@@ -81,3 +88,6 @@ int main(int argc, char* argv[])
     }
 }
 
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
