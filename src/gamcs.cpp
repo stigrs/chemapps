@@ -65,6 +65,8 @@ int main(int argc, char* argv[])
         Stdutils::fopen(to, output_file);
 
         auto tstart = std::chrono::system_clock::now();
+        std::time_t start_time = std::chrono::system_clock::to_time_t(tstart);
+        to << std::ctime(&start_time) << '\n';
 
         if (pot == "Gaussian" || pot == "gaussian") {
             Chem::Gamcs<Chem::Gaussian> ga(from, to);
@@ -78,9 +80,10 @@ int main(int argc, char* argv[])
         auto tend = std::chrono::system_clock::now();
         std::chrono::duration<double> telapsed = tend - tstart;
         std::time_t end_time = std::chrono::system_clock::to_time_t(tend);
+        auto telapsed_str = Stdutils::timefmt(telapsed.count());
 
-        to << "Computation finished at " << std::ctime(&end_time) << '\n'
-           << "Elapsed time: " << telapsed.count() << " s\n";
+        to << "Computation finished at  " << std::ctime(&end_time) << '\n'
+           << "Elapsed time (HH:MM:SS): " << telapsed_str << '\n';
     }
     catch (std::exception& e) {
         std::cerr << "what: " << e.what() << '\n';
