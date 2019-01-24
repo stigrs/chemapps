@@ -286,7 +286,7 @@ void Chem::Vibration::freqs_unit_conv(Numlib::Vec<double>& vib) const
 
     for (auto& vi : vib) {
         auto x = vi * factor;
-        vi = Numlib::sign(std::sqrt(std::abs(x)), x);
+        vi = std::copysign(std::sqrt(std::abs(x)), x);
     }
 }
 

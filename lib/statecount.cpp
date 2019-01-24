@@ -37,7 +37,7 @@ Numlib::Vec<double> Chem::Statecount::bswine(const Numlib::Vec<double>& vibr,
                                              bool sum,
                                              const Numlib::Vec<double>& rot)
 {
-    auto res = Numlib::zeros<Numlib::Vec<double>>(ngrains);
+    Numlib::Vec<double> res(ngrains);
     if (!rot.empty()) { // initialize with rotational states
         res = rot;
     }
@@ -69,8 +69,8 @@ Numlib::Vec<double> Chem::Statecount::steinrab(const Numlib::Vec<double>& vibr,
                                                double egrain,
                                                bool sum)
 {
-    auto at = Numlib::zeros<Numlib::Vec<double>>(ngrains);
-    auto tt = Numlib::zeros<Numlib::Vec<double>>(ngrains);
+    Numlib::Vec<double> at(ngrains);
+    Numlib::Vec<double> tt(ngrains);
 
     at(0) = 1.0;
     tt(0) = 1.0;
@@ -122,7 +122,7 @@ Numlib::Vec<double> Chem::Statecount::steinrab(const Numlib::Vec<double>& vibr,
 Numlib::Vec<double> Chem::Statecount::free_rotor(
     double sigma, double rotc, int ngrains, double egrain, bool sum)
 {
-    auto res = Numlib::zeros<Numlib::Vec<double>>(ngrains);
+    Numlib::Vec<double> res(ngrains);
 
     double f = -0.5;
     if (sum) {
@@ -147,12 +147,12 @@ Numlib::Vec<double> Chem::Statecount::hindered_rotor(double sigma,
     using Numlib::comp_ellint_1;
     using Numlib::comp_ellint_2;
 
-    auto res = Numlib::zeros<Numlib::Vec<double>>(ngrains);
+    Numlib::Vec<double> res(ngrains);
 
     int iv0 = Numlib::round<int>(barrier / egrain - 0.5);
 
     double v0 = barrier;
-    double q1f = std::sqrt(Numlib::Constants::pi) / (sigma * std::sqrt(rotc));
+    double q1f = std::sqrt(pi) / (sigma * std::sqrt(rotc));
     double ei = 0.0;
 
     if (sum) { // eq. 4.52 in Forst (2003)
