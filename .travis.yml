@@ -61,30 +61,9 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-5
-            - gfortran
-      env:
-        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5 && BUILD_TYPE=Debug"
-
-    - os: linux
-      addons: 
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-            - gfortran
-      env:
-        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5 && BUILD_TYPE=Release"
-
-    - os: linux
-      addons: 
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
             - g++-6
             - gfortran
+            - libboost-all-dev
       env:
         - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6 && BUILD_TYPE=Debug"
 
@@ -96,6 +75,7 @@ matrix:
           packages:
             - g++-6
             - gfortran
+            - libboost-all-dev
       env:
         - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6 && BUILD_TYPE=Release"
 
@@ -107,6 +87,7 @@ matrix:
           packages:
             - g++-7
             - gfortran
+            - libboost-all-dev
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && BUILD_TYPE=Debug"
 
@@ -118,6 +99,7 @@ matrix:
           packages:
             - g++-7
             - gfortran
+            - libboost-all-dev
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && BUILD_TYPE=Release"
 
@@ -129,37 +111,12 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-          packages:
-            - clang-5.0
-            - g++-5
-            - gfortran
-      env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && BUILD_TYPE=Debug"
-
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
-          packages:
-            - clang-5.0
-            - g++-5
-            - gfortran
-      env:
-        - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && BUILD_TYPE=Release"
-
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-6.0
           packages:
             - clang-6.0
             - g++-6
             - gfortran
+            - libboost-all-dev
       env:
         - MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0 && BUILD_TYPE=Debug"
 
@@ -173,6 +130,7 @@ matrix:
             - clang-6.0
             - g++-6
             - gfortran
+            - libboost-all-dev
       env:
         - MATRIX_EVAL="CC=clang-6.0 && CXX=clang++-6.0 && BUILD_TYPE=Release"
 
