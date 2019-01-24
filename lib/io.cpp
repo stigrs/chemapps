@@ -8,6 +8,7 @@
 #include <chem/periodic_table.h>
 #include <numlib/constants.h>
 #include <stdutils/stdutils.h>
+#include <string>
 #include <sstream>
 #include <stdexcept>
 
@@ -147,7 +148,7 @@ void Chem::read_mol_formula(std::istream& from,
     std::string buf;
     from >> buf;
 
-    auto n = Stdutils::from_string<int>(buf);
+    auto n = std::stoi(buf);
     assert(n >= 1);
     formula.resize(n);
 
@@ -166,7 +167,7 @@ void Chem::read_mol_formula(std::istream& from,
         }
         if ((ch != ',') && (ch != ';') && (ch != ']')) {
             throw std::runtime_error("bad separator in molecular formula: " +
-                                     Stdutils::to_string(ch));
+                                     std::to_string(ch));
         }
         if (ch == ']') {
             from.unget();
@@ -176,7 +177,7 @@ void Chem::read_mol_formula(std::istream& from,
         }
         if (stoich < 1) {
             throw std::runtime_error("bad stoichiometry: " +
-                                     Stdutils::to_string(stoich));
+                                     std::to_string(stoich));
         }
         formula[i].atom = atom;
         formula[i].stoich = stoich;
