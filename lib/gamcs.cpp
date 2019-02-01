@@ -22,7 +22,7 @@ Chem::Gamcs<Pot>::Gamcs(std::istream& from, std::ostream& to) : mol(from, to)
 
     // Read input:
 
-    dist_min = 0.7; // experimental r(H-H) = 0.74 angstrom
+    dist_min = 0.5; // experimental r(H-H) = 0.74 angstrom
     dist_max = 2.2;
 
     energy_min = -std::numeric_limits<double>::max();
@@ -72,7 +72,7 @@ Chem::Gamcs<Pot>::Gamcs(std::istream& from, std::ostream& to) : mol(from, to)
 
     // Validate input:
 
-    Assert::dynamic(dist_min >= 0.7, "bad dist_min < 0.7");
+    Assert::dynamic(dist_min >= 0.5, "bad dist_min < 0.5");
     Assert::dynamic(dist_max > dist_min, "bad dist_max <= dist_min");
     Assert::dynamic(energy_var > 0.0, "bad energy_var <= 0.0");
     Assert::dynamic(energy_tol > 0.0, "bad energy_tol <= 0.0");
@@ -233,9 +233,6 @@ void Chem::Gamcs<Pot>::init_population(std::ostream& to)
     Stdutils::Format<double> dfix;
     dfix.fixed().width(12).precision(6);
 
-    Stdutils::Format<double> sci;
-    sci.scientific().width(8).precision(2);
-
     to << "Initialization:\n"
        << line('-') << '\n'
        << "Iter  E(curr)       E(best)       Optimization\n"
@@ -344,12 +341,14 @@ bool Chem::Gamcs<Pot>::geom_sensible(const Chem::Molecule& m) const
     Numlib::pdist_matrix(dist_mat, m.get_xyz());
     for (auto v : dist_mat) {
         if (v > 0.0 && v < dist_min) { // avoid too close atoms
+            geom_ok = false;
             break;
         }
     }
     if (geom_ok) { // avoid too long bond distances
         for (std::size_t i = 0; i < m.num_atoms(); ++i) {
             if (m.geom().get_distance(i) >= dist_max) {
+                geom_ok = false;
                 break;
             }
         }
