@@ -9,7 +9,6 @@
 #include <stdutils/stdutils.h>
 #include <cstdlib>
 #include <fstream>
-#include <limits>
 
 void Chem::Gaussian::init(std::istream& from, const std::string& key)
 {
@@ -70,8 +69,8 @@ void Chem::Gaussian::run(Chem::Molecule& mol) const
         mol.set_xyz(coord.xyz); // update Cartesian coordinates
         mol.elec().set_energy(data.get_scf_zpe_energy()[0]); // update energy
     }
-    else { // calculation failed to converge; set energy to infinity:
-        constexpr double emax = std::numeric_limits<double>::max();
+    else { // calculation failed to converge; set energy to zero:
+        constexpr double emax = 0.0;
         mol.elec().set_energy(emax);
     }
 }
