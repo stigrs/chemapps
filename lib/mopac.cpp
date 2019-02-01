@@ -10,7 +10,6 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <fstream>
-#include <limits>
 #include <sstream>
 
 void Chem::Mopac::init(std::istream& from, const std::string& key)
@@ -56,8 +55,8 @@ void Chem::Mopac::run(Chem::Molecule& mol) const
         mol.set_xyz(xyz); // update Cartesian coordinates
         mol.elec().set_energy(get_heat_of_formation()); // update energy
     }
-    else { // calculation failed to converge; set energy to infinity
-        constexpr double emax = std::numeric_limits<double>::max();
+    else { // calculation failed to converge; set energy to zero
+        constexpr double emax = 0.0;
         mol.elec().set_energy(emax);
     }
 }
