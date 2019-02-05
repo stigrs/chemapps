@@ -66,6 +66,7 @@ set(PROGRAMS
     gausshess2
     gaussnmr
     gaussopt
+    gausstodal
     gausstopoly
     gmsget
     gmsgetxyz
