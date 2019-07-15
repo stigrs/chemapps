@@ -126,7 +126,7 @@ void Chem::Vibration::print(std::ostream& to) const
     Stdutils::Format<double> fix;
     fix.fixed().width(8).precision(2);
 
-    if (freqs.size() > 0) {
+    if (!freqs.empty()) {
         Index it = 0;
         to << "Vibrational modes (cm^-1):\n" << line('-') << '\n';
         for (Index i = 0; i < freqs.size(); ++i) {

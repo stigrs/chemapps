@@ -106,8 +106,10 @@ inline void Vibration::analysis(std::ostream& to) const
     Stdutils::Format<char> line;
     line.width(21).fill('=');
 
-    to << "\nVibrational analysis:\n" << line('=') << "\n\n";
-    print(to);
+    if (!freqs.empty()) {
+        to << "\nVibrational analysis:\n" << line('=') << "\n\n";
+        print(to);
+    }
 }
 
 } // namespace Chem
