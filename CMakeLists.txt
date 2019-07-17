@@ -23,7 +23,7 @@ endif()
 
 # Set default MSVC compiler options to avoid D9025 error.
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS")
+    set(CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS /D_CRT_SECURE_NO_WARNINGS")
 endif()
 
 # Set release compiler options.
@@ -59,6 +59,9 @@ endif()
 
 include(ExternalProject)
 find_package(Git)
+
+# Boost is required.
+find_package(Boost 1.54 REQUIRED)
 
 # BLAS and LAPACK is required.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
