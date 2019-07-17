@@ -103,7 +103,6 @@ TEST_CASE("test_statecount")
         for (auto ei : en) {
             idx.push_back(Numlib::round<int>(ei / egrain));
         }
-        std::cout << "Hindered rotor" << std::endl;
         for (std::size_t i = 0; i < idx.size(); ++i) {
             CHECK(std::abs(wsum(idx[i]) - wsum_ans(i)) / wsum_ans(i) < 0.28);
         }
