@@ -6,6 +6,7 @@
 
 #include <chem/gauss_data.h>
 #include <chem/periodic_table.h>
+#include <numlib/traits.h>
 #include <stdutils/stdutils.h>
 #include <iostream>
 #include <fstream>
@@ -45,7 +46,8 @@ int main(int argc, char* argv[])
     // Count number of atoms per atom type:
     std::vector<int> natoms(atoms.size());
     for (std::size_t i = 0; i < atoms.size(); ++i) {
-        natoms[i] = std::count(data.atnum.begin(), data.atnum.end(), atoms[i]);
+        natoms[i] = narrow_cast<int>(
+            std::count(data.atnum.begin(), data.atnum.end(), atoms[i]));
     }
     // Create Dalton mol file:
     using namespace Chem::Periodic_table;
