@@ -82,6 +82,7 @@ set(PROGRAMS
     moptoxyz
     nejconv
     nejeff
+    nmravg
     nwget
     nwgetxyz
     nwzmap
