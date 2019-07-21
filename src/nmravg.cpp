@@ -40,7 +40,9 @@ std::vector<int> nuclei;
 // Forward declarations:
 
 void gaussian(std::istream& from);
+void dalton(std::istream& from);
 double gauss_sscc(std::istream& from, const std::string& search_str);
+double dalton_sscc(std::istream& from, const std::string& search_str);
 double average(const std::vector<double>& values);
 
 //------------------------------------------------------------------------------
@@ -126,8 +128,11 @@ int main(int argc, char* argv[])
         if (prog == "Gaussian" || prog == "gaussian") {
             gaussian(from);
         }
+        else if (prog == "Dalton" || prog == "dalton") {
+            dalton(from);
+        }
         else {
-            std::cerr << "Only Gaussian is currently supported\n";
+            std::cerr << prog << " is not supported\n";
             return 1;
         }
     }
@@ -154,6 +159,26 @@ void gaussian(std::istream& from)
 
         str = "Total nuclear spin-spin coupling J";
         std::cout << "J_tot = " << gauss_sscc(from, str) << '\n';
+    }
+}
+
+void dalton(std::istream& from)
+{
+    if (avg_sscc) {
+        std::string str = "Isotropic FC contribution :";
+        std::cout << "J_FC =  " << dalton_sscc(from, str) << '\n';
+
+        str = "Isotropic SD contribution :";
+        std::cout << "J_SD =  " << dalton_sscc(from, str) << '\n';
+
+        str = "Isotropic PSO contribution:";
+        std::cout << "J_PSO = " << dalton_sscc(from, str) << '\n';
+
+        str = "Isotropic DSO contribution:";
+        std::cout << "J_DSO = " << dalton_sscc(from, str) << '\n';
+
+        str = "Isotropic coupling        :";
+        std::cout << "J_tot = " << dalton_sscc(from, str) << '\n';
     }
 }
 
@@ -212,6 +237,75 @@ double gauss_sscc(std::istream& from, const std::string& search_str)
                     }
                 }
                 break;
+            }
+        }
+    }
+    return average(sscc);
+}
+
+double dalton_sscc(std::istream& from, const std::string& search_str)
+{
+    from.clear();
+    from.seekg(0, std::ios_base::beg); // move to beginning of file
+
+    std::string line;
+    std::string word1;
+    std::string word2;
+    std::string buf;
+
+    std::vector<std::string> atsymb;
+    std::vector<double> sscc;
+
+    while (std::getline(from, line)) {
+        if (line.find("Molecular geometry (au)") != std::string::npos) {
+            std::getline(from, line); // ignore two lines
+            std::getline(from, line);
+            for (int it = 0; it < atoms; ++it) {
+                std::getline(from, line);
+                std::istringstream iss(line);
+                iss >> word1;
+                atsymb.push_back(word1);
+            }
+            break;
+        }
+    }
+    std::string str = "Indirect spin-spin coupling between";
+
+    bool nuclei_found = false;
+
+    for (auto ni : nuclei) {
+        while (std::getline(from, line)) {
+            if (line.find(str) != std::string::npos) {
+                std::istringstream iss(line);
+                for (int it = 0; it < 4; ++it) {
+                    iss >> buf; // ignore
+                }
+                iss >> word1 >> buf >> word2;
+                int indx_center = -1;
+                auto pos1 = std::find(atsymb.begin(), atsymb.end(), word2);
+                if (pos1 != atsymb.end()) {
+                    indx_center = std::distance(atsymb.begin(), pos1) + 1;
+                }
+                if (indx_center == center) {
+                    pos1 = std::find(atsymb.begin(), atsymb.end(), word1);
+                    auto indx_nuc = std::distance(atsymb.begin(), pos1) + 1;
+                    if (indx_nuc == ni) {
+                        nuclei_found = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (nuclei_found) {
+            double jval;
+            while (std::getline(from, line)) {
+                if (line.find(search_str) != std::string::npos) {
+                    line.erase(0, search_str.length());
+                    std::istringstream iss(line);
+                    iss >> buf >> jval;
+                    sscc.push_back(jval);
+                    break;
+                }
             }
         }
     }
