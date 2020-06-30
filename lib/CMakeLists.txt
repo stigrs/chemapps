@@ -23,6 +23,7 @@ set(
     gaussian.cpp
     geometry.cpp
     io.cpp
+	ising.cpp
     mcmm.cpp
     molecule.cpp
     mopac.cpp

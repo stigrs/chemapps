@@ -73,6 +73,7 @@ set(PROGRAMS
     gmsget
     gmsgetxyz
     gmsscan
+	ising
     mcmm 
     mcmmtocom
     mcmmtoxyz
