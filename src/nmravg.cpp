@@ -281,7 +281,7 @@ double dalton_sscc(std::istream& from, const std::string& search_str)
                     iss >> buf; // ignore
                 }
                 iss >> word1 >> buf >> word2;
-                int indx_center = -1;
+                std::ptrdiff_t indx_center = -1;
                 auto pos1 = std::find(atsymb.begin(), atsymb.end(), word2);
                 if (pos1 != atsymb.end()) {
                     indx_center = std::distance(atsymb.begin(), pos1) + 1;
