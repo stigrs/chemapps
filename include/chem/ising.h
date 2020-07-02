@@ -31,7 +31,7 @@ private:
     void mcmove(Numlib::Mat<int>& spins, double beta);
 
     // Compute lattice energy.
-    double energy(const Numlib::Mat<int>& spins) const;
+    void compute_energy_magn(const Numlib::Mat<int>& spins);
 
     // Compute magnetisation.
     double magnetisation(const Numlib::Mat<int>& spins) const;
@@ -42,6 +42,9 @@ private:
     int size;      // lattice size
     double jint;   // interaction (ferromagnetic if positive)
     double bfield; // external magnetic field
+
+	double energy; // lattice energy
+	double magn;   // net magnetisation
 
     std::mt19937_64 mt; // random number engine
 };

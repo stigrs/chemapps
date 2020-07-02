@@ -31,20 +31,23 @@ std::array<double, 4> Chem::Ising2D::metropolis(double temp, int mc_trials)
     // Perform Monte Carlo sampling:
     for (int it = 0; it < mc_trials; ++it) {
         mcmove(spins, beta);
-        double de = energy(spins);
-        double dm = magnetisation(spins);
-        e1 += de;
-        m1 += dm;
-        e2 += de * de;
-        m2 += dm * dm;
+        compute_energy_magn(spins);
+        e1 += energy;
+        m1 += magn;
+        e2 += energy * energy;
+        m2 += magn * magn;
     }
     // Normalise average values:
-    double n1 = 1.0 / (mc_trials * size * size);
-    double n2 = 1.0 / (mc_trials * mc_trials * size * size);
-    double e_avg = e1 * n1;
-    double m_avg = m1 * n1;
-    double c_avg = (n1 * e2 - n2 * e1 * e1) * beta * beta;
-    double x_avg = (n1 * m2 - n2 * m1 * m1) * beta;
+    e1 /= static_cast<double>(mc_trials);
+    e2 /= static_cast<double>(mc_trials);
+    m1 /= static_cast<double>(mc_trials);
+    m2 /= static_cast<double>(mc_trials);
+    double n2 = static_cast<double>(size * size);
+
+    double e_avg = e1 / n2;
+    double m_avg = m1 / n2;
+    double c_avg = beta * beta * (e2 - e1 * e1) / n2;
+    double x_avg = beta * (m2 - m1 * m1) / n2;
 
     return {e_avg, m_avg, c_avg, x_avg};
 }
@@ -66,9 +69,9 @@ void Chem::Ising2D::mcmove(Numlib::Mat<int>& spins, double beta)
         double ediff = 2.0 * bfield * st + 2.0 * jint * st * s_nb;
 
         // Check for acceptance; flip spin if accepted:
-		if (ediff < 0.0) {
-			st *= -1;
-		}
+        if (ediff < 0.0) {
+            st *= -1;
+        }
         else if (rnd_real_uni(mt) <= std::exp(-ediff * beta)) {
             st *= -1;
         }
@@ -76,18 +79,18 @@ void Chem::Ising2D::mcmove(Numlib::Mat<int>& spins, double beta)
     }
 }
 
-double Chem::Ising2D::energy(const Numlib::Mat<int>& spins) const
+void Chem::Ising2D::compute_energy_magn(const Numlib::Mat<int>& spins)
 {
-    double energy = 0.0;
+    magn = magnetisation(spins);
+    energy = 0.0;
 #pragma omp parallel for
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
             auto sij = spins(i, j);
-            auto s_nb = spins(i, pbc(j - 1)) + spins(i, pbc(j + 1)) +
-                        spins(pbc(i - 1), j) + spins(pbc(i + 1), j);
-
-            energy += -bfield * sij - jint * sij * s_nb;
+            auto s_nb = spins(i, pbc(j + 1)) + spins(pbc(i + 1), j);
+            energy -= sij * s_nb;
         }
     }
-    return energy / 4.0;
+    energy *= jint;
+    energy -= bfield * magn;
 }
