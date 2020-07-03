@@ -14,9 +14,7 @@
 
 std::array<double, 4> Chem::Ising2D::metropolis(double temp, int mc_trials)
 {
-    // Initialise spin matrix and variables:
-    auto spins = init_spins();
-
+    // Initialise variables:
     double beta = 1.0 / temp;
     double e1 = 0.0;
     double e2 = 0.0;
@@ -25,13 +23,12 @@ std::array<double, 4> Chem::Ising2D::metropolis(double temp, int mc_trials)
 
     // Perform equilibration:
     for (int it = 0; it < mc_trials; ++it) {
-        mcmove(spins, beta);
+        mc_spin_flip(beta);
     }
-
     // Perform Monte Carlo sampling:
     for (int it = 0; it < mc_trials; ++it) {
-        mcmove(spins, beta);
-        compute_energy_magn(spins);
+        mc_spin_flip(beta);
+        compute_energy_magn();
         e1 += energy;
         m1 += magn;
         e2 += energy * energy;
@@ -42,8 +39,8 @@ std::array<double, 4> Chem::Ising2D::metropolis(double temp, int mc_trials)
     e2 /= static_cast<double>(mc_trials);
     m1 /= static_cast<double>(mc_trials);
     m2 /= static_cast<double>(mc_trials);
-    double n2 = static_cast<double>(size * size);
 
+    double n2 = static_cast<double>(size * size);
     double e_avg = e1 / n2;
     double m_avg = m1 / n2;
     double c_avg = beta * beta * (e2 - e1 * e1) / n2;
@@ -52,7 +49,7 @@ std::array<double, 4> Chem::Ising2D::metropolis(double temp, int mc_trials)
     return {e_avg, m_avg, c_avg, x_avg};
 }
 
-void Chem::Ising2D::mcmove(Numlib::Mat<int>& spins, double beta)
+void Chem::Ising2D::mc_spin_flip(double beta)
 {
     std::uniform_int_distribution<> rnd_int_uni(0, size - 1);
     std::uniform_real_distribution<> rnd_real_uni(0.0, 1.0);
@@ -79,9 +76,9 @@ void Chem::Ising2D::mcmove(Numlib::Mat<int>& spins, double beta)
     }
 }
 
-void Chem::Ising2D::compute_energy_magn(const Numlib::Mat<int>& spins)
+void Chem::Ising2D::compute_energy_magn()
 {
-    magn = magnetisation(spins);
+    magn = magnetisation();
     energy = 0.0;
 #pragma omp parallel for
     for (int i = 0; i < size; ++i) {

@@ -25,26 +25,28 @@ public:
 
 private:
     // Initialise spins for the ground state.
-    Numlib::Mat<int> init_spins() const;
+    void init_spins();
 
-    // Perform Monte Carlo sampling.
-    void mcmove(Numlib::Mat<int>& spins, double beta);
+    // Perform Monte Carlo sampling of spin flips.
+    void mc_spin_flip(double beta);
 
     // Compute lattice energy.
-    void compute_energy_magn(const Numlib::Mat<int>& spins);
+    void compute_energy_magn();
 
     // Compute magnetisation.
-    double magnetisation(const Numlib::Mat<int>& spins) const;
+    double magnetisation() const;
 
-	// Periodic boundary conditions.
+    // Periodic boundary conditions.
     int pbc(int i) const;
 
     int size;      // lattice size
     double jint;   // interaction (ferromagnetic if positive)
     double bfield; // external magnetic field
 
-	double energy; // lattice energy
-	double magn;   // net magnetisation
+    double energy; // lattice energy
+    double magn;   // net magnetisation
+
+    Numlib::Mat<int> spins; // spin matrix
 
     std::mt19937_64 mt; // random number engine
 };
@@ -60,22 +62,20 @@ inline Ising2D::Ising2D(int sz, double j, double b, int seed)
     else {
         mt.seed(seed); // should only be used for testing
     }
+    init_spins();
 }
 
-inline Numlib::Mat<int> Ising2D::init_spins() const
+inline void Ising2D::init_spins()
 {
-    return Numlib::ones<Numlib::Mat<int>>(size, size);
+    spins = Numlib::ones<Numlib::Mat<int>>(size, size);
 }
 
-inline double Ising2D::magnetisation(const Numlib::Mat<int>& spins) const
+inline double Ising2D::magnetisation() const
 {
     return static_cast<double>(Numlib::sum(spins.ravel()));
 }
 
-inline int Ising2D::pbc(int i) const
-{
-    return (i + size) % size;
-}
+inline int Ising2D::pbc(int i) const { return (i + size) % size; }
 } // namespace Chem
 
 #endif // CHEM_ISING_H
