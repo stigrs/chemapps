@@ -5,8 +5,10 @@
 // and conditions.
 
 #include <chem/ising.h>
+#include <stdutils/stdutils.h>
 #include <stdexcept>
 #include <cmath>
+#include <fstream>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -29,6 +31,7 @@ std::array<double, 4> Chem::Ising2D::metropolis(double temp, int mc_trials)
     for (int it = 0; it < mc_trials; ++it) {
         mc_spin_flip(beta);
         compute_energy_magn();
+        visualize_if_requested(temp, it);
         e1 += energy;
         m1 += magn;
         e2 += energy * energy;
@@ -90,4 +93,23 @@ void Chem::Ising2D::compute_energy_magn()
     }
     energy *= jint;
     energy -= bfield * magn;
+}
+
+void Chem::Ising2D::visualize_if_requested(double temp, int it) const
+{
+    for (auto& vi : viz) {
+        if (vi == it) {
+            std::string fname = "ising_T" + std::to_string(temp) + "_N" +
+                                std::to_string(it) + ".csv";
+            std::ofstream to;
+            Stdutils::fopen(to, fname);
+
+            for (int i = 0; i < size; ++i) {
+                for (int j = 0; j < size - 1; ++j) {
+                    to << spins(i, j) << ",";
+                }
+                to << spins(i, size - 1) << std::endl;
+            }
+        }
+    }
 }

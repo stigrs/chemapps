@@ -18,6 +18,7 @@
 #include <exception>
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -37,7 +38,8 @@ int main(int argc, char* argv[])
         ("t0", "intial temperature", cxxopts::value<double>()) 
         ("t1", "final temperature", cxxopts::value<double>()) 
         ("ntemp", "number of temperature steps", cxxopts::value<int>()) 
-        ("trials", "number of Monte Carlo trials", cxxopts::value<int>()->default_value("1000"));
+        ("trials", "number of Monte Carlo trials", cxxopts::value<int>()->default_value("1000")) 
+        ("viz", "vizualisation steps", cxxopts::value<std::vector<int>>());
     // clang-format on
 
     auto args = options.parse(argc, argv);
@@ -50,6 +52,8 @@ int main(int argc, char* argv[])
     double t1 = 0.0;
     double jint = 0.0;
     double bfield = 0.0;
+
+    std::vector<int> viz;
 
     if (args.count("help")) {
         std::cout << options.help({"", "Group"}) << '\n';
@@ -67,12 +71,15 @@ int main(int argc, char* argv[])
     if (args.count("t1")) {
         t1 = args["t1"].as<double>();
     }
+    if (args.count("viz")) {
+        viz = args["viz"].as<std::vector<int>>();
+    }
     trials = args["trials"].as<int>();
     jint = args["jint"].as<double>();
     bfield = args["bfield"].as<double>();
 
     try {
-        Chem::Ising2D mod(size, jint, bfield);
+        Chem::Ising2D mod(size, jint, bfield, viz);
         std::cout << "T,E,<M>,Cv,X\n";
 
         auto temp = Numlib::linspace(t0, t1, ntemp);

@@ -11,6 +11,7 @@
 #include <numlib/math.h>
 #include <array>
 #include <random>
+#include <vector>
 
 namespace Chem {
 
@@ -18,7 +19,8 @@ namespace Chem {
 //
 class Ising2D {
 public:
-    Ising2D(int sz, double j, double b, int seed = 0);
+    Ising2D(
+        int sz, double j, double b, const std::vector<int>& v, int seed = 0);
 
     // Perform Metropolis algorithm.
     std::array<double, 4> metropolis(double temp, int mc_trials = 1000);
@@ -29,6 +31,9 @@ private:
 
     // Perform Monte Carlo sampling of spin flips.
     void mc_spin_flip(double beta);
+
+    // Visualize spin matrix.
+    void visualize_if_requested(double temp, int it) const;
 
     // Compute lattice energy.
     void compute_energy_magn();
@@ -47,12 +52,14 @@ private:
     double magn;   // net magnetisation
 
     Numlib::Mat<int> spins; // spin matrix
+    std::vector<int> viz;
 
     std::mt19937_64 mt; // random number engine
 };
 
-inline Ising2D::Ising2D(int sz, double j, double b, int seed)
-    : size(sz), jint(j), bfield(b)
+inline Ising2D::Ising2D(
+    int sz, double j, double b, const std::vector<int>& v, int seed)
+    : size(sz), jint(j), bfield(b), viz(v)
 {
     if (seed == 0) {
         std::random_device rd;
