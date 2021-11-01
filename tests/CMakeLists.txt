@@ -9,9 +9,7 @@ include_directories(${BLAS_INCLUDE_DIRS})
 include_directories(${LAPACKE_INCLUDE_DIRS})
 link_directories(${ChemApps_BINARY_DIR})
 link_directories(${Numlib_LIBRARY_DIRS})
-if(MKL_FOUND)
-    link_directories(${MKL_LIBRARY_DIRS})
-endif()
+link_directories(${BLAS_LIBRARY_DIRS})
 
 # Copy *.inp files to build directory.
 file(GLOB INP_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"

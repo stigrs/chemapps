@@ -62,6 +62,7 @@ find_package(Git)
 
 # Boost is required.
 find_package(Boost 1.54 REQUIRED)
+add_definitions(-DBOOST_ALLOW_DEPRECATED_HEADERS) # silence warnings
 
 # BLAS and LAPACK is required.
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -70,6 +71,7 @@ if(DEFINED ENV{MKLROOT})
 	if(MKL_FOUND)
 		add_definitions(${MKL_DEFINITIONS})
 		set(BLAS_INCLUDE_DIRS ${MKL_INCLUDE_DIRS})
+		set(BLAS_LIBRARY_DIRS ${MKL_LIBRARY_DIRS})
 		set(BLAS_LIBRARIES ${MKL_LIBRARIES})
 	endif()
 else()

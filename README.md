@@ -32,14 +32,16 @@ ChemApps is released under the [MIT](LICENSE) license.
 
 ## Usage of Third Party Libraries
 
-This project makes use of the [Catch](https://https://github.com/philsquared/catch) 
-testing library, code from the [qcl](https://github.com/ben-albrecht/qcl) 
-project, and the [cxxopts](https://github.com/jarro2783/cxxopts) library. 
-Please see the [ThirdPartyNotices.txt](ThirdPartyNotices.txt) file for details 
-regarding the licensing of Catch, qcl, and cxxopts, and cxxopts.
+This project makes use of code from the following third-party libraries:
 
-The user of this software needs to obtain separate licenses for [MOPAC](http://openmopac.net/index.html), 
-[MOPAC 5.022mn](https://comp.chem.umn.edu/mopac/) or [Gaussian](http://gaussian.com/). 
+* [Catch2](https://github.com/catchorg/Catch2)
+* [qcl](https://github.com/ben-albrecht/qcl) 
+* [cxxopts](https://github.com/jarro2783/cxxopts)
+
+Please see the [ThirdPartyNotices.txt](ThirdPartyNotices.txt) file for details 
+regarding the licensing of these libraries
+
+The user of this software needs to obtain separate licenses for [MOPAC](http://openmopac.net/index.html), [MOPAC 5.022mn](https://comp.chem.umn.edu/mopac/) or [Gaussian](http://gaussian.com/). 
 
 ## Quick Start 
 
@@ -50,15 +52,14 @@ The user of this software needs to obtain separate licenses for [MOPAC](http://o
 * [Stdutils](https://github.com/stigrs/stdutils.git)
 * [OpenBLAS](https://www.openblas.net/) 0.3.3 (Intel MKL is recommended)
 
-### Supported Platforms
+### Supported Compilers
 
-The test suite that exercises ChemApps has been built and passes successfully 
-on the following platforms:
-* GNU/Linux using GCC 6.4.0, 7.3.0
-* GNU/Linux using Clang 6.0
-* OS X Sierra (10.12) using Apple Xcode 9.2
-* OS X High Sierra (10.13) using Apple Xcode 9.4, 10.0 
-* Windows using Visual Studio 2017 (x86 and x64)
+| Compiler      | Versions Currently Tested |
+|:--------------|--------------------------:|
+| GCC           | 8                         |
+| Clang         | 10                        |
+| Visual Studio | VS2019 & VS2017           |
+| XCode         | 11.4 & 10.3               |
 
 ### Obtaining the Source Code
 

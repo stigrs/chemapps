@@ -10,9 +10,7 @@ include_directories(${BLAS_INCLUDE_DIRS})
 include_directories(${LAPACKE_INCLUDE_DIRS})
 link_directories(${ChemApps_BINARY_DIR})
 link_directories(${Numlib_LIBRARY_DIRS})
-if(MKL_FOUND)
-    link_directories(${MKL_LIBRARY_DIRS})
-endif()
+link_directories(${BLAS_LIBRARY_DIRS})
 
 if(GIT_FOUND)
     # Add cxxopts
