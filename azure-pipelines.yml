@@ -4,8 +4,8 @@ trigger:
 pr:
   autoCancel: true
 
-## GCC
-#stages:
+# GCC
+stages:
 #- stage: GCC
 #  dependsOn: []
 #  variables:
