@@ -16,14 +16,14 @@ jobs:
   continueOnError: false
 
   steps:
-  - powershell: |
-      Invoke-WebRequest -Uri "https://sourceforge.net/projects/openblas/files/v0.3.7/OpenBLAS-0.3.7-x64.zip/download" -OutFile OpenBLAS.zip
-      mkdir OpenBLAS
-      7z x OpenBLAS.zip -o.\OpenBLAS
-      dir .\OpenBLAS\
-      Invoke-WebRequest -Uri "https://sourceforge.net/projects/boost/files/latest/download" -OutFile boost_1_77_0.7z
-      7z x boost_1_77_0.7z
-      dir .\boost_1_77_0\
+    - script: |
+        git clone --branch master https://github.com/boostorg/boost-ci.git boost-ci-cloned
+        xcopy /s /e /q /i /y boost-ci-cloned\ci .\ci
+        rmdir /s /q boost-ci-cloned
+        ci\azure-pipelines\install.bat
+      displayName: 'Install'
+    - script: ci\build.bat
+      displayName: 'Build'
     name: Prepare
 
 #  - task: CMake@1
