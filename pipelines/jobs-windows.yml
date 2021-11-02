@@ -17,15 +17,15 @@ jobs:
 
   steps:
   - powershell: |
-      Invoke-WebRequest -Uri "https://sourceforge.net/projects/openblas/files/v0.3.7/OpenBLAS-0.3.7-x64.zip/download"
+      Invoke-WebRequest -Uri "https://sourceforge.net/projects/openblas/files/v0.3.7/OpenBLAS-0.3.7-x64.zip/download" -OutFile OpenBLAS.zip
       mkdir OpenBLAS
-      7z x OpenBLAS-0.3.7-x64.zip -o OpenBLAS
+      7z x OpenBLAS.zip -o.\OpenBLAS
       dir .
       dir .\OpenBLAS
-      git clone https://github.com/Microsoft/vcpkg.git
-      .\vcpkg\bootstrap-vcpkg.bat
-      cd vcpkg
-      .\vcpkg install boost
+      Invoke-WebRequest -Uri "https://sourceforge.net/projects/boost/files/latest/download" -OutFile boost_1_77_0.zip
+      7z x boost_1_77_0.zip
+      dir .
+      dir .\boost_1_77_0
     name: Prepare
 
 #  - task: CMake@1
