@@ -1,6 +1,5 @@
 # ChemApps - A C++ Chemistry Toolkit 
-[![Build Status](https://dev.azure.com/stigrs0020/stigrs/_apis/build/status/stigrs.chemapps?branchName=master)](https://dev.azure.com/stigrs0020/stigrs/_build/latest?definitionId=9&branchName=master)[![Build status](https://ci.appveyor.com/api/projects/status/vflq1qqtrk4k34ee?svg=true)](https://ci.appveyor.com/project/stigrs/chemapps)
-
+[![Build Status](https://dev.azure.com/stigrs0020/stigrs/_apis/build/status/stigrs.chemapps?branchName=master)](https://dev.azure.com/stigrs0020/stigrs/_build/latest?definitionId=9&branchName=master)
 
 ChemApps provides a suite of utility tools and programs for thermochemistry
 and chemical kinetics.
