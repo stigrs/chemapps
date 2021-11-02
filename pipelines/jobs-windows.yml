@@ -20,12 +20,10 @@ jobs:
       Invoke-WebRequest -Uri "https://sourceforge.net/projects/openblas/files/v0.3.7/OpenBLAS-0.3.7-x64.zip/download" -OutFile OpenBLAS.zip
       mkdir OpenBLAS
       7z x OpenBLAS.zip -o.\OpenBLAS
-      dir .
-      dir .\OpenBLAS
-      Invoke-WebRequest -Uri "https://sourceforge.net/projects/boost/files/latest/download" -OutFile boost_1_77_0.zip
-      7z x boost_1_77_0.zip
-      dir .
-      dir .\boost_1_77_0
+      dir .\OpenBLAS\
+      Invoke-WebRequest -Uri "https://sourceforge.net/projects/boost/files/latest/download" -OutFile boost_1_77_0.7z
+      7z x boost_1_77_0.7z
+      dir .\boost_1_77_0\
     name: Prepare
 
 #  - task: CMake@1
