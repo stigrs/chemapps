@@ -17,7 +17,7 @@ jobs:
 
   steps:
   - powershell: |
-      Invoke-WebRequest -Uri "https://boostorg.jfrog.io/native/main/release/1.77.0/source/boost_1_77_0.7z"
+      Invoke-WebRequest -Uri "https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.7z" -OutFile boost_1_77_0.7z
       7z x boost_1_77_0.7z
       dir .\boost_1_77_0
     name: Prepare
