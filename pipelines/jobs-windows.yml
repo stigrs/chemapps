@@ -1,0 +1,45 @@
+parameters:
+  jobName: ''
+  imageName: ''
+
+jobs:
+- job:
+  displayName: ${{ parameters.imageName }}
+  pool:
+    vmImage: ${{ parameters.imageName }}
+  strategy:
+    matrix:
+      debug:
+        BUILD_TYPE: 'Debug'
+      release:
+        BUILD_TYPE: 'Release'
+  continueOnError: false
+
+  steps:
+  - powershell: |
+      Invoke-WebRequest -Uri https://sourceforge.net/projects/openblas/files/v0.3.7/OpenBLAS-0.3.7-x64.zip/download -Outfile OpenBLAS.zip Expand-Archive .\OpenBLAS
+      dir .
+      dir .\OpenBLAS
+      git clone https://github.com/Microsoft/vcpkg.git
+      .\vcpkg\bootstrap-vcpkg.bat
+      cd vcpkg
+      .\vcpkg install boost
+    name: Prepare
+
+#  - task: CMake@1
+#    name: Configure
+#    inputs:
+#      workingDirectory: build
+#      cmakeArgs: ' .. '
+#
+#  - task: CMake@1
+#    name: Build
+#    inputs:
+#      workingDirectory: build
+#      cmakeArgs: '--build . --config $(BUILD_TYPE)'
+#
+#  - script: ctest -C $(BUILD_TYPE) --output-on-failure --no-compress-output
+#    name: CTest
+#    workingDirectory: build
+#    failOnStderr: true
+#
