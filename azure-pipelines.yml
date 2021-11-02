@@ -1,9 +1,9 @@
-#trigger:
-#  - master
-#
-#pr:
-#  autoCancel: true
-#
+trigger:
+  - master
+
+pr:
+  autoCancel: true
+
 ## GCC
 #stages:
 #- stage: GCC
