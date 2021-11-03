@@ -22,13 +22,15 @@ jobs:
       Expand-Archive .\openblas.zip .\openblas
       dir .\openblas\include
       dir .\openblas\lib
+      dir $(Build.SourcesDirectory)
+      dir $(Build.SourcesDirectory)\openblas
     name: Prepare
 
   - task: CMake@1
     name: Configure
     inputs:
       workingDirectory: build
-      cmakeArgs: '-DBLAS_DIR=../openblas .. '
+      cmakeArgs: '-DBLAS_DIR=$(Build.SourcesDirectory)/openblas .. '
 
   - task: CMake@1
     name: Build
