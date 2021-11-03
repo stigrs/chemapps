@@ -2,15 +2,14 @@ parameters:
   jobName: ''
   imageName: ''
 
-variables:
-- name: 'BLAS_DIR'
-  value: '.\openblas'
-
 jobs:
 - job:
   displayName: ${{ parameters.imageName }}
   pool:
     vmImage: ${{ parameters.imageName }}
+  variables:
+    BLAS_DIR: '.\openblas'
+
   strategy:
     matrix:
       debug:
