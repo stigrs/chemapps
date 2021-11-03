@@ -21,7 +21,12 @@ jobs:
       mkdir openblas
       Expand-Archive .\openblas.zip .\openblas
       dir .\openblas
+      set BLAS_DIR="$env:Build.SoucesDirectory"\openblas
+    env:
+      BLAS_DIR: $(BLAS_DIR)
     name: Prepare
+
+  - powershell: echo $env:BLAS_DIR
 
 #  - task: CMake@1
 #    name: Configure
