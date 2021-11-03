@@ -9,7 +9,6 @@ jobs:
     vmImage: ${{ parameters.imageName }}
   variables:
     BLAS_DIR: '.\openblas'
-
   strategy:
     matrix:
       debug:
@@ -25,23 +24,19 @@ jobs:
       Expand-Archive .\openblas.zip .\openblas
     name: Prepare
 
-  - powershell: |
-      echo ${env:BLAS_DIR}
-      dir ${env:BLAS_DIR}
+  - task: CMake@1
+    name: Configure
+    inputs:
+      workingDirectory: build
+      cmakeArgs: ' .. '
 
-#  - task: CMake@1
-#    name: Configure
-#    inputs:
-#      workingDirectory: build
-#      cmakeArgs: ' .. '
-#
-#  - task: CMake@1
-#    name: Build
-#    inputs:
-#      workingDirectory: build
-#      cmakeArgs: '--build . --config $(BUILD_TYPE)'
-#
-#  - script: ctest -C $(BUILD_TYPE) --output-on-failure --no-compress-output
-#    name: CTest
-#    workingDirectory: build
-#    failOnStderr: true
+  - task: CMake@1
+    name: Build
+    inputs:
+      workingDirectory: build
+      cmakeArgs: '--build . --config $(BUILD_TYPE)'
+
+  - script: ctest -C $(BUILD_TYPE) --output-on-failure --no-compress-output
+    name: CTest
+    workingDirectory: build
+    failOnStderr: true
