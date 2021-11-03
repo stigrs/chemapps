@@ -7,6 +7,8 @@ jobs:
   displayName: ${{ parameters.imageName }}
   pool:
     vmImage: ${{ parameters.imageName }}
+  variables:
+    BLAS_ROOT: '$(Build.SourcesDirectory)\openblas'
   strategy:
     matrix:
       debug:
@@ -20,17 +22,14 @@ jobs:
       Invoke-WebRequest -Uri "https://sourceforge.net/projects/openblas/files/v0.3.7/OpenBLAS-0.3.7-x64.zip/download" -OutFile openblas.zip -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::Chrome
       mkdir openblas
       Expand-Archive .\openblas.zip .\openblas
-      dir .\openblas\include
-      dir .\openblas\lib
-      dir $(Build.SourcesDirectory)
-      dir $(Build.SourcesDirectory)\openblas
+      dir $env:BLAS_ROOT
     name: Prepare
 
   - task: CMake@1
     name: Configure
     inputs:
       workingDirectory: build
-      cmakeArgs: '-DBLAS_ROOT=$(Build.SourcesDirectory)\openblas .. '
+      cmakeArgs: ' .. '
 
   - task: CMake@1
     name: Build
