@@ -30,7 +30,7 @@ jobs:
     name: Configure
     inputs:
       workingDirectory: build
-      cmakeArgs: '-DBLAS_DIR=$(Build.SourcesDirectory)/openblas .. '
+      cmakeArgs: '-DBLAS_ROOT=$(Build.SourcesDirectory)\openblas .. '
 
   - task: CMake@1
     name: Build
