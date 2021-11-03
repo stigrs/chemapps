@@ -21,12 +21,11 @@ jobs:
       mkdir openblas
       Expand-Archive .\openblas.zip .\openblas
       dir .\openblas
-      set BLAS_DIR="$env:Build.SoucesDirectory"\openblas
-    env:
-      BLAS_DIR: $(BLAS_DIR)
+      Write-Host "Making BLAS_DIR available as an environment variable."
+      Write-Host "##vso[task.setvariable variable=BLAS_DIR;]${env:Build.SourcesDirectory}\openblas"
     name: Prepare
 
-  - powershell: echo $env:BLAS_DIR
+  - powershell: echo ${env:BLAS_DIR}
 
 #  - task: CMake@1
 #    name: Configure
