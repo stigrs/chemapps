@@ -16,7 +16,7 @@ jobs:
   continueOnError: false
 
   steps:
-  - script: brew install boost openblas
+  - script: brew install openblas
     name: Prepare
 
   - task: CMake@1

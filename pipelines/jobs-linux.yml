@@ -16,7 +16,7 @@ jobs:
   continueOnError: false
 
   steps:
-  - script: sudo apt-get install gfortran libboost-all-dev libopenblas-dev liblapacke-dev
+  - script: sudo apt-get install gfortran libopenblas-dev liblapacke-dev
     name: Prepare
 
   - task: CMake@1
