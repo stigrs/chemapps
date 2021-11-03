@@ -2,6 +2,10 @@ parameters:
   jobName: ''
   imageName: ''
 
+variables:
+- name: 'BLAS_DIR'
+  value: '.\openblas'
+
 jobs:
 - job:
   displayName: ${{ parameters.imageName }}
@@ -20,11 +24,11 @@ jobs:
       Invoke-WebRequest -Uri "https://sourceforge.net/projects/openblas/files/v0.3.7/OpenBLAS-0.3.7-x64.zip/download" -OutFile openblas.zip -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::Chrome
       mkdir openblas
       Expand-Archive .\openblas.zip .\openblas
-      Write-Host "##vso[task.setvariable variable=BLAS_DIR;]${env:System.DefaultWorkingDirectory}\openblas"
-      Write-Host "Making ${env:BLAS_DIR} available as an environment variable."
     name: Prepare
 
-  - powershell: echo ${env:BLAS_DIR}
+  - powershell: |
+      echo ${env:BLAS_DIR}
+      dir ${env:BLAS_DIR}
 
 #  - task: CMake@1
 #    name: Configure
