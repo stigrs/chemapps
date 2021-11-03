@@ -7,8 +7,6 @@ jobs:
   displayName: ${{ parameters.imageName }}
   pool:
     vmImage: ${{ parameters.imageName }}
-  variables:
-    BLAS_DIR: '.\openblas'
   strategy:
     matrix:
       debug:
@@ -28,7 +26,7 @@ jobs:
     name: Configure
     inputs:
       workingDirectory: build
-      cmakeArgs: ' .. '
+      cmakeArgs: '-DBLAS_DIR=./openblas .. '
 
   - task: CMake@1
     name: Build
