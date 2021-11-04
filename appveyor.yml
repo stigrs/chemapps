@@ -13,6 +13,7 @@ image:
 cache:
   - C:\cmake-3.8.0-win32-x86
   - C:\local
+  - C:\local\openblas
 
 install:
   - ps: |
@@ -21,7 +22,6 @@ install:
         7z x -y cmake-3.8.0-win32-x86.zip -oC:\
       }
       Invoke-WebRequest -Uri "https://sourceforge.net/projects/openblas/files/v0.3.7/OpenBLAS-0.3.7-x64.zip/download" -OutFile openblas.zip -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::Chrome
-      mkdir openblas
       Expand-Archive .\openblas.zip "C:\local\openblas"
       $env:BLAS_ROOT="C:\local\openblas"
       $env:PATH="C:\cmake-3.8.0-win32-x86\bin;C:\local\openblas\bin;$env:PATH"
