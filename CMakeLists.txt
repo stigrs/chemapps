@@ -73,7 +73,6 @@ if(DEFINED ENV{MKLROOT})
 else()
     find_package(OpenBLAS)
 endif()
-message(${BLAS_LIBRARIES})
 
 # Stdutils is required.
 find_package(Stdutils)
