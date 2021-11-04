@@ -23,7 +23,7 @@ install:
       }
       Invoke-WebRequest -Uri "https://sourceforge.net/projects/openblas/files/v0.3.7/OpenBLAS-0.3.7-x64.zip/download" -OutFile openblas.zip -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::Chrome
       Expand-Archive .\openblas.zip "C:\local\openblas"
-      dir "C:\local\openblas"
+      $env:BLAS_ROOT="C:\local\openblas"
       $env:PATH="C:\cmake-3.8.0-win32-x86\bin;C:\local\openblas\bin;$env:PATH"
 before_build:
   - ps: |
