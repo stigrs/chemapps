@@ -73,6 +73,7 @@ if(DEFINED ENV{MKLROOT})
 else()
     find_package(OpenBLAS)
 endif()
+message(${BLAS_LIBRARIES})
 
 # Stdutils is required.
 find_package(Stdutils)
@@ -125,7 +126,7 @@ endif()
 # Build the software:
 
 add_subdirectory(lib)
-#add_subdirectory(src)
+add_subdirectory(src)
 
 # Enable testing.
 option(BUILD_TESTS "Build tests." ON)
